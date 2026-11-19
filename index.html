@@ -6,311 +6,849 @@
 <title>K-Pop Lingua</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root { --bg: #12101c; --card: #1e1a2e; --accent: #ff2e93; --secondary: #8a2be2; --text: #ffffff; --muted: #a09cb0; --success: #00e676; }
-* { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; user-select: none; }
-.header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1e1a2e; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10; }
-.badge { background: rgba(255,46,147,0.15); border: 1px solid var(--accent); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-.screen { display: none; padding: 20px; }
+:root {
+  --bg: #0e0b16;
+  --surface: #191426;
+  --surface-2: #241e38;
+  --accent: #ff2e93;
+  --purple: #8a2be2;
+  --cyan: #00e5ff;
+  --gold: #ffd700;
+  --success: #00e676;
+  --danger: #ff4757;
+  --text: #ffffff;
+  --muted: #9b93b3;
+}
+* { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; user-select: none; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: rgba(25,20,38,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; }
+.brand { font-weight: 800; font-size: 17px; background: linear-gradient(90deg, #ff7ac6, #a56eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stats { display: flex; gap: 8px; }
+.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 5px 11px; border-radius: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); }
+.pill.xp { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.1); }
+
+/* Screens */
+.screen { display: none; padding: 18px; animation: fadeIn 0.2s ease; }
 .screen.active { display: block; }
-.lesson-card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2d2844; gap: 12px; }
-.lesson-card.completed { border-color: var(--success); }
-.btn { background: linear-gradient(135deg, var(--accent), var(--secondary)); color: white; border: none; padding: 11px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; flex-shrink: 0; }
-.btn:active { transform: scale(0.97); }
-.theory-box { background: var(--card); padding: 20px; border-radius: 16px; line-height: 1.6; margin-bottom: 20px; border: 1px solid #2d2844; }
-.theory-box h3 { margin-top: 0; color: #ff7ac6; }
-.korean-word { font-size: 40px; font-weight: bold; text-align: center; margin: 20px 0; padding: 22px; background: rgba(138,43,226,0.2); border-radius: 16px; border: 1px solid rgba(138,43,226,0.4); }
-.translit { font-size: 18px; color: #ff7ac6; margin-top: 6px; font-weight: 600; }
-.audio-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 24px; font-weight: bold; font-size: 14px; cursor: pointer; }
-.audio-status { display: block; font-size: 12px; color: var(--muted); margin-top: 8px; font-weight: normal; }
-.option-btn { display: block; width: 100%; text-align: left; background: var(--card); border: 1px solid #383252; color: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; font-size: 15px; cursor: pointer; }
-.option-btn.correct { background: rgba(0,230,118,0.25); border-color: var(--success); }
-.option-btn.wrong { background: rgba(255,46,147,0.25); border-color: var(--accent); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Module Banner */
+.module-banner { background: linear-gradient(135deg, #2d144d, #4d1344); border: 1px solid rgba(255,46,147,0.4); border-radius: 20px; padding: 18px; margin-bottom: 18px; position: relative; overflow: hidden; }
+.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 10px; margin-bottom: 8px; color: #ff99d6; }
+.module-banner h2 { margin: 0 0 6px; font-size: 20px; }
+.module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
+.bar-bg { background: rgba(0,0,0,0.35); height: 8px; border-radius: 8px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.35s ease; }
+
+/* Lesson Cards */
+.lesson-card { background: var(--surface); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; }
+.lesson-card.done { border-color: rgba(0,230,118,0.45); }
+.lesson-card.exam { background: linear-gradient(135deg, #23193b, #361c3d); border: 1px solid rgba(255,215,0,0.45); }
+.lesson-card.locked { opacity: 0.5; }
+.l-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.l-title { font-weight: 700; font-size: 15px; }
+
+/* Buttons */
+.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 18px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; transition: transform 0.1s; }
+.btn:active { transform: scale(0.96); }
+.btn.full { width: 100%; padding: 15px; font-size: 15px; }
+.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); }
+.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Study Screen */
+.study-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.close-btn { background: var(--surface-2); color: #fff; border: none; width: 36px; height: 36px; border-radius: 12px; font-size: 18px; cursor: pointer; }
+.study-progress { flex: 1; }
+.step-count { font-size: 12px; color: var(--muted); font-weight: 700; }
+
+.card-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; margin-bottom: 16px; line-height: 1.55; }
+.card-box h3 { margin: 0 0 10px; color: #ff85cb; font-size: 18px; }
+.card-box p { margin: 0 0 12px; font-size: 14px; color: #e6e1f2; }
+
+.example-list { display: grid; gap: 10px; margin-top: 12px; }
+.example-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; }
+.example-row:active { background: #30284a; }
+.ex-kr { font-size: 24px; font-weight: 800; color: #fff; min-width: 72px; }
+.ex-info { flex: 1; padding: 0 10px; }
+.ex-tr { font-size: 13px; color: var(--cyan); font-weight: 700; }
+.ex-ru { font-size: 12px; color: var(--muted); }
+.ex-play { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,46,147,0.2); color: #ff7ac6; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+.prompt-word { text-align: center; background: linear-gradient(180deg, rgba(138,43,226,0.2), rgba(255,46,147,0.1)); border: 1px solid rgba(138,43,226,0.4); border-radius: 20px; padding: 22px 16px; margin-bottom: 16px; }
+.big-kr { font-size: 44px; font-weight: 800; letter-spacing: 2px; }
+.big-tr { font-size: 15px; color: var(--cyan); margin-top: 6px; font-weight: 600; }
+.audio-pill { margin-top: 12px; background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 24px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+.opt-btn { display: block; width: 100%; text-align: left; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; padding: 15px 16px; border-radius: 14px; margin-bottom: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.15s; }
+.opt-btn.correct { background: rgba(0,230,118,0.18); border-color: var(--success); }
+.opt-btn.wrong { background: rgba(255,71,87,0.18); border-color: var(--danger); }
+
+/* Builder Exercise */
+.build-slots { min-height: 64px; background: var(--surface); border: 2px dashed rgba(255,255,255,0.18); border-radius: 16px; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-bottom: 16px; }
+.build-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 18px; }
+.chip { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; padding: 12px 18px; border-radius: 14px; font-size: 20px; font-weight: 800; cursor: pointer; }
+.chip.used { opacity: 0.25; pointer-events: none; }
+.chip.in-slot { background: rgba(138,43,226,0.35); border-color: var(--purple); }
+
+.feedback-bar { padding: 14px 16px; border-radius: 14px; margin-bottom: 14px; font-size: 14px; font-weight: 600; display: none; }
+.feedback-bar.ok { display: block; background: rgba(0,230,118,0.15); border: 1px solid var(--success); color: #9effc7; }
+.feedback-bar.err { display: block; background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: #ffb3ba; }
+
+/* Binder / Albums */
+.tabs-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
+.subtab { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.subtab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .binder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.collect-card { background: var(--card); border-radius: 16px; padding: 15px; text-align: center; border: 1px solid #333; }
-.collect-card.locked { filter: grayscale(1) opacity(0.35); }
-.collect-card.ssr { border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.25); }
-.nav { position: fixed; bottom: 0; left: 0; right: 0; background: #181526; display: flex; justify-content: space-around; padding: 14px 0; border-top: 1px solid #333; }
-.nav-item { color: var(--muted); font-size: 14px; cursor: pointer; }
-.nav-item.active { color: var(--accent); font-weight: bold; }
+.photocard { background: linear-gradient(160deg, #251e3d, #171226); border-radius: 18px; padding: 14px 12px; text-align: center; border: 1.5px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+.photocard.locked { filter: grayscale(1) opacity(0.4); }
+.photocard.sr { border-color: #b46eff; box-shadow: 0 0 14px rgba(138,43,226,0.28); }
+.photocard.ssr { border: 2px solid var(--gold); box-shadow: 0 0 18px rgba(255,215,0,0.3); }
+.pc-rarity { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 8px; background: rgba(0,0,0,0.45); }
+.pc-art { height: 110px; border-radius: 12px; background: radial-gradient(circle, rgba(255,46,147,0.22), rgba(18,14,30,0.6)); display: flex; align-items: center; justify-content: center; font-size: 52px; margin-bottom: 10px; }
+.pc-name { font-weight: 800; font-size: 14px; }
+.pc-role { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* Shop */
+.shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.shop-item.vip { background: linear-gradient(135deg, #2f1d4a, #42183f); border-color: var(--gold); }
+
+/* Leaderboard */
+.league-card { background: linear-gradient(135deg, #1b2142, #2e1842); border: 1px solid rgba(0,229,255,0.3); border-radius: 18px; padding: 16px; margin-bottom: 16px; text-align: center; }
+.rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+.rank-row.me { border-color: var(--accent); background: rgba(255,46,147,0.12); }
+.rank-pos { width: 30px; font-weight: 800; font-size: 16px; }
+.rank-name { flex: 1; font-weight: 700; font-size: 14px; }
+.rank-xp { font-weight: 800; color: var(--cyan); font-size: 14px; }
+
+/* Bottom Nav */
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20,16,32,0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 10px 0 14px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
+.nav-item { color: var(--muted); font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.nav-item span { font-size: 20px; }
+.nav-item.active { color: var(--accent); }
 </style>
 </head>
 <body>
-<div class="header"><b>✨ K-Pop Lingua</b><div class="badge">🎤 <span id="coins">50</span></div></div>
-<div id="screen-lessons" class="screen active"><h3 style="margin-top:0">Путь трейни (Программа)</h3><div id="lessons-list"></div></div>
-<div id="screen-study" class="screen"><button class="btn" style="background:#2d2844;margin-bottom:15px" onclick="switchTab('lessons')">← Назад</button><div id="study-content"></div></div>
-<div id="screen-binder" class="screen"><h3 style="margin-top:0">Твой Биндер карточек</h3><button class="btn" style="width:100%;margin-bottom:15px;padding:14px" onclick="buyPack()">🎁 Открыть K-Pop пак (50 🎤)</button><div class="binder-grid" id="binder-grid"></div></div>
-<div class="nav"><div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')">📚 Уроки</div><div class="nav-item" id="nav-binder" onclick="switchTab('binder')">🃏 Биндер</div></div>
+
+<div class="header">
+  <div class="brand">✨ K-Pop Lingua</div>
+  <div class="stats">
+    <div class="pill xp">⚡ <span id="xp-val">0</span> XP</div>
+    <div class="pill coins">🎤 <span id="coins-val">50</span></div>
+  </div>
+</div>
+
+<!-- LESSONS -->
+<div id="screen-lessons" class="screen active">
+  <div class="module-banner">
+    <div class="module-tag">Блок 1 • Новичок (TOPIK 0→1)</div>
+    <h2>Стажировка: Код Хангыля</h2>
+    <p>Научись уверенно читать корейские буквы, имена айдолов и первые слова без подсказок.</p>
+    <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
+  </div>
+  <div id="lessons-list"></div>
+</div>
+
+<!-- STUDY -->
+<div id="screen-study" class="screen">
+  <div class="study-top">
+    <button class="close-btn" onclick="switchTab('lessons')">✕</button>
+    <div class="study-progress"><div class="bar-bg"><div class="bar-fill" id="study-bar" style="width: 0%"></div></div></div>
+    <div class="step-count" id="step-count">1/6</div>
+  </div>
+  <div id="study-body"></div>
+</div>
+
+<!-- BINDER / ALBUMS -->
+<div id="screen-binder" class="screen">
+  <h3 style="margin:0 0 12px">🃏 Витрина и Альбомы</h3>
+  <div class="tabs-row" id="album-tabs">
+    <button class="subtab active" onclick="setAlbum('all', this)">Все карты</button>
+    <button class="subtab" onclick="setAlbum('trainee', this)">Эра: Трейни</button>
+    <button class="subtab" onclick="setAlbum('debut', this)">Эра: Дебют</button>
+  </div>
+  <button class="btn full" style="margin-bottom:16px" onclick="buyPack(50, 'any')">🎁 Открыть Чиби-пак (50 🎤)</button>
+  <div class="binder-grid" id="binder-grid"></div>
+</div>
+
+<!-- SHOP -->
+<div id="screen-shop" class="screen">
+  <h3 style="margin:0 0 14px">🛍 Магазин агентства</h3>
+  <div class="shop-item vip">
+    <div>
+      <div class="l-title">👑 VIP Trainee Pass (30 дней)</div>
+      <div class="l-meta">×2 опыта и 🎤 за уроки, безлимит на экзамены, эксклюзивная рамка</div>
+    </div>
+    <button class="btn gold" onclick="demoDonate('VIP Pass')">150 ⭐</button>
+  </div>
+  <div class="shop-item">
+    <div>
+      <div class="l-title">💿 Дебютный бокс (3 карты)</div>
+      <div class="l-meta">Гарантированная карта SR или SSR в альбом «Дебют»</div>
+    </div>
+    <button class="btn" onclick="demoDonate('Дебютный бокс')">75 ⭐</button>
+  </div>
+  <div class="shop-item">
+    <div>
+      <div class="l-title">🎤 Мешок микрофонов (+300 🎤)</div>
+      <div class="l-meta">Хватит на 6 обычных чиби-паков в витрине</div>
+    </div>
+    <button class="btn" onclick="demoDonate('300 микрофонов')">50 ⭐</button>
+  </div>
+  <div class="card-box" style="margin-top:16px;font-size:13px;color:var(--muted)">
+    💡 Оплата через <b>Telegram Stars (⭐)</b> будет подключена на следующем этапе вместе с сервером. Сейчас можно тестировать интерфейс.
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="screen-rank" class="screen">
+  <div class="league-card">
+    <div class="module-tag">Недельный зачёт • Лига Трейни</div>
+    <h3 style="margin:4px 0 6px">🏆 Топ-3 получают SSR-карту!</h3>
+    <div style="font-size:13px;color:#c9bedf">До конца недели: 4 дня 12 часов</div>
+  </div>
+  <div id="rank-list"></div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')"><span>📚</span>Уроки</div>
+  <div class="nav-item" id="nav-binder" onclick="switchTab('binder')"><span>🃏</span>Альбомы</div>
+  <div class="nav-item" id="nav-shop" onclick="switchTab('shop')"><span>🛍</span>Магазин</div>
+  <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
+</div>
 
 <script>
-if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
+if (window.Telegram && window.Telegram.WebApp) {
+  window.Telegram.WebApp.expand();
+}
 
+/* ====== КУРС: БЛОК 1 (МЕТОДИКА SEJONG + K-POP) ====== */
 const LESSONS = [
   {
     id: 1,
-    title: "Глава 1. Хангыль: Первые буквы",
-    desc: "Читаем имя Лисы из BLACKPINK",
+    title: "Урок 1. Гласные и «невидимка» ㅇ",
+    desc: "6 базовых гласных • 7 шагов",
     coins: 50,
-    card: 1,
-    theory: "<h3>Корейский алфавит как конструктор</h3><p>Корейские буквы складываются в квадратные слоги:</p><p>• <b>ㄹ</b> [Р/Л] + <b>ㅣ</b> [И] = <b>리 (Ли)</b><br>• <b>ㅅ</b> [С] + <b>ㅏ</b> [А] = <b>사 (Са)</b></p><p>Соединяем два слога и получаем имя: <b>리사 — Лиса!</b></p>",
-    qs: [
-      { w: "리사", tr: "[Ли-са]", file: "audio/lisa.mp3", q: "Как читается это имя участницы BLACKPINK?", o: ["Лиса", "Джису", "Розэ", "Дженни"], c: 0 },
-      { w: "사", tr: "[Са]", file: "audio/sa.mp3", q: "Какой это слог (ㅅ + ㅏ)?", o: ["Ри", "Са", "Ма", "Но"], c: 1 }
+    xp: 80,
+    cardId: 1,
+    steps: [
+      {
+        type: "theory",
+        title: "Секрет кружочка ㅇ",
+        text: "В корейском гласная никогда не пишется одна. Если слог начинается с гласного звука, перед ним ставят немой кружочек <b>ㅇ</b>. Нажимай на карточки ниже, чтобы услышать звук:",
+        examples: [
+          { kr: "아", tr: "[а]", ru: "Вертикальная, черта вправо", file: "audio/a.mp3" },
+          { kr: "어", tr: "[о] открытое", ru: "Как «о» с широким ртом", file: "audio/eo.mp3" },
+          { kr: "오", tr: "[о] округлое", ru: "Губы трубочкой, черта вверх", file: "audio/o.mp3" },
+          { kr: "우", tr: "[у]", ru: "Черта смотрит вниз", file: "audio/u.mp3" },
+          { kr: "으", tr: "[ы]", ru: "Просто ровная линия", file: "audio/eu.mp3" },
+          { kr: "이", tr: "[и]", ru: "Просто вертикальная палочка", file: "audio/i.mp3" }
+        ]
+      },
+      {
+        type: "choice",
+        kr: "아", tr: "Нажми, чтобы послушать", file: "audio/a.mp3",
+        q: "Какой звук даёт этот слог?",
+        opts: ["[а]", "[у]", "[и]", "[ы]"],
+        correct: 0,
+        explain: "ㅇ не читается, а ㅏ (черта вправо) — это звук [а]."
+      },
+      {
+        type: "choice",
+        kr: "우", tr: "Подсказка: черта вниз", file: "audio/u.mp3",
+        q: "Как читается этот слог?",
+        opts: ["[о]", "[и]", "[у]", "[а]"],
+        correct: 2,
+        explain: "ㅜ смотрит вниз — это звук [у]."
+      },
+      {
+        type: "theory",
+        title: "Первое настоящее слово!",
+        text: "Из одних только гласных уже получаются слова. Например, корейское слово «ребёнок» звучит почти как начало слова «айдол»:",
+        examples: [
+          { kr: "아이", tr: "[а-и]", ru: "Ребёнок (아 + 이)", file: "audio/ai.mp3" },
+          { kr: "우유", tr: "[у-ю]", ru: "Молоко (любимый напиток в дорамах)", file: "audio/uyu.mp3" },
+          { kr: "오이", tr: "[о-и]", ru: "Огурец", file: "audio/oi.mp3" }
+        ]
+      },
+      {
+        type: "build",
+        q: "Собери слово «Ребёнок» [а-и]",
+        file: "audio/ai.mp3",
+        audioText: "아이",
+        answer: ["아", "이"],
+        pool: ["우", "아", "오", "이", "으"],
+        explain: "Отлично! 아 [а] + 이 [и] = 아이."
+      },
+      {
+        type: "build",
+        q: "Собери слово «Огурец» [о-и]",
+        file: "audio/oi.mp3",
+        audioText: "오이",
+        answer: ["오", "이"],
+        pool: ["이", "어", "오", "아"],
+        explain: "Точно! 오 [о] + 이 [и] = 오이."
+      }
     ]
   },
   {
     id: 2,
-    title: "Глава 2. Слоги-блоки и кружочек ㅇ",
-    desc: "Учимся читать имя Джина из BTS",
+    title: "Урок 2. Первые согласные",
+    desc: "ㄱ, ㄴ, ㅁ, ㅅ, ㄹ • Читаем имена айдолов",
     coins: 60,
-    card: 2,
-    theory: "<h3>Секрет пустого кружочка ㅇ</h3><p>В начале слога буква <b>ㅇ</b> не читается — она просто держит гласную. А внизу слога (в патчиме) читается как носовое <b>[Н]</b>.</p><p>• <b>ㅈ</b> [Чж] + <b>ㅣ</b> [И] + <b>ㄴ</b> [Н] = <b>진 (Джин)</b><br>• <b>ㅇ</b> + <b>ㅏ</b> [А] + <b>ㄴ</b> [Н] = <b>안 (Ан)</b></p>",
-    qs: [
-      { w: "진", tr: "[Джин]", file: "audio/jin.mp3", q: "Как читается имя этого участника BTS?", o: ["Ви", "Джин", "Шуга", "Чимин"], c: 1 },
-      { w: "안녕", tr: "[Ан-нён]", file: "audio/annyeong.mp3", q: "Как переводится главное приветствие Аннён?", o: ["Привет / Пока", "Спасибо", "Извини", "Помогите"], c: 0 }
+    xp: 100,
+    cardId: 2,
+    steps: [
+      {
+        type: "theory",
+        title: "5 главных согласных",
+        text: "Когда приходит согласная, она встаёт на место кружочка <b>ㅇ</b>. Запомни форму букв — она напоминает положение языка и губ:",
+        examples: [
+          { kr: "ㄱ", tr: "[к / г]", ru: "В начале — ближе к [к], между гласными — [г]", file: "audio/ga.mp3" },
+          { kr: "ㄴ", tr: "[н]", ru: "Кончик языка упирается вверх", file: "audio/na.mp3" },
+          { kr: "ㅁ", tr: "[м]", ru: "Квадратик — похож на закрытый рот", file: "audio/ma.mp3" },
+          { kr: "ㅅ", tr: "[с / щ]", ru: "Перед «и» (시) смягчается в [щи]", file: "audio/sa.mp3" },
+          { kr: "ㄹ", tr: "[р / л]", ru: "Змея: между гласными мягкое [р]", file: "audio/ra.mp3" }
+        ]
+      },
+      {
+        type: "theory",
+        title: "Читаем имена и слова",
+        text: "Посмотри, как легко складываются имена звёзд и базовые местоимения:",
+        examples: [
+          { kr: "리사", tr: "[Ли-са]", ru: "Лиса (ㄹ+ㅣ = 리, ㅅ+ㅏ = 사)", file: "audio/lisa.mp3" },
+          { kr: "미나", tr: "[Ми-на]", ru: "Мина из TWICE (ㅁ+ㅣ, ㄴ+ㅏ)", file: "audio/mina.mp3" },
+          { kr: "나", tr: "[на]", ru: "Я (неформально, часто в песнях)", file: "audio/na.mp3" },
+          { kr: "너", tr: "[но]", ru: "Ты (неформально)", file: "audio/neo.mp3" }
+        ]
+      },
+      {
+        type: "choice",
+        kr: "미나", tr: "ㅁ+ㅣ и ㄴ+ㅏ", file: "audio/mina.mp3",
+        q: "Какое имя здесь написано?",
+        opts: ["Лиса", "Мина", "Соми", "Наён"],
+        correct: 1,
+        explain: "ㅁ [м] + ㅣ [и] = 미, ㄴ [н] + ㅏ [а] = 나 → Мина!"
+      },
+      {
+        type: "choice",
+        kr: "너", tr: "ㄴ + ㅓ", file: "audio/neo.mp3",
+        q: "Как переводится это местоимение?",
+        opts: ["Я", "Ты", "Мы", "Любовь"],
+        correct: 1,
+        explain: "나 — это «Я», а 너 — это «Ты»."
+      },
+      {
+        type: "build",
+        q: "Собери имя «Лиса» [Ли-са]",
+        file: "audio/lisa.mp3",
+        audioText: "리사",
+        answer: ["리", "사"],
+        pool: ["미", "사", "나", "리"],
+        explain: "리 [ли] + 사 [са] = 리사!"
+      },
+      {
+        type: "build",
+        q: "Собери имя «Соми» [Со-ми]",
+        file: "audio/somi.mp3",
+        audioText: "소미",
+        answer: ["소", "미"],
+        pool: ["미", "사", "소", "리"],
+        explain: "ㅅ+ㅗ = 소 [со], ㅁ+ㅣ = 미 [ми] → 소미!"
+      }
     ]
   },
   {
     id: 3,
-    title: "Глава 3. Главные слова из песен",
-    desc: "Переводим припевы: Любовь и Супер",
+    title: "Урок 3. Согласные ㅂ, ㄷ, ㅈ, ㅎ",
+    desc: "Слова из песен и шоу • 6 шагов",
     coins: 70,
-    card: 3,
-    theory: "<h3>Словарь каждого K-pop фаната</h3><p>• <b>사랑해 (Саранхэ)</b> — Я тебя люблю (неформально, так айдолы говорят фанатам).<br>• <b>대박 (Тэбак)</b> — Супер / Вау / Офигеть!<br>• <b>화이팅 (Файтин)</b> — Вперед / Удачи / Не сдавайся!</p>",
-    qs: [
-      { w: "사랑해", tr: "[Са-ран-хэ]", file: "audio/saranghae.mp3", q: "Что означает эта фраза в песнях?", o: ["Доброе утро", "Я тебя люблю", "Не уходи", "С днем рождения"], c: 1 },
-      { w: "대박", tr: "[Тэ-бак]", file: "audio/daebak.mp3", q: "Когда корейцы кричат Тэбак?", o: ["Когда видят что-то крутое (Вау!)", "Когда прощаются", "Когда хотят спать"], c: 0 },
-      { w: "화이팅", tr: "[Хва-и-тин / Файтин]", file: "audio/fighting.mp3", q: "Что значит слово Файтин?", o: ["Вперед / Удачи!", "Тишина", "Прощай"], c: 0 }
+    xp: 120,
+    cardId: 3,
+    steps: [
+      {
+        type: "theory",
+        title: "Ещё 4 ключевые буквы",
+        text: "Запомни ассоциации, чтобы читать их на автомате:",
+        examples: [
+          { kr: "ㅂ", tr: "[п / б]", ru: "Похожа на стакан с водой (Bucket → Б/П)", file: "audio/ba.mp3" },
+          { kr: "ㄷ", tr: "[т / д]", ru: "Похожа на дверной проём (Door → Д/Т)", file: "audio/da.mp3" },
+          { kr: "ㅈ", tr: "[ч / дж]", ru: "Как ㅅ с крышей сверху", file: "audio/ja.mp3" },
+          { kr: "ㅎ", tr: "[х]", ru: "Человечек в шляпе (Hat → Х)", file: "audio/ha.mp3" }
+        ]
+      },
+      {
+        type: "theory",
+        title: "Словарь K-pop шоу",
+        text: "Эти слова ты слышишь в каждом втором эпизоде Run BTS или Going Seventeen:",
+        examples: [
+          { kr: "바보", tr: "[па-бо]", ru: "Дурачок / глупыш (часто шутливо)", file: "audio/babo.mp3" },
+          { kr: "하나", tr: "[ха-на]", ru: "Один (в счёте «Хана, туль, сет!»)", file: "audio/hana.mp3" },
+          { kr: "지수", tr: "[Джи-су]", ru: "Джису (ㅈ+ㅣ, ㅅ+ㅜ)", file: "audio/jisoo.mp3" },
+          { kr: "모자", tr: "[мо-джа]", ru: "Шапка / кепка", file: "audio/moja.mp3" }
+        ]
+      },
+      {
+        type: "choice",
+        kr: "바보", tr: "ㅂ+ㅏ и ㅂ+ㅗ", file: "audio/babo.mp3",
+        q: "Что означает слово 바보?",
+        opts: ["Один", "Дурачок", "Кепка", "Привет"],
+        correct: 1,
+        explain: "В начале ㅂ звучит глуше [п], а между гласными озвончается в [б] → па-бо."
+      },
+      {
+        type: "choice",
+        kr: "하나", tr: "ㅎ+ㅏ и ㄴ+ㅏ", file: "audio/hana.mp3",
+        q: "Что кричат айдолы перед фото, говоря «하나»?",
+        opts: ["Сыр!", "Один (Раз!)", "Стоп", "Вперёд"],
+        correct: 1,
+        explain: "하나 [хана] — это «один» (корейский счёт)."
+      },
+      {
+        type: "build",
+        q: "Собери имя «Джису» [Джи-су]",
+        file: "audio/jisoo.mp3",
+        audioText: "지수",
+        answer: ["지", "수"],
+        pool: ["수", "사", "지", "하"],
+        explain: "ㅈ+ㅣ = 지, ㅅ+ㅜ = 수 → 지수!"
+      }
     ]
   },
   {
     id: 4,
-    title: "Глава 4. Обращения: Оппа, Онни, Хён",
-    desc: "Как правильно обращаться к старшим",
+    title: "Урок 4. Секрет Патчима",
+    desc: "3-буквенные слоги • Джин, Привет и Любовь",
     coins: 80,
-    card: 4,
-    theory: "<h3>В Корее возраст решает всё</h3><p>Старших нельзя звать просто по имени — нужно добавлять особое слово:</p><p>• <b>오빠 (Оппа)</b> — девушка к старшему парню/айдолу.<br>• <b>언니 (Онни)</b> — девушка к старшей девушке.<br>• <b>형 (Хён)</b> — парень к старшему парню.<br>• <b>막내 (Макнэ)</b> — самый младший участник в группе.</p>",
-    qs: [
-      { w: "언니", tr: "[Он-ни]", file: "audio/eonni.mp3", q: "Кто и к кому обращается словом Онни?", o: ["Девушка к старшей девушке", "Парень к старшему парню", "Девушка к парню"], c: 0 },
-      { w: "막내", tr: "[Мак-нэ]", file: "audio/maknae.mp3", q: "Кого в K-pop группе называют Макнэ?", o: ["Лидера группы", "Самого младшего участника", "Главного танцора"], c: 1 }
+    xp: 140,
+    cardId: 4,
+    steps: [
+      {
+        type: "theory",
+        title: "Что такое Патчим (받침)?",
+        text: "Патчим — это согласная, которая ставится <b>в самый низ слога</b>. Она закрывает слог. Важно: кружочек <b>ㅇ</b> внизу перестаёт быть немым и читается как носовое <b>[н]</b> (как английское -ng)!",
+        examples: [
+          { kr: "진", tr: "[Джин]", ru: "ㅈ + ㅣ + ㄴ (снизу)", file: "audio/jin.mp3" },
+          { kr: "안", tr: "[Ан]", ru: "ㅇ (немой) + ㅏ + ㄴ (снизу)", file: "audio/an.mp3" },
+          { kr: "사랑", tr: "[Са-ран]", ru: "Любовь (в 랑 снизу носовое ㅇ)", file: "audio/sarang.mp3" },
+          { kr: "안녕", tr: "[Ан-нён]", ru: "Привет / Пока (неформально)", file: "audio/annyeong.mp3" }
+        ]
+      },
+      {
+        type: "choice",
+        kr: "사랑", tr: "ㅅ+ㅏ и ㄹ+ㅏ+ㅇ", file: "audio/sarang.mp3",
+        q: "Как переводится главное слово K-pop баллад 사랑?",
+        opts: ["Скучаю", "Любовь", "Звезда", "Музыка"],
+        correct: 1,
+        explain: "사랑 [саран] — любовь. Отсюда и знаменитое 사랑해 (люблю тебя)."
+      },
+      {
+        type: "choice",
+        kr: "진", tr: "ㅈ + ㅣ + ㄴ", file: "audio/jin.mp3",
+        q: "Какая буква здесь стоит в патчиме (внизу)?",
+        opts: ["ㄱ [к]", "ㄴ [н]", "ㅁ [м]", "ㅇ [н]"],
+        correct: 1,
+        explain: "Внизу стоит ㄴ [н], поэтому читается Джи-н."
+      },
+      {
+        type: "build",
+        q: "Собери слово «Привет» [Ан-нён]",
+        file: "audio/annyeong.mp3",
+        audioText: "안녕",
+        answer: ["안", "녕"],
+        pool: ["녕", "랑", "안", "진"],
+        explain: "안 [ан] + 녕 [нён] = 안녕!"
+      },
+      {
+        type: "build",
+        q: "Собери слово «Любовь» [Са-ран]",
+        file: "audio/sarang.mp3",
+        audioText: "사랑",
+        answer: ["사", "랑"],
+        pool: ["랑", "진", "사", "안"],
+        explain: "사 [са] + 랑 [ран] = 사랑!"
+      }
     ]
   },
   {
     id: 5,
-    title: "Глава 5. Разбор хитов: BTS и Stray Kids",
-    desc: "Понимаем строчки без субтитров",
-    coins: 100,
-    card: 5,
-    theory: "<h3>Фразы прямо из припевов</h3><p>• <b>보고 싶어 (Пого щипо)</b> — Я скучаю по тебе (культовая строчка из Spring Day — BTS).<br>• <b>미쳤어 (Мичхоссо)</b> — С ума сойти / Безумие.<br>• <b>진짜 (Чинчча)</b> — Правда? / Реально?</p>",
-    qs: [
-      { w: "보고 싶어", tr: "[По-го щи-по]", file: "audio/bogoshipo.mp3", q: "Как переводится строчка Пого щипо?", o: ["Я скучаю по тебе", "Я иду домой", "Танцуй со мной"], c: 0 },
-      { w: "진짜", tr: "[Чин-чча]", file: "audio/jinjja.mp3", q: "Что спрашивает айдол, говоря Чинчча?", o: ["Который час?", "Правда? / Реально?", "Где микрофон?"], c: 1 }
+    isExam: true,
+    title: "🏆 Экзамен: Оценка трейни",
+    desc: "Без подсказок! Награда: +150 🎤 и SSR-карта",
+    coins: 150,
+    xp: 250,
+    cardId: 5,
+    steps: [
+      {
+        type: "choice",
+        kr: "리사", tr: "Без подсказок!", file: "audio/lisa.mp3",
+        q: "Прочитай имя:",
+        opts: ["Джису", "Лиса", "Мина", "Соми"],
+        correct: 1,
+        explain: "리 [ли] + 사 [са] = Лиса."
+      },
+      {
+        type: "choice",
+        kr: "하나", tr: "Без подсказок!", file: "audio/hana.mp3",
+        q: "Что означает это слово?",
+        opts: ["Дурачок", "Любовь", "Один", "Ребёнок"],
+        correct: 2,
+        explain: "하나 [хана] — один."
+      },
+      {
+        type: "build",
+        q: "Собери слово «Дурачок» [па-бо]",
+        file: "audio/babo.mp3",
+        audioText: "바보",
+        answer: ["바", "보"],
+        pool: ["보", "나", "바", "모"],
+        explain: "바 + 보 = 바보!"
+      },
+      {
+        type: "build",
+        q: "Собери слово «Любовь» [са-ран]",
+        file: "audio/sarang.mp3",
+        audioText: "사랑",
+        answer: ["사", "랑"],
+        pool: ["안", "사", "녕", "랑"],
+        explain: "사랑 — любовь. Экзамен сдан!"
+      }
     ]
   }
 ];
 
+/* ====== КАРТОЧКИ (ГОТОВЫ ПОД ЧИБИ-PNG) ====== */
 const CARDS = [
-  { id: 1, name: "Стажер Сеула", r: "R", e: "🎧" },
-  { id: 2, name: "Неоновый Лайтстик", r: "R", e: "🪄" },
-  { id: 3, name: "Билет на Сеул-тур", r: "SR", e: "🎫" },
-  { id: 4, name: "Острый Токпокки", r: "SR", e: "🥢" },
-  { id: 5, name: "Золотой Альбом", r: "SSR", e: "💿" },
-  { id: 6, name: "Главный Вокалист", r: "SSR", e: "👑" }
+  { id: 1, album: "trainee", name: "Чиби-Стажёр Мина", role: "Вокал • Зал практики", r: "R", art: "🎧" },
+  { id: 2, album: "trainee", name: "Чиби-Танцор Кай", role: "Хореография • Зеркальный зал", r: "R", art: "🕺" },
+  { id: 3, album: "trainee", name: "Ночной Рамён", role: "Перерыв после репетиции", r: "SR", art: "🍜" },
+  { id: 4, album: "debut", name: "Чиби-Рэпер Джин", role: "Студия звукозаписи", r: "SR", art: "🎙️" },
+  { id: 5, album: "debut", name: "Сцена Дебюта", role: "Лимитка за Экзамен Блока 1", r: "SSR", art: "🌟" },
+  { id: 6, album: "debut", name: "Золотой Лайтстик", role: "Секретная карта из паков", r: "SSR", art: "👑" }
 ];
 
-let st = { coins: 50, done: [], cards: [] };
+/* ====== СОСТОЯНИЕ ====== */
+let st = { coins: 50, xp: 0, done: [], cards: [] };
 try {
-  let saved = localStorage.getItem('kp_st_v2');
+  const saved = localStorage.getItem('kp_lingua_v3');
   if (saved) st = JSON.parse(saved);
 } catch (e) {}
 
 function save() {
-  try { localStorage.setItem('kp_st_v2', JSON.stringify(st)); } catch (e) {}
-  document.getElementById('coins').innerText = st.coins;
+  try { localStorage.setItem('kp_lingua_v3', JSON.stringify(st)); } catch (e) {}
+  document.getElementById('coins-val').innerText = st.coins;
+  document.getElementById('xp-val').innerText = st.xp;
 }
 
-let currentAudio = null;
-
-function playAudio(filePath, wordText) {
-  let statusEl = document.getElementById('audio-status');
-  if (statusEl) statusEl.innerText = 'Загрузка звука...';
-  
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio = null;
-  }
-
-  let audio = new Audio(filePath);
-  currentAudio = audio;
-  
-  audio.onplaying = function() {
-    if (statusEl) statusEl.innerText = '🔊 Воспроизводится...';
-  };
-  audio.onended = function() {
-    if (statusEl) statusEl.innerText = 'Нажми еще раз, чтобы повторить';
-  };
-  audio.onerror = function() {
+/* ====== АУДИО (MP3 + ЗАПАСНОЙ ГОЛОС) ====== */
+let curAudio = null;
+function playAudio(file, text) {
+  if (curAudio) { curAudio.pause(); curAudio = null; }
+  const fallback = () => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      let u = new SpeechSynthesisUtterance(wordText);
+      const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ko-KR';
       u.rate = 0.85;
       window.speechSynthesis.speak(u);
-      if (statusEl) statusEl.innerText = 'Озвучка через систему (загрузи папку audio на GitHub для студийного голоса)';
-    } else {
-      if (statusEl) statusEl.innerText = 'Файл ' + filePath + ' еще не загружен на GitHub';
     }
   };
-
-  audio.play().catch(function() {
-    if (statusEl) statusEl.innerText = 'Нажми кнопку еще раз для запуска звука';
-  });
+  if (!file) return fallback();
+  const a = new Audio(file);
+  curAudio = a;
+  a.onerror = fallback;
+  a.play().catch(fallback);
 }
 
+/* ====== НАВИГАЦИЯ ====== */
 function switchTab(t) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + t).classList.add('active');
-  if (document.getElementById('nav-' + t)) document.getElementById('nav-' + t).classList.add('active');
-  if (t === 'lessons') renderL();
-  if (t === 'binder') renderB();
+  const nav = document.getElementById('nav-' + t);
+  if (nav) nav.classList.add('active');
+  if (t === 'lessons') renderLessons();
+  if (t === 'binder') renderBinder();
+  if (t === 'rank') renderRank();
 }
 
-function renderL() {
-  let el = document.getElementById('lessons-list');
-  el.innerHTML = '';
-  LESSONS.forEach(l => {
-    let d = st.done.includes(l.id);
-    let card = document.createElement('div');
-    card.className = 'lesson-card' + (d ? ' completed' : '');
-    
-    let info = document.createElement('div');
-    info.innerHTML = '<b>' + (d ? '✅ ' : '') + l.title + '</b><br><small style="color:#a09cb0">' + l.desc + ' • +' + l.coins + ' 🎤</small>';
-    
-    let btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.innerText = d ? 'Повтор' : 'Учить';
-    btn.onclick = function() { startL(l.id); };
-    
-    card.appendChild(info);
-    card.appendChild(btn);
-    el.appendChild(card);
+/* ====== ЭКРАН УРОКОВ ====== */
+function renderLessons() {
+  const pct = Math.round((st.done.length / LESSONS.length) * 100);
+  document.getElementById('module-progress').style.width = pct + '%';
+  const list = document.getElementById('lessons-list');
+  list.innerHTML = '';
+
+  LESSONS.forEach((l, idx) => {
+    const done = st.done.includes(l.id);
+    const prevDone = idx === 0 || st.done.includes(LESSONS[idx - 1].id);
+    const locked = l.isExam && !prevDone && !done;
+
+    const el = document.createElement('div');
+    el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (locked ? ' locked' : '');
+    el.innerHTML = `
+      <div>
+        <div class="l-title">${done ? '✅ ' : (locked ? '🔒 ' : '')}${l.title}</div>
+        <div class="l-meta">${l.desc} • +${l.coins} 🎤 • +${l.xp} XP</div>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'btn' + (l.isExam ? ' gold' : '');
+    btn.innerText = locked ? 'Закрыто' : (done ? 'Повтор' : (l.isExam ? 'Сдать' : 'Учить'));
+    btn.disabled = locked;
+    btn.onclick = () => startLesson(l.id);
+    el.appendChild(btn);
+    list.appendChild(el);
   });
 }
 
-let cur = null, qi = 0;
+/* ====== ДВИЖОК УРОКА ====== */
+let curL = null, stepIdx = 0, buildAns = [];
 
-function startL(id) {
-  cur = LESSONS.find(x => x.id === id);
-  qi = 0;
+function startLesson(id) {
+  curL = LESSONS.find(x => x.id === id);
+  stepIdx = 0;
   switchTab('study');
-  let box = document.getElementById('study-content');
-  box.innerHTML = '<div class="theory-box">' + cur.theory + '</div>';
-  let btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.style.width = '100%';
-  btn.style.padding = '15px';
-  btn.innerText = 'Перейти к практике →';
-  btn.onclick = function() { nextQ(); };
-  box.appendChild(btn);
+  renderStep();
 }
 
-function nextQ() {
-  let box = document.getElementById('study-content');
-  if (qi >= cur.qs.length) {
-    let newCardText = '';
-    if (!st.done.includes(cur.id)) {
-      st.done.push(cur.id);
-      st.coins += cur.coins;
-      if (!st.cards.includes(cur.card)) {
-        st.cards.push(cur.card);
-        let cObj = CARDS.find(c => c.id === cur.card);
-        newCardText = '<p style="color:#ffd700;font-weight:bold">🎉 Выбита карточка: ' + cObj.e + ' ' + cObj.name + ' [' + cObj.r + ']</p>';
-      }
-      save();
-    }
-    box.innerHTML = '<div class="theory-box" style="text-align:center"><h2>🔥 Глава пройдена!</h2><p>Награда: +' + cur.coins + ' 🎤</p>' + newCardText + '</div>';
-    let btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.style.width = '100%';
-    btn.style.padding = '15px';
-    btn.innerText = 'Открыть Биндер карточек 🃏';
-    btn.onclick = function() { switchTab('binder'); };
-    box.appendChild(btn);
+function renderStep() {
+  const total = curL.steps.length;
+  document.getElementById('study-bar').style.width = Math.round((stepIdx / total) * 100) + '%';
+  document.getElementById('step-count').innerText = Math.min(stepIdx + 1, total) + '/' + total;
+  const body = document.getElementById('study-body');
+  body.innerHTML = '';
+
+  if (stepIdx >= total) {
+    finishLesson();
     return;
   }
 
-  let q = cur.qs[qi];
-  box.innerHTML = '';
-  
-  let wordBox = document.createElement('div');
-  wordBox.className = 'korean-word';
-  wordBox.innerHTML = '<div>' + q.w + '</div><div class="translit">' + q.tr + '</div>';
-  
-  let audioBtn = document.createElement('button');
-  audioBtn.className = 'audio-btn';
-  audioBtn.innerHTML = '🔊 Послушать произношение';
-  audioBtn.onclick = function() { playAudio(q.file, q.w); };
-  wordBox.appendChild(audioBtn);
+  const s = curL.steps[stepIdx];
 
-  let statusSpan = document.createElement('span');
-  statusSpan.id = 'audio-status';
-  statusSpan.className = 'audio-status';
-  statusSpan.innerText = 'Нажми на кнопку выше для озвучки';
-  wordBox.appendChild(statusSpan);
+  if (s.type === 'theory') {
+    let exHtml = s.examples.map(e => `
+      <div class="example-row" onclick="playAudio('${e.file}', '${e.kr}')">
+        <div class="ex-kr">${e.kr}</div>
+        <div class="ex-info">
+          <div class="ex-tr">${e.tr}</div>
+          <div class="ex-ru">${e.ru}</div>
+        </div>
+        <div class="ex-play">🔊</div>
+      </div>
+    `).join('');
+    body.innerHTML = `
+      <div class="card-box">
+        <h3>${s.title}</h3>
+        <p>${s.text}</p>
+        <div class="example-list">${exHtml}</div>
+      </div>
+      <button class="btn full" onclick="nextStep()">Понятно, дальше →</button>
+    `;
+  }
 
-  box.appendChild(wordBox);
+  if (s.type === 'choice') {
+    body.innerHTML = `
+      <div class="prompt-word">
+        <div class="big-kr">${s.kr}</div>
+        <div class="big-tr">${s.tr}</div>
+        <button class="audio-pill" onclick="playAudio('${s.file}', '${s.kr}')">🔊 Послушать</button>
+      </div>
+      <h3 style="margin:0 0 12px;font-size:16px">${s.q}</h3>
+      <div id="opts-wrap"></div>
+      <div id="fb" class="feedback-bar"></div>
+      <button id="next-btn" class="btn full" style="display:none" onclick="nextStep()">Дальше →</button>
+    `;
+    const wrap = document.getElementById('opts-wrap');
+    s.opts.forEach((opt, i) => {
+      const b = document.createElement('button');
+      b.className = 'opt-btn';
+      b.innerText = opt;
+      b.onclick = () => checkChoice(b, i, s);
+      wrap.appendChild(b);
+    });
+  }
 
-  let qTitle = document.createElement('h3');
-  qTitle.innerText = q.q;
-  box.appendChild(qTitle);
-
-  q.o.forEach((opt, i) => {
-    let b = document.createElement('button');
-    b.className = 'option-btn';
-    b.innerText = opt;
-    b.onclick = function() { ans(b, i, q.c); };
-    box.appendChild(b);
-  });
-}
-
-function ans(b, i, c) {
-  document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-  if (i === c) {
-    b.classList.add('correct');
-    setTimeout(function() { qi++; nextQ(); }, 750);
-  } else {
-    b.classList.add('wrong');
-    setTimeout(function() { nextQ(); }, 900);
+  if (s.type === 'build') {
+    buildAns = [];
+    body.innerHTML = `
+      <div class="prompt-word" style="padding:16px">
+        <div style="font-size:16px;font-weight:700">${s.q}</div>
+        <button class="audio-pill" onclick="playAudio('${s.file}', '${s.audioText}')">🔊 Подсказка голосом</button>
+      </div>
+      <div class="build-slots" id="build-slots"><span style="color:var(--muted);font-size:13px">Нажимай на слоги ниже</span></div>
+      <div class="build-pool" id="build-pool"></div>
+      <div id="fb" class="feedback-bar"></div>
+      <button id="check-build" class="btn full" onclick="checkBuild()">Проверить</button>
+      <button id="next-btn" class="btn full" style="display:none" onclick="nextStep()">Дальше →</button>
+    `;
+    renderBuildUI(s);
   }
 }
 
-function renderB() {
-  let g = document.getElementById('binder-grid');
-  g.innerHTML = '';
-  CARDS.forEach(c => {
-    let u = st.cards.includes(c.id);
-    g.innerHTML += '<div class="collect-card ' + (u ? '' : 'locked') + (c.r === 'SSR' ? ' ssr' : '') + '"><small>' + c.r + '</small><div style="font-size:44px;margin:10px 0">' + (u ? c.e : '❓') + '</div><b>' + (u ? c.name : 'Закрыто') + '</b></div>';
+function checkChoice(btn, idx, s) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (idx === s.correct) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-bar ok';
+    fb.innerText = '✅ Верно! ' + s.explain;
+  } else {
+    btn.classList.add('wrong');
+    btns[s.correct].classList.add('correct');
+    fb.className = 'feedback-bar err';
+    fb.innerText = '❌ Почти! ' + s.explain;
+  }
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function renderBuildUI(s) {
+  const slots = document.getElementById('build-slots');
+  const pool = document.getElementById('build-pool');
+  slots.innerHTML = buildAns.length ? '' : '<span style="color:var(--muted);font-size:13px">Нажимай на слоги ниже</span>';
+  buildAns.forEach((item, pos) => {
+    const c = document.createElement('button');
+    c.className = 'chip in-slot';
+    c.innerText = item.val;
+    c.onclick = () => { buildAns.splice(pos, 1); renderBuildUI(s); };
+    slots.appendChild(c);
+  });
+  pool.innerHTML = '';
+  s.pool.forEach((val, idx) => {
+    const used = buildAns.some(a => a.idx === idx);
+    const c = document.createElement('button');
+    c.className = 'chip' + (used ? ' used' : '');
+    c.innerText = val;
+    c.onclick = () => { buildAns.push({ val, idx }); renderBuildUI(s); };
+    pool.appendChild(c);
   });
 }
 
-function buyPack() {
-  if (st.coins < 50) return alert('Нужно 50 🎤! Пройди главу, чтобы заработать микрофоны.');
-  st.coins -= 50;
-  let rc = CARDS[Math.floor(Math.random() * CARDS.length)];
+function checkBuild() {
+  const s = curL.steps[stepIdx];
+  const userStr = buildAns.map(a => a.val).join('');
+  const targetStr = s.answer.join('');
+  const fb = document.getElementById('fb');
+  if (userStr === targetStr) {
+    fb.className = 'feedback-bar ok';
+    fb.innerText = '✅ ' + s.explain;
+    document.getElementById('check-build').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'block';
+    playAudio(s.file, s.audioText);
+  } else {
+    fb.className = 'feedback-bar err';
+    fb.innerText = '❌ Не совсем так. Попробуй переставить слоги!';
+  }
+}
+
+function nextStep() {
+  stepIdx++;
+  renderStep();
+}
+
+function finishLesson() {
+  document.getElementById('study-bar').style.width = '100%';
+  let rewardCardHtml = '';
+  if (!st.done.includes(curL.id)) {
+    st.done.push(curL.id);
+    st.coins += curL.coins;
+    st.xp += curL.xp;
+    if (curL.cardId && !st.cards.includes(curL.cardId)) {
+      st.cards.push(curL.cardId);
+      const c = CARDS.find(x => x.id === curL.cardId);
+      rewardCardHtml = `<p style="color:var(--gold);font-weight:800">🎉 Новая карта в альбом: ${c.art} ${c.name} [${c.r}]</p>`;
+    }
+    save();
+  }
+  document.getElementById('study-body').innerHTML = `
+    <div class="card-box" style="text-align:center;padding:28px 20px">
+      <div style="font-size:48px;margin-bottom:8px">${curL.isExam ? '🏆' : '🔥'}</div>
+      <h2 style="margin:0 0 8px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
+      <p>Награда: <b>+${curL.coins} 🎤</b> и <b>+${curL.xp} XP</b></p>
+      ${rewardCardHtml}
+    </div>
+    <button class="btn full" style="margin-bottom:10px" onclick="switchTab('lessons')">К карте уроков</button>
+    <button class="btn ghost full" onclick="switchTab('binder')">Открыть Альбомы 🃏</button>
+  `;
+}
+
+/* ====== АЛЬБОМЫ И ПАКИ ====== */
+let curAlbum = 'all';
+function setAlbum(a, btn) {
+  curAlbum = a;
+  document.querySelectorAll('.subtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBinder();
+}
+
+function renderBinder() {
+  const g = document.getElementById('binder-grid');
+  g.innerHTML = '';
+  const list = curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum);
+  list.forEach(c => {
+    const has = st.cards.includes(c.id);
+    const rClass = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
+    g.innerHTML += `
+      <div class="photocard ${has ? rClass : 'locked'}">
+        <div class="pc-rarity">${c.r}</div>
+        <div class="pc-art">${has ? c.art : '❓'}</div>
+        <div class="pc-name">${has ? c.name : 'Скрытая карта'}</div>
+        <div class="pc-role">${has ? c.role : 'Открой пак или пройди урок'}</div>
+      </div>
+    `;
+  });
+}
+
+function buyPack(price) {
+  if (st.coins < price) return alert('Не хватает микрофонов! Нужно ' + price + ' 🎤.');
+  st.coins -= price;
+  const rc = CARDS[Math.floor(Math.random() * CARDS.length)];
   if (!st.cards.includes(rc.id)) {
     st.cards.push(rc.id);
-    alert('🎉 Новая карточка в Биндер: ' + rc.e + ' ' + rc.name + ' [' + rc.r + ']!');
+    alert('🎉 Новая чиби-карта: ' + rc.art + ' ' + rc.name + ' [' + rc.r + ']!');
   } else {
     st.coins += 20;
-    alert('Повторка: ' + rc.e + ' ' + rc.name + '. Возвращено +20 🎤');
+    alert('Повторка: ' + rc.name + '. Возвращено +20 🎤');
   }
   save();
-  renderB();
+  renderBinder();
+}
+
+function demoDonate(name) {
+  alert('Оплата «' + name + '» через Telegram Stars будет подключена, когда развернём сервер бота.');
+}
+
+/* ====== ЛИДЕРБОРД ====== */
+function renderRank() {
+  const bots = [
+    { name: "Minji_Seoul", xp: 620 },
+    { name: "Kpop_Sora", xp: 480 },
+    { name: "V_Army95", xp: 340 },
+    { name: "Felix_Sun", xp: 190 },
+    { name: "Ты (Трейни)", xp: st.xp, me: true }
+  ].sort((a, b) => b.xp - a.xp);
+
+  const list = document.getElementById('rank-list');
+  list.innerHTML = '';
+  bots.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : (i + 1)));
+    list.innerHTML += `
+      <div class="rank-row ${p.me ? 'me' : ''}">
+        <div class="rank-pos">${medal}</div>
+        <div class="rank-name">${p.name}</div>
+        <div class="rank-xp">${p.xp} XP</div>
+      </div>
+    `;
+  });
 }
 
 save();
-renderL();
+renderLessons();
 </script>
 </body>
 </html>
