@@ -18,7 +18,8 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85p
 .btn { background: linear-gradient(135deg, var(--accent), var(--secondary)); color: white; border: none; padding: 11px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; flex-shrink: 0; }
 .theory-box { background: var(--card); padding: 20px; border-radius: 16px; line-height: 1.6; margin-bottom: 20px; border: 1px solid #2d2844; }
 .theory-box h3 { margin-top: 0; color: #ff7ac6; }
-.korean-word { font-size: 38px; font-weight: bold; text-align: center; margin: 20px 0; padding: 22px; background: rgba(138,43,226,0.2); border-radius: 16px; cursor: pointer; border: 1px solid rgba(138,43,226,0.4); }
+.korean-word { font-size: 38px; font-weight: bold; text-align: center; margin: 20px 0; padding: 22px; background: rgba(138,43,226,0.2); border-radius: 16px; cursor: pointer; border: 1px solid rgba(138,43,226,0.4); transition: transform 0.1s; }
+.korean-word:active { transform: scale(0.97); }
 .korean-word small { display: block; font-size: 13px; color: var(--muted); margin-top: 8px; font-weight: normal; }
 .option-btn { display: block; width: 100%; text-align: left; background: var(--card); border: 1px solid #383252; color: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; font-size: 15px; cursor: pointer; }
 .option-btn.correct { background: rgba(0,230,118,0.25); border-color: var(--success); }
@@ -50,8 +51,8 @@ const LESSONS = [
     card: 1,
     theory: "<h3>Корейский алфавит как конструктор</h3><p>Корейские буквы складываются в квадратные слоги:</p><p>• <b>ㄹ</b> [Р/Л] + <b>ㅣ</b> [И] = <b>리 (Ли)</b><br>• <b>ㅅ</b> [С] + <b>ㅏ</b> [А] = <b>사 (Са)</b></p><p>Соединяем два слога и получаем имя: <b>리사 — Лиса!</b></p>",
     qs: [
-      { w: "리사", q: "Как читается это имя участницы BLACKPINK?", o: ["Лиса", "Джису", "Розэ", "Дженни"], c: 0 },
-      { w: "사", q: "Какой это слог (ㅅ + ㅏ)?", o: ["Ри", "Са", "Ма", "Но"], c: 1 }
+      { w: "리사", tr: "Ли-са", q: "Как читается это имя участницы BLACKPINK?", o: ["Лиса", "Джису", "Розэ", "Дженни"], c: 0 },
+      { w: "사", tr: "Са", q: "Какой это слог (ㅅ + ㅏ)?", o: ["Ри", "Са", "Ма", "Но"], c: 1 }
     ]
   },
   {
@@ -62,8 +63,8 @@ const LESSONS = [
     card: 2,
     theory: "<h3>Секрет пустого кружочка ㅇ</h3><p>В начале слога буква <b>ㅇ</b> не читается — она просто держит гласную. А внизу слога (в патчиме) читается как носовое <b>[Н]</b>.</p><p>• <b>ㅈ</b> [Чж] + <b>ㅣ</b> [И] + <b>ㄴ</b> [Н] = <b>진 (Джин)</b><br>• <b>ㅇ</b> + <b>ㅏ</b> [А] + <b>ㄴ</b> [Н] = <b>안 (Ан)</b></p>",
     qs: [
-      { w: "진", q: "Как читается имя этого участника BTS?", o: ["Ви", "Джин", "Шуга", "Чимин"], c: 1 },
-      { w: "안녕", q: "Как переводится главное приветствие Аннён?", o: ["Привет / Пока", "Спасибо", "Извини", "Помогите"], c: 0 }
+      { w: "진", tr: "Джин", q: "Как читается имя этого участника BTS?", o: ["Ви", "Джин", "Шуга", "Чимин"], c: 1 },
+      { w: "안녕", tr: "Ан-нён", q: "Как переводится главное приветствие Аннён?", o: ["Привет / Пока", "Спасибо", "Извини", "Помогите"], c: 0 }
     ]
   },
   {
@@ -74,9 +75,9 @@ const LESSONS = [
     card: 3,
     theory: "<h3>Словарь каждого K-pop фаната</h3><p>• <b>사랑해 (Саранхэ)</b> — Я тебя люблю (неформально, так айдолы говорят фанатам).<br>• <b>대박 (Тэбак)</b> — Супер / Вау / Офигеть!<br>• <b>화이팅 (Файтин)</b> — Вперед / Удачи / Не сдавайся!</p>",
     qs: [
-      { w: "사랑해", q: "Что означает эта фраза в песнях?", o: ["Доброе утро", "Я тебя люблю", "Не уходи", "С днем рождения"], c: 1 },
-      { w: "대박", q: "Когда корейцы кричат Тэбак?", o: ["Когда видят что-то крутое (Вау!)", "Когда прощаются", "Когда хотят спать"], c: 0 },
-      { w: "화이팅", q: "Что значит слово Файтин?", o: ["Вперед / Удачи!", "Тишина", "Прощай"], c: 0 }
+      { w: "사랑해", tr: "Са-ран-хэ", q: "Что означает эта фраза в песнях?", o: ["Доброе утро", "Я тебя люблю", "Не уходи", "С днем рождения"], c: 1 },
+      { w: "대박", tr: "Тэ-бак", q: "Когда корейцы кричат Тэбак?", o: ["Когда видят что-то крутое (Вау!)", "Когда прощаются", "Когда хотят спать"], c: 0 },
+      { w: "화이팅", tr: "Фай-тин", q: "Что значит слово Файтин?", o: ["Вперед / Удачи!", "Тишина", "Прощай"], c: 0 }
     ]
   },
   {
@@ -87,8 +88,8 @@ const LESSONS = [
     card: 4,
     theory: "<h3>В Корее возраст решает всё</h3><p>Старших нельзя звать просто по имени — нужно добавлять особое слово:</p><p>• <b>오빠 (Оппа)</b> — девушка к старшему парню/айдолу.<br>• <b>언니 (Онни)</b> — девушка к старшей девушке.<br>• <b>형 (Хён)</b> — парень к старшему парню.<br>• <b>막내 (Макнэ)</b> — самый младший участник в группе.</p>",
     qs: [
-      { w: "언니", q: "Кто и к кому обращается словом Онни?", o: ["Девушка к старшей девушке", "Парень к старшему парню", "Девушка к парню"], c: 0 },
-      { w: "막내", q: "Кого в K-pop группе называют Макнэ?", o: ["Лидера группы", "Самого младшего участника", "Главного танцора"], c: 1 }
+      { w: "언니", tr: "Он-ни", q: "Кто и к кому обращается словом Онни?", o: ["Девушка к старшей девушке", "Парень к старшему парню", "Девушка к парню"], c: 0 },
+      { w: "막내", tr: "Мак-нэ", q: "Кого в K-pop группе называют Макнэ?", o: ["Лидера группы", "Самого младшего участника", "Главного танцора"], c: 1 }
     ]
   },
   {
@@ -99,8 +100,8 @@ const LESSONS = [
     card: 5,
     theory: "<h3>Фразы прямо из припевов</h3><p>• <b>보고 싶어 (Пого щипо)</b> — Я скучаю по тебе (культовая строчка из Spring Day — BTS).<br>• <b>미쳤어 (Мичхоссо)</b> — С ума сойти / Безумие.<br>• <b>진짜 (Чинчча)</b> — Правда? / Реально?</p>",
     qs: [
-      { w: "보고 싶어", q: "Как переводится строчка Пого щипо?", o: ["Я скучаю по тебе", "Я иду домой", "Танцуй со мной"], c: 0 },
-      { w: "진짜", q: "Что спрашивает айдол, говоря Чинчча?", o: ["Который час?", "Правда? / Реально?", "Где микрофон?"], c: 1 }
+      { w: "보고 싶어", tr: "По-го щи-по", q: "Как переводится строчка Пого щипо?", o: ["Я скучаю по тебе", "Я иду домой", "Танцуй со мной"], c: 0 },
+      { w: "진짜", tr: "Чин-чча", q: "Что спрашивает айдол, говоря Чинчча?", o: ["Который час?", "Правда? / Реально?", "Где микрофон?"], c: 1 }
     ]
   }
 ];
@@ -125,7 +126,24 @@ function save() {
   document.getElementById('coins').innerText = st.coins;
 }
 
+let currentAudio = null;
 function speak(t) {
+  try {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    const url = 'https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=ko&q=' + encodeURIComponent(t);
+    currentAudio = new Audio(url);
+    currentAudio.play().catch(function() {
+      fallbackSpeak(t);
+    });
+  } catch (e) {
+    fallbackSpeak(t);
+  }
+}
+
+function fallbackSpeak(t) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     let u = new SpeechSynthesisUtterance(t);
@@ -213,7 +231,7 @@ function nextQ() {
   
   let wordBox = document.createElement('div');
   wordBox.className = 'korean-word';
-  wordBox.innerHTML = '🔊 ' + q.w + '<small>Нажми на слово, чтобы послушать</small>';
+  wordBox.innerHTML = '🔊 ' + q.w + '<small>[' + q.tr + '] • Нажми, чтобы послушать</small>';
   wordBox.onclick = function() { speak(q.w); };
   box.appendChild(wordBox);
 
