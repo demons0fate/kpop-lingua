@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>K-Pop Lingua</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root { --bg: #12101c; --card: #1e1a2e; --accent: #ff2e93; --secondary: #8a2be2; --text: #ffffff; --muted: #a09cb0; --success: #00e676; }
+* { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; user-select: none; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1e1a2e; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10; }
+.badge { background: rgba(255,46,147,0.15); border: 1px solid var(--accent); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+.screen { display: none; padding: 20px; }
+.screen.active { display: block; }
+.lesson-card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2d2844; gap: 12px; }
+.lesson-card.completed { border-color: var(--success); }
+.btn { background: linear-gradient(135deg, var(--accent), var(--secondary)); color: white; border: none; padding: 11px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+.btn:active { transform: scale(0.97); }
+.theory-box { background: var(--card); padding: 20px; border-radius: 16px; line-height: 1.6; margin-bottom: 20px; border: 1px solid #2d2844; }
+.theory-box h3 { margin-top: 0; color: #ff7ac6; }
+.korean-card { text-align: center; margin: 15px 0 20px 0; padding: 22px; background: rgba(138,43,226,0.18); border-radius: 16px; border: 1px solid rgba(138,43,226,0.4); }
+.korean-word-text { font-size: 42px; font-weight: bold; margin-bottom: 6px; }
+.korean-trans { font-size: 15px; color: #ff7ac6; margin-bottom: 14px; font-weight: 600; }
+.sound-btn { background: #ff2e93; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(255,46,147,0.35); }
+.sound-status { font-size: 12px; color: var(--muted); margin-top: 8px; min-height: 16px; }
+.option-btn { display: block; width: 100%; text-align: left; background: var(--card); border: 1px solid #383252; color: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; font-size: 15px; cursor: pointer; }
+.option-btn.correct { background: rgba(0,230,118,0.25); border-color: var(--success); }
+.option-btn.wrong { background: rgba(255,46,147,0.25); border-color: var(--accent); }
+.binder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.collect-card { background: var(--card); border-radius: 16px; padding: 15px; text-align: center; border: 1px solid #333; }
+.collect-card.locked { filter: grayscale(1) opacity(0.35); }
+.collect-card.ssr { border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.25); }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: #181526; display: flex; justify-content: space-around; padding: 14px 0; border-top: 1px solid #333; }
+.nav-item { color: var(--muted); font-size: 14px; cursor: pointer; }
+.nav-item.active { color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="header"><b>✨ K-Pop Lingua</b><div class="badge">🎤 <span id="coins">50</span></div></div>
+<div id="screen-lessons" class="screen active"><h3 style="margin-top:0">Путь трейни (Программа)</h3><div id="lessons-list"></div></div>
+<div id="screen-study" class="screen"><button class="btn" style="background:#2d2844;margin-bottom:15px" onclick="switchTab('lessons')">← Назад</button><div id="study-content"></div></div>
+<div id="screen-binder" class="screen"><h3 style="margin-top:0">Твой Биндер карточек</h3><button class="btn" style="width:100%;margin-bottom:15px;padding:14px" onclick="buyPack()">🎁 Открыть K-Pop пак (50 🎤)</button><div class="binder-grid" id="binder-grid"></div></div>
+<div class="nav"><div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')">📚 Уроки</div><div class="nav-item" id="nav-binder" onclick="switchTab('binder')">🃏 Биндер</div></div>
+
+<audio id="tts-player" preload="none"></audio>
+
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+  window.Telegram.WebApp.expand();
+}
+
+const LESSONS = [
+  {
+    id: 1,
+    title: "Глава 1. Хангыль: Первые буквы",
+    desc: "Читаем имя Лисы из BLACKPINK",
+    coins: 50,
+    card: 1,
+    theory: "<h3>Корейский алфавит как конструктор</h3><p>Корейские буквы складываются в квадратные слоги:</p><p>• <b>ㄹ</b> [Р/Л] + <b>ㅣ</b> [И] = <b>리 (Ли)</b><br>• <b>ㅅ</b> [С] + <b>ㅏ</b> [А] = <b>사 (Са)</b></p><p>Соединяем два слога и получаем имя: <b>리사 — Лиса!</b></p>",
+    qs: [
+      { w: "리사", tr: "[Ли-са]", q: "Как читается это имя участницы BLACKPINK?", o: ["Лиса", "Джису", "Розэ", "Дженни"], c: 0 },
+      { w: "사", tr: "[Са]", q: "Какой это слог (ㅅ + ㅏ)?", o: ["Ри", "Са", "Ма", "Но"], c: 1 }
+    ]
+  },
+  {
+    id: 2,
+    title: "Глава 2. Слоги-блоки и кружочек ㅇ",
+    desc: "Учимся читать имя Джина из BTS",
+    coins: 60,
+    card: 2,
+    theory: "<h3>Секрет пустого кружочка ㅇ</h3><p>В начале слога буква <b>ㅇ</b> не читается — она просто держит гласную. А внизу слога (в патчиме) читается как носовое <b>[Н]</b>.</p><p>• <b>ㅈ</b> [Чж] + <b>ㅣ</b> [И] + <b>ㄴ</b> [Н] = <b>진 (Джин)</b><br>• <b>ㅇ</b> + <b>ㅏ</b> [А] + <b>ㄴ</b> [Н] = <b>안 (Ан)</b></p>",
+    qs: [
+      { w: "진", tr: "[Джин]", q: "Как читается имя этого участника BTS?", o: ["Ви", "Джин", "Шуга", "Чимин"], c: 1 },
+      { w: "안녕", tr: "[Ан-нён]", q: "Как переводится главное приветствие Аннён?", o: ["Привет / Пока", "Спасибо", "Извини", "Помогите"], c: 0 }
+    ]
+  },
+  {
+    id: 3,
+    title: "Глава 3. Главные слова из песен",
+    desc: "Переводим припевы: Любовь и Супер",
+    coins: 70,
+    card: 3,
+    theory: "<h3>Словарь каждого K-pop фаната</h3><p>• <b>사랑해 (Саранхэ)</b> — Я тебя люблю (неформально, так айдолы говорят фанатам).<br>• <b>대박 (Тэбак)</b> — Супер / Вау / Офигеть!<br>• <b>화이팅 (Файтин)</b> — Вперед / Удачи / Не сдавайся!</p>",
+    qs: [
+      { w: "사랑해", tr: "[Са-ран-хэ]", q: "Что означает эта фраза в песнях?", o: ["Доброе утро", "Я тебя люблю", "Не уходи", "С днем рождения"], c: 1 },
+      { w: "대박", tr: "[Тэ-бак]", q: "Когда корейцы кричат Тэбак?", o: ["Когда видят что-то крутое (Вау!)", "Когда прощаются", "Когда хотят спать"], c: 0 },
+      { w: "화이팅", tr: "[Хва-и-тхин / Файтин]", q: "Что значит слово Файтин?", o: ["Вперед / Удачи!", "Тишина", "Прощай"], c: 0 }
+    ]
+  },
+  {
+    id: 4,
+    title: "Глава 4. Обращения: Оппа, Онни, Хён",
+    desc: "Как правильно обращаться к старшим",
+    coins: 80,
+    card: 4,
+    theory: "<h3>В Корее возраст решает всё</h3><p>Старших нельзя звать просто по имени — нужно добавлять особое слово:</p><p>• <b>오빠 (Оппа)</b> — девушка к старшему парню/айдолу.<br>• <b>언니 (Онни)</b> — девушка к старшей девушке.<br>• <b>형 (Хён)</b> — парень к старшему парню.<br>• <b>막내 (Макнэ)</b> — самый младший участник в группе.</p>",
+    qs: [
+      { w: "언니", tr: "[Он-ни]", q: "Кто и к кому обращается словом Онни?", o: ["Девушка к старшей девушке", "Парень к старшему парню", "Девушка к парню"], c: 0 },
+      { w: "막내", tr: "[Ман-нэ]", q: "Кого в K-pop группе называют Макнэ?", o: ["Лидера группы", "Самого младшего участника", "Главного танцора"], c: 1 }
+    ]
+  },
+  {
+    id: 5,
+    title: "Глава 5. Разбор хитов: BTS и Stray Kids",
+    desc: "Понимаем строчки без субтитров",
+    coins: 100,
+    card: 5,
+    theory: "<h3>Фразы прямо из припевов</h3><p>• <b>보고 싶어 (Пого щипо)</b> — Я скучаю по тебе (культовая строчка из Spring Day — BTS).<br>• <b>미쳤어 (Мичхоссо)</b> — С ума сойти / Безумие.<br>• <b>진짜 (Чинчча)</b> — Правда? / Реально?</p>",
+    qs: [
+      { w: "보고 싶어", tr: "[По-го щи-по]", q: "Как переводится строчка Пого щипо?", o: ["Я скучаю по тебе", "Я иду домой", "Танцуй со мной"], c: 0 },
+      { w: "진짜", tr: "[Чин-чча]", q: "Что спрашивает айдол, говоря Чинчча?", o: ["Который час?", "Правда? / Реально?", "Где микрофон?"], c: 1 }
+    ]
+  }
+];
+
+const CARDS = [
+  { id: 1, name: "Стажер Сеула", r: "R", e: "🎧" },
+  { id: 2, name: "Неоновый Лайтстик", r: "R", e: "🪄" },
+  { id: 3, name: "Билет на Сеул-тур", r: "SR", e: "🎫" },
+  { id: 4, name: "Острый Токпокки", r: "SR", e: "🥢" },
+  { id: 5, name: "Золотой Альбом", r: "SSR", e: "💿" },
+  { id: 6, name: "Главный Вокалист", r: "SSR", e: "👑" }
+];
+
+let st = { coins: 50, done: [], cards: [] };
+try {
+  let saved = localStorage.getItem('kp_st_v2');
+  if (saved) st = JSON.parse(saved);
+} catch (e) {}
+
+function save() {
+  try { localStorage.setItem('kp_st_v2', JSON.stringify(st)); } catch (e) {}
+  document.getElementById('coins').innerText = st.coins;
+}
+
+function playVoice(word) {
+  let statusEl = document.getElementById('sound-status');
+  if (statusEl) statusEl.innerText = "⏳ Загрузка голоса...";
+  
+  let player = document.getElementById('tts-player');
+  player.pause();
+  player.currentTime = 0;
+  player.src = "https://api.streamelements.com/kappa/v2/speech?voice=Seoyeon&text=" + encodeURIComponent(word);
+  
+  let playPromise = player.play();
+  if (playPromise !== undefined) {
+    playPromise.then(function() {
+      if (statusEl) statusEl.innerText = "🔊 Воспроизводится...";
+      player.onended = function() {
+        if (statusEl) statusEl.innerText = "Нажми кнопку еще раз для повтора";
+      };
+    }).catch(function(err) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        let u = new SpeechSynthesisUtterance(word);
+        u.lang = 'ko-KR';
+        u.rate = 0.85;
+        window.speechSynthesis.speak(u);
+        if (statusEl) statusEl.innerText = "🔊 Озвучено системным голосом";
+      } else {
+        if (statusEl) statusEl.innerText = "Проверь громкость мультимедиа на телефоне";
+      }
+    });
+  }
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + t).classList.add('active');
+  if (document.getElementById('nav-' + t)) document.getElementById('nav-' + t).classList.add('active');
+  if (t === 'lessons') renderL();
+  if (t === 'binder') renderB();
+}
+
+function renderL() {
+  let el = document.getElementById('lessons-list');
+  el.innerHTML = '';
+  LESSONS.forEach(l => {
+    let d = st.done.includes(l.id);
+    let card = document.createElement('div');
+    card.className = 'lesson-card' + (d ? ' completed' : '');
+    
+    let info = document.createElement('div');
+    info.innerHTML = '<b>' + (d ? '✅ ' : '') + l.title + '</b><br><small style="color:#a09cb0">' + l.desc + ' • +' + l.coins + ' 🎤</small>';
+    
+    let btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.innerText = d ? 'Повтор' : 'Учить';
+    btn.onclick = function() { startL(l.id); };
+    
+    card.appendChild(info);
+    card.appendChild(btn);
+    el.appendChild(card);
+  });
+}
+
+let cur = null, qi = 0;
+
+function startL(id) {
+  cur = LESSONS.find(x => x.id === id);
+  qi = 0;
+  switchTab('study');
+  let box = document.getElementById('study-content');
+  box.innerHTML = '<div class="theory-box">' + cur.theory + '</div>';
+  let btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.style.width = '100%';
+  btn.style.padding = '15px';
+  btn.innerText = 'Перейти к практике →';
+  btn.onclick = function() { nextQ(); };
+  box.appendChild(btn);
+}
+
+function nextQ() {
+  let box = document.getElementById('study-content');
+  if (qi >= cur.qs.length) {
+    let newCardText = '';
+    if (!st.done.includes(cur.id)) {
+      st.done.push(cur.id);
+      st.coins += cur.coins;
+      if (!st.cards.includes(cur.card)) {
+        st.cards.push(cur.card);
+        let cObj = CARDS.find(c => c.id === cur.card);
+        newCardText = '<p style="color:#ffd700;font-weight:bold">🎉 Выбита карточка: ' + cObj.e + ' ' + cObj.name + ' [' + cObj.r + ']</p>';
+      }
+      save();
+    }
+    box.innerHTML = '<div class="theory-box" style="text-align:center"><h2>🔥 Глава пройдена!</h2><p>Награда: +' + cur.coins + ' 🎤</p>' + newCardText + '</div>';
+    let btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.style.width = '100%';
+    btn.style.padding = '15px';
+    btn.innerText = 'Открыть Биндер карточек 🃏';
+    btn.onclick = function() { switchTab('binder'); };
+    box.appendChild(btn);
+    return;
+  }
+
+  let q = cur.qs[qi];
+  box.innerHTML = '';
+  
+  let cardBox = document.createElement('div');
+  cardBox.className = 'korean-card';
+  
+  let wText = document.createElement('div');
+  wText.className = 'korean-word-text';
+  wText.innerText = q.w;
+  
+  let trText = document.createElement('div');
+  trText.className = 'korean-trans';
+  trText.innerText = q.tr;
+  
+  let sBtn = document.createElement('button');
+  sBtn.className = 'sound-btn';
+  sBtn.innerHTML = '🔊 Послушать произношение';
+  sBtn.onclick = function() { playVoice(q.w); };
+  
+  let stText = document.createElement('div');
+  stText.className = 'sound-status';
+  stText.id = 'sound-status';
+  stText.innerText = 'Нажми на кнопку выше, чтобы услышать слово';
+  
+  cardBox.appendChild(wText);
+  cardBox.appendChild(trText);
+  cardBox.appendChild(sBtn);
+  cardBox.appendChild(stText);
+  box.appendChild(cardBox);
+
+  let qTitle = document.createElement('h3');
+  qTitle.innerText = q.q;
+  box.appendChild(qTitle);
+
+  q.o.forEach((opt, i) => {
+    let b = document.createElement('button');
+    b.className = 'option-btn';
+    b.innerText = opt;
+    b.onclick = function() { ans(b, i, q.c); };
+    box.appendChild(b);
+  });
+}
+
+function ans(b, i, c) {
+  document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+  if (i === c) {
+    b.classList.add('correct');
+    setTimeout(function() { qi++; nextQ(); }, 750);
+  } else {
+    b.classList.add('wrong');
+    setTimeout(function() { nextQ(); }, 900);
+  }
+}
+
+function renderB() {
+  let g = document.getElementById('binder-grid');
+  g.innerHTML = '';
+  CARDS.forEach(c => {
+    let u = st.cards.includes(c.id);
+    g.innerHTML += '<div class="collect-card ' + (u ? '' : 'locked') + (c.r === 'SSR' ? ' ssr' : '') + '"><small>' + c.r + '</small><div style="font-size:44px;margin:10px 0">' + (u ? c.e : '❓') + '</div><b>' + (u ? c.name : 'Закрыто') + '</b></div>';
+  });
+}
+
+function buyPack() {
+  if (st.coins < 50) return alert('Нужно 50 🎤! Пройди главу, чтобы заработать микрофоны.');
+  st.coins -= 50;
+  let rc = CARDS[Math.floor(Math.random() * CARDS.length)];
+  if (!st.cards.includes(rc.id)) {
+    st.cards.push(rc.id);
+    alert('🎉 Новая карточка в Биндер: ' + rc.e + ' ' + rc.name + ' [' + rc.r + ']!');
+  } else {
+    st.coins += 20;
+    alert('Повторка: ' + rc.e + ' ' + rc.name + '. Возвращено +20 🎤');
+  }
+  save();
+  renderB();
+}
+
+save();
+renderL();
+</script>
+</body>
+</html>
