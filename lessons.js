@@ -1,8 +1,9 @@
 const LESSONS = [
-  {
+
+    {
     id: 1,
     title: "Урок 1. Все 10 базовых гласных",
-    desc: "От 아 до 유 • Аудирование, пары, прописи, слово 아이유",
+    desc: "От 아 до 유 • Прописи каждой гласной, аудирование, пары, слово 아이유",
     coins: 80,
     xp: 150,
     cardId: 1,
@@ -19,14 +20,10 @@ const LESSONS = [
           { kr: "우", tr: "[у]", ru: "Горизонталь, черта вниз", file: "audio/u.mp3" }
         ]
       },
-      {
-        type: "draw",
-        kr: "아",
-        tr: "[а]",
-        ru: "Звук [а]",
-        file: "audio/a.mp3",
-        blind: true
-      },
+      { type: "draw", kr: "아", tr: "[а]", ru: "Звук [а]", file: "audio/a.mp3", blind: false },
+      { type: "draw", kr: "어", tr: "[о] открытое", ru: "Открытое [о]", file: "audio/eo.mp3", blind: false },
+      { type: "draw", kr: "오", tr: "[о] округлое", ru: "Округлое [о]", file: "audio/o.mp3", blind: false },
+      { type: "draw", kr: "우", tr: "[у]", ru: "Звук [у]", file: "audio/u.mp3", blind: false },
       {
         type: "choice", kr: "어", tr: "Черта влево", file: "audio/eo.mp3",
         q: "Какой звук даёт этот слог?",
@@ -58,6 +55,12 @@ const LESSONS = [
           { kr: "유", tr: "[ю]", ru: "Две черты вниз", file: "audio/yu.mp3" }
         ]
       },
+      { type: "draw", kr: "으", tr: "[ы]", ru: "Звук [ы]", file: "audio/eu.mp3", blind: false },
+      { type: "draw", kr: "이", tr: "[и]", ru: "Звук [и]", file: "audio/i.mp3", blind: false },
+      { type: "draw", kr: "야", tr: "[я]", ru: "Звук [я]", file: "audio/ya.mp3", blind: false },
+      { type: "draw", kr: "여", tr: "[ё] открытое", ru: "Открытое [ё]", file: "audio/yeo.mp3", blind: false },
+      { type: "draw", kr: "요", tr: "[ё] округлое", ru: "Округлое [ё]", file: "audio/yo.mp3", blind: false },
+      { type: "draw", kr: "유", tr: "[ю]", ru: "Звук [ю]", file: "audio/yu.mp3", blind: false },
       {
         type: "choice", kr: "야", tr: "Две черты вправо", file: "audio/ya.mp3",
         q: "Что выкрикивают айдолы в шоу, когда удивляются или зовут друга словом 야?",
@@ -140,7 +143,7 @@ const LESSONS = [
         tr: "[у-ю]",
         ru: "Молоко",
         file: "audio/uyu.mp3",
-        blind: true
+        blind: false
       },
       {
         type: "match",
