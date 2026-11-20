@@ -2,7 +2,7 @@ const LESSONS = [
   {
     id: 1,
     title: "Урок 1. Все 10 базовых гласных",
-    desc: "От 아 до 유 • Аудирование, пары, слово 아이유",
+    desc: "От 아 до 유 • Аудирование, пары, прописи, слово 아이유",
     coins: 80,
     xp: 150,
     cardId: 1,
@@ -18,6 +18,14 @@ const LESSONS = [
           { kr: "오", tr: "[о] округлое", ru: "Горизонталь, черта вверх", file: "audio/o.mp3" },
           { kr: "우", tr: "[у]", ru: "Горизонталь, черта вниз", file: "audio/u.mp3" }
         ]
+      },
+      {
+        type: "draw",
+        kr: "아",
+        tr: "[а]",
+        ru: "Звук [а]",
+        file: "audio/a.mp3",
+        blind: true
       },
       {
         type: "choice", kr: "어", tr: "Черта влево", file: "audio/eo.mp3",
@@ -103,8 +111,8 @@ const LESSONS = [
         explain: "이유 [ию] — «причина». Очень частое слово в лирике баллад."
       },
       {
-        type: "build",
-        q: "Собери слово «Молоко» [у-ю]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Молоко»",
         file: "audio/uyu.mp3", audioText: "우유",
         answer: ["우", "유"],
         pool: ["유", "요", "우", "아", "이"],
@@ -119,12 +127,20 @@ const LESSONS = [
         explain: "여 [ё] + 우 [у] = 여우!"
       },
       {
-        type: "build",
-        q: "Собери имя певицы «IU» [А-и-ю]",
+        type: "listen_build",
+        q: "Послушай и собери имя певицы «IU»",
         file: "audio/iu.mp3", audioText: "아이유",
         answer: ["아", "이", "유"],
         pool: ["유", "아", "요", "이", "우"],
         explain: "아 + 이 + 유 = 아이유! Ты только что собрал 3-сложное имя."
+      },
+      {
+        type: "draw",
+        kr: "우유",
+        tr: "[у-ю]",
+        ru: "Молоко",
+        file: "audio/uyu.mp3",
+        blind: true
       },
       {
         type: "match",
@@ -172,6 +188,14 @@ const LESSONS = [
           { kr: "다", tr: "[та / да]", ru: "ㄷ — дверь (Door → Д/Т)", file: "audio/da.mp3" },
           { kr: "라", tr: "[ра / ла]", ru: "ㄹ — змея: между гласными мягкое [р]", file: "audio/ra.mp3" }
         ]
+      },
+      {
+        type: "draw",
+        kr: "나",
+        tr: "[на]",
+        ru: "Слог [на]",
+        file: "audio/na.mp3",
+        blind: true
       },
       {
         type: "match",
@@ -244,8 +268,8 @@ const LESSONS = [
         explain: "가수 [касу] — певец/певица."
       },
       {
-        type: "build",
-        q: "Собери слово «Певец» [ка-су]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Певец»",
         file: "audio/gasu.mp3", audioText: "가수",
         answer: ["가", "수"],
         pool: ["수", "사", "가", "나", "고"],
@@ -293,16 +317,16 @@ const LESSONS = [
         ]
       },
       {
-        type: "build",
-        q: "Собери имя «Лиса» [Ли-са]",
-        file: "audio/lisa.mp3", audioText: "리사",
-        answer: ["리", "사"],
-        pool: ["미", "사", "리", "소"],
-        explain: "리 + 사 = 리사!"
+        type: "draw",
+        kr: "리사",
+        tr: "[Ли-са]",
+        ru: "Имя: Лиса",
+        file: "audio/lisa.mp3",
+        blind: true
       },
       {
-        type: "build",
-        q: "Собери имя «Соми» [Со-ми]",
+        type: "listen_build",
+        q: "Послушай и собери имя «Соми»",
         file: "audio/somi.mp3", audioText: "소미",
         answer: ["소", "미"],
         pool: ["미", "소", "사", "나"],
@@ -395,8 +419,8 @@ const LESSONS = [
         explain: "피 + 아 + 노 = 피아노 (пианино)."
       },
       {
-        type: "build",
-        q: "Собери слово «Кофе» [кхо-пхи]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Кофе»",
         file: "audio/keopi.mp3", audioText: "커피",
         answer: ["커", "피"],
         pool: ["피", "카", "커", "포", "비"],
@@ -411,8 +435,8 @@ const LESSONS = [
         explain: "ㅈ+ㅣ = 지, ㅅ+ㅜ = 수 → 지수!"
       },
       {
-        type: "build",
-        q: "Собери слово «Пианино» [пхи-а-но]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Пианино»",
         file: "audio/piano.mp3", audioText: "피아노",
         answer: ["피", "아", "노"],
         pool: ["노", "피", "나", "아", "파"],
@@ -437,12 +461,12 @@ const LESSONS = [
         ]
       },
       {
-        type: "build",
-        q: "Собери слово «Шапка» [мо-джа]",
-        file: "audio/moja.mp3", audioText: "모자",
-        answer: ["모", "자"],
-        pool: ["자", "차", "모", "마"],
-        explain: "모 + 자 = 모자!"
+        type: "draw",
+        kr: "커피",
+        tr: "[кхо-пхи]",
+        ru: "Кофе",
+        file: "audio/keopi.mp3",
+        blind: true
       },
       {
         type: "choice", kr: "포도", tr: "ㅍ+ㅗ и ㄷ+ㅗ", file: "audio/podo.mp3",
@@ -528,8 +552,8 @@ const LESSONS = [
         explain: "뽀뽀 [ппо-ппо] — чмок! Не путай с 바보 [па-бо] (дурачок)."
       },
       {
-        type: "build",
-        q: "Собери слово «Оппа» [оп-па]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Оппа»",
         file: "audio/oppa.mp3", audioText: "오빠",
         answer: ["오", "빠"],
         pool: ["빠", "바", "오", "아", "파"],
@@ -558,8 +582,16 @@ const LESSONS = [
         explain: "싸다 [ссада] — дешёвый. Полезно при покупке мерча!"
       },
       {
-        type: "build",
-        q: "Собери слово «Чмок» [ппо-ппо]",
+        type: "draw",
+        kr: "오빠",
+        tr: "[оп-па]",
+        ru: "Слово: Оппа",
+        file: "audio/oppa.mp3",
+        blind: true
+      },
+      {
+        type: "listen_build",
+        q: "Послушай и собери слово «Чмок»",
         file: "audio/ppoppo.mp3", audioText: "뽀뽀",
         answer: ["뽀", "뽀"],
         pool: ["보", "뽀", "포", "뽀"],
@@ -622,8 +654,8 @@ const LESSONS = [
         explain: "노래 [норэ] — песня! А «норэбан» — знаменитое корейское караоке."
       },
       {
-        type: "build",
-        q: "Собери слово «Песня» [но-рэ]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Песня»",
         file: "audio/norae.mp3", audioText: "노래",
         answer: ["노", "래"],
         pool: ["래", "라", "노", "나", "레"],
@@ -688,8 +720,8 @@ const LESSONS = [
         explain: "사과 [сагва] имеет сразу два значения: яблоко и извинение!"
       },
       {
-        type: "build",
-        q: "Собери слово «Лучший!» [чхве-го]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Лучший!»",
         file: "audio/choego.mp3", audioText: "최고",
         answer: ["최", "고"],
         pool: ["고", "최", "취", "코", "가"],
@@ -702,6 +734,14 @@ const LESSONS = [
         answer: ["과", "자"],
         pool: ["자", "사", "과", "고"],
         explain: "과 + 자 = 과자!"
+      },
+      {
+        type: "draw",
+        kr: "노래",
+        tr: "[но-рэ]",
+        ru: "Слово: Песня",
+        file: "audio/norae.mp3",
+        blind: true
       },
       {
         type: "listen", kr: "노래", tr: "[но-рэ]", file: "audio/norae.mp3",
@@ -828,8 +868,16 @@ const LESSONS = [
         explain: "마음 [маым] — душа, сердце, чувства."
       },
       {
-        type: "build",
-        q: "Собери слово «Привет» [ан-нён]",
+        type: "draw",
+        kr: "사랑",
+        tr: "[са-ран]",
+        ru: "Слово: Любовь",
+        file: "audio/sarang.mp3",
+        blind: true
+      },
+      {
+        type: "listen_build",
+        q: "Послушай и собери слово «Привет»",
         file: "audio/annyeong.mp3", audioText: "안녕",
         answer: ["안", "녕"],
         pool: ["녕", "랑", "안", "진", "남"],
@@ -937,8 +985,8 @@ const LESSONS = [
         explain: "서울 [соуль] — Сеул!"
       },
       {
-        type: "build",
-        q: "Собери слово «Музыка» [ы-мак]",
+        type: "listen_build",
+        q: "Послушай и собери слово «Музыка»",
         file: "audio/eumak.mp3", audioText: "음악",
         answer: ["음", "악"],
         pool: ["악", "막", "음", "안"],
@@ -953,12 +1001,20 @@ const LESSONS = [
         explain: "한 + 국 = 한국!"
       },
       {
-        type: "build",
-        q: "Собери слово «Корейский язык» [хан-гу-го]",
+        type: "listen_build",
+        q: "Послушай и собери «Корейский язык»",
         file: "audio/hangugeo.mp3", audioText: "한국어",
         answer: ["한", "국", "어"],
         pool: ["어", "한", "국", "아", "음"],
         explain: "한 + 국 + 어 = 한국어!"
+      },
+      {
+        type: "draw",
+        kr: "음악",
+        tr: "[ы-мак]",
+        ru: "Слово: Музыка",
+        file: "audio/eumak.mp3",
+        blind: true
       },
       {
         type: "listen", kr: "밥", tr: "[пап]", file: "audio/bap.mp3",
@@ -1016,8 +1072,8 @@ const LESSONS = [
         explain: "고마워 [комаво] — тёплое, дружеское «спасибо»."
       },
       {
-        type: "build",
-        q: "Собери фразу «Я тебя люблю» [са-ран-хэ]",
+        type: "listen_build",
+        q: "Послушай и собери фразу «Я тебя люблю»",
         file: "audio/saranghae.mp3", audioText: "사랑해",
         answer: ["사", "랑", "해"],
         pool: ["해", "랑", "사", "하", "람"],
@@ -1073,12 +1129,20 @@ const LESSONS = [
         explain: "진 + 짜 = 진짜!"
       },
       {
-        type: "build",
-        q: "Собери «Я скучаю» [по-го щи-по]",
+        type: "listen_build",
+        q: "Послушай и собери «Я скучаю»",
         file: "audio/bogoshipo.mp3", audioText: "보고 싶어",
         answer: ["보", "고", " ", "싶", "어"],
         pool: ["고", "싶", "보", "어", " "],
         explain: "보고 싶어 — теперь ты умеешь писать главную фразу фандомов!"
+      },
+      {
+        type: "draw",
+        kr: "고마워",
+        tr: "[ко-ма-во]",
+        ru: "Слово: Спасибо",
+        file: "audio/gomawo.mp3",
+        blind: true
       },
       {
         type: "match",
@@ -1134,8 +1198,8 @@ const LESSONS = [
         explain: "커피 [кхопхи] — кофе (а кафе — 카페)."
       },
       {
-        type: "build",
-        q: "Собери слово «Дорама»",
+        type: "listen_build",
+        q: "Послушай и собери слово «Дорама»",
         file: "audio/drama.mp3", audioText: "드라마",
         answer: ["드", "라", "마"],
         pool: ["라", "마", "드", "다", "나"],
@@ -1178,6 +1242,14 @@ const LESSONS = [
         explain: "Патчим ㅁ переходит на место ㅇ → [ы-мак] (музыка)."
       },
       {
+        type: "draw",
+        kr: "사랑",
+        tr: "[са-ран]",
+        ru: "Слово: Любовь",
+        file: "audio/sarang.mp3",
+        blind: true
+      },
+      {
         type: "choice", kr: "꽃", tr: "Без подсказок", file: "audio/kkot.mp3",
         q: "Как читается и переводится слово 꽃?",
         opts: ["[ккот] — Цветок", "[ккоч] — Одежда", "[кот] — Дом", "[ккоп] — Книга"],
@@ -1200,8 +1272,8 @@ const LESSONS = [
         explain: "고마워 — спасибо!"
       },
       {
-        type: "build",
-        q: "Собери «Я тебя люблю»",
+        type: "listen_build",
+        q: "Послушай и собери «Я тебя люблю»",
         file: "audio/saranghae.mp3", audioText: "사랑해",
         answer: ["사", "랑", "해"],
         pool: ["사", "해", "랑", "람", "하"],
