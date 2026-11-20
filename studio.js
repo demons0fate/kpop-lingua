@@ -249,3 +249,369 @@
 
   // Экран Студии
   window.renderStudio = function () {
+    initStudioState();
+    const b = getTeamBonuses();
+    const d = st.daily;
+    const doneCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
+    const allDone = doneCnt === 3;
+
+    studioScreen.innerHTML = `
+      <div class="agency-card">
+        <div class="agency-top">
+          <div>
+            <div class="agency-rank">${getRankTitle(st.xp)} • Серия: ${st.streak.count} дн.</div>
+            <div class="agency-name">${st.agencyName}</div>
+          </div>
+          <button class="btn ghost" style="padding:7px 11px;font-size:12px" id="rename-agency">Имя</button>
+        </div>
+        <div style="font-size:12px;color:#d8cce8;margin-bottom:8px">
+          Бонусы: <b style="color:var(--cyan)">+${b.xp}% XP</b> • <b style="color:#ff85cb">+${b.coins}% 🎤</b> • <b style="color:var(--gold)">-${b.energyMin}м ⚡</b>
+        </div>
+        <div class="studio-stats">
+          <div class="st-box"><div class="st-val" style="color:var(--accent)">${b.power}</div><div class="st-lbl">Фандом</div></div>
+          <div class="st-box"><div class="st-val" style="color:var(--cyan)">${st.cards.length}/${CARDS.length}</div><div class="st-lbl">Артисты</div></div>
+          <div class="st-box"><div class="st-val" style="color:var(--gold)">${st.dust}</div><div class="st-lbl">Зв. пыль</div></div>
+        </div>
+      </div>
+
+      <h3 style="margin:0 0 8px;font-size:15px">Состав группы (${b.count}/4)</h3>
+      <div class="team-grid" id="team-grid"></div>
+
+      <div class="synergy-box ${b.synergy ? '' : 'off'}">
+        <span>${b.synergy ? 'Синергия эры активна! (+15% XP, +15% 🎤)' : 'Поставь 4 карты одной Эры для бонуса Синергии'}</span>
+        <b>${b.synergy ? 'ON' : `${b.count}/4`}</b>
+      </div>
+
+      <h3 style="margin:0 0 8px;font-size:15px">Полка трофеев (${st.trophies.length}/${TROPHIES.length})</h3>
+      <div class="trophy-grid">
+        ${TROPHIES.map(t => {
+          const has = st.trophies.includes(t.id);
+          return `<div class="trophy-item ${has ? 'has' : ''}" onclick="alert('${t.name}\\n${t.desc}\\nЭффект: ${t.buff}')">
+            <div class="trophy-ico">${t.icon}</div>
+            <div class="trophy-name">${t.name}</div>
+            <div class="trophy-buff">${has ? t.buff : 'Закрыто'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px">
+        <h3 style="margin:0;font-size:15px">Ежедневные контракты</h3>
+        <span style="font-size:12px;color:var(--cyan);font-weight:800">${doneCnt}/3 выполнено</span>
+      </div>
+      <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}">
+        <div><div class="c-title">Пройти 1 урок или повтор</div><div class="l-meta">Вкладка Уроки</div></div>
+        <div class="c-prog">${Math.min(d.lessons, 1)}/1</div>
+      </div>
+      <div class="contract-row ${d.dict >= 2 ? 'done' : ''}">
+        <div><div class="c-title">Написать 2 слова в Диктанте</div><div class="l-meta">Словарь → Диктант</div></div>
+        <div class="c-prog">${Math.min(d.dict, 2)}/2</div>
+      </div>
+      <div class="contract-row ${d.cards >= 3 ? 'done' : ''}">
+        <div><div class="c-title">Перевернуть 3 карточки</div><div class="l-meta">Словарь → 3D-Карточки</div></div>
+        <div class="c-prog">${Math.min(d.cards, 3)}/3</div>
+      </div>
+
+      <div class="daily-prize">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase">Награда за все 3 контракта</div>
+        <div style="font-size:14px;font-weight:800;margin:4px 0 8px">Серебряный кейс + 25 микрофонов</div>
+        ${allDone && !d.claimed
+          ? `<button class="btn gold full" id="claim-daily">Забрать награду!</button>`
+          : (d.claimed
+              ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Награда получена! Новые контракты завтра.</div>`
+              : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((doneCnt / 3) * 100)}%"></div></div>`)
+        }
+      </div>
+    `;
+
+    document.getElementById('rename-agency').onclick = () => {
+      const n = prompt('Придумай название своего агентства:', st.agencyName);
+      if (n && n.trim()) { st.agencyName = n.trim().slice(0, 22); save(); updateStudioBadge(); renderStudio(); }
+    };
+
+    const claimBtn = document.getElementById('claim-daily');
+    if (claimBtn) {
+      claimBtn.onclick = () => {
+        st.daily.claimed = true; st.cases.silver++; st.coins += 25;
+        save(); updateStudioBadge(); haptic('ok'); sfx('win'); fireConfetti(); renderStudio();
+      };
+    }
+
+    const tgGrid = document.getElementById('team-grid');
+    ROLES.forEach(r => {
+      const cid = st.team[r.key];
+      const tier = cid ? getBestTier(cid) : null;
+      const c = tier ? CARDS.find(x => x.id === cid) : null;
+      const el = document.createElement('div');
+      el.className = 'team-slot' + (c ? ' filled' : '');
+      if (c) {
+        const tm = TIER_META[tier];
+        el.style.borderColor = tm.color;
+        el.innerHTML = `<div class="slot-role" style="color:${tm.color}">${r.title} • ${tm.name}</div><div style="font-weight:800;font-size:13px">${c.name}</div><div class="pc-bonus">+${Math.round(c.bonusVal * tm.mult)} ${c.bonusType === 'energy' ? 'мин ⚡' : '%'}</div>`;
+      } else {
+        el.innerHTML = `<div class="slot-role">${r.title}</div><div style="font-size:22px;opacity:0.35;margin:6px 0">+</div><div class="l-meta">Выбрать (${r.desc})</div>`;
+      }
+      el.onclick = () => openSlotPicker(r);
+      tgGrid.appendChild(el);
+    });
+  };
+
+  function openSlotPicker(role) {
+    const owned = CARDS.filter(c => getBestTier(c.id) && c.roleKey === role.key);
+    const modal = document.getElementById('pack-modal');
+    modal.classList.add('open');
+    if (!owned.length) {
+      modal.innerHTML = `<div class="card-box" style="max-width:300px;text-align:center"><h3>Роль: ${role.title}</h3><p style="color:var(--muted)">У тебя пока нет артистов этой роли. Открывай кейсы во вкладке «Артисты»!</p><button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button></div>`;
+      return;
+    }
+    let html = `<div class="card-box" style="width:100%;max-width:320px"><h3 style="margin-bottom:12px">Выбери: ${role.title}</h3>`;
+    owned.forEach(c => {
+      const tier = getBestTier(c.id), tm = TIER_META[tier];
+      html += `<div class="vocab-row" data-pick="${c.id}"><div class="vocab-tag" style="border-color:${tm.color};color:${tm.color}">${c.tag}</div><div style="flex:1"><div style="font-weight:800;font-size:14px">${c.name}</div><div style="font-size:11px;color:${tm.color}">${tm.name} • Сила ${tm.power}</div></div></div>`;
+    });
+    html += `<button class="btn ghost full" style="margin-top:8px" onclick="document.getElementById('pack-modal').classList.remove('open')">Закрыть</button></div>`;
+    modal.innerHTML = html;
+    modal.querySelectorAll('[data-pick]').forEach(row => {
+      row.onclick = () => {
+        st.team[role.key] = Number(row.getAttribute('data-pick'));
+        save(); haptic('ok'); sfx('ok'); modal.classList.remove('open'); renderStudio();
+      };
+    });
+  }
+
+  // Вкладка «Артисты и Кейсы»
+  window.renderBinder = function () {
+    if (typeof CARDS === 'undefined') return;
+    initStudioState();
+    const cs = st.cases;
+
+    document.getElementById('bias-banner-wrap').innerHTML = `
+      <div class="cases-grid">
+        <div class="case-card silver">
+          <div class="case-title" style="color:#cfd8dc">Серебряный</div>
+          <div class="case-sub">Серебро / Золото</div>
+          <button class="case-btn ${cs.silver > 0 ? 'ready' : ''}" onclick="openCaseModal('silver')">${cs.silver > 0 ? `Открыть (${cs.silver})` : '50 🎤'}</button>
+        </div>
+        <div class="case-card gold">
+          <div class="case-title" style="color:#ffd700">Золотой</div>
+          <div class="case-sub">Золото / Платина</div>
+          <button class="case-btn ${cs.gold > 0 ? 'ready' : ''}" onclick="openCaseModal('gold')">${cs.gold > 0 ? `Открыть (${cs.gold})` : '120 🎤'}</button>
+        </div>
+        <div class="case-card platinum">
+          <div class="case-title" style="color:#00e5ff">Платиновый</div>
+          <div class="case-sub">100% Платина</div>
+          <button class="case-btn ${cs.platinum > 0 ? 'ready' : ''}" onclick="openCaseModal('platinum')">${cs.platinum > 0 ? `Открыть (${cs.platinum})` : 'За Экзамен'}</button>
+        </div>
+      </div>`;
+
+    const g = document.getElementById('binder-grid'); g.innerHTML = '';
+    (curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum)).forEach(c => {
+      const best = getBestTier(c.id);
+      const craft = getCraftableTier(c.id);
+      const inTeam = st.team[c.roleKey] === c.id;
+      const el = document.createElement('div');
+      el.className = `photocard ${best ? 'tier-' + best : 'locked'} ${inTeam ? 'bias-active' : ''}`;
+      const totalCopies = best ? Object.values(st.inv[c.id]).reduce((a, b) => a + b, 0) : 0;
+      el.innerHTML = `
+        ${inTeam ? '<div class="pc-bias-tag">В СОСТАВЕ</div>' : ''}
+        <div class="pc-rarity" style="color:${best ? TIER_META[best].color : 'var(--muted)'}">${best ? TIER_META[best].name : 'Закрыто'}</div>
+        ${craft ? '<div class="craft-badge">СЛИЯНИЕ 3→1</div>' : ''}
+        ${best ? cardArtHtml(c) : '<div class="pc-art" style="background:#181326"><div class="pc-monogram" style="opacity:0.25">?</div></div>'}
+        <div class="pc-name">${best ? c.name : 'Скрытый артист'}</div>
+        <div class="pc-role">${best ? `${c.role} • Копий: ${totalCopies}` : 'Открой кейс выше'}</div>
+      `;
+      if (best) el.onclick = () => openArtistModal(c.id);
+      g.appendChild(el);
+    });
+  };
+
+  // Чистое окно Артиста (Озвучка + Состав + Крафт 3 в 1)
+  function openArtistModal(cardId) {
+    const c = CARDS.find(x => x.id === cardId);
+    const best = getBestTier(cardId);
+    const inv = st.inv[cardId];
+    const inTeam = st.team[c.roleKey] === cardId;
+    const craftTier = getCraftableTier(cardId);
+    const nextTier = craftTier ? TIERS[TIERS.indexOf(craftTier) + 1] : null;
+    const tm = TIER_META[best];
+
+    const modal = document.getElementById('pack-modal');
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box" style="width:100%;max-width:330px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:12px;font-weight:900;color:${tm.color}">${tm.name.toUpperCase()} • ${c.role}</span>
+          <button class="close-btn" style="width:30px;height:30px;font-size:14px" onclick="document.getElementById('pack-modal').classList.remove('open')">✕</button>
+        </div>
+        <div class="photocard tier-${best}" style="margin-bottom:10px;cursor:default">
+          ${cardArtHtml(c)}
+          <div class="pc-name" style="font-size:16px">${c.name}</div>
+          <div class="pc-bonus" style="font-size:12px">Бонус: +${Math.round(c.bonusVal * tm.mult)} ${c.bonusType === 'energy' ? 'мин ⚡' : '%'} • Фандом ${tm.power}</div>
+        </div>
+        <div class="tier-pills">
+          ${TIERS.map(t => `<div class="t-pill" style="border-color:${inv[t] >= 3 && t !== 'neon' ? 'var(--success)' : 'rgba(255,255,255,0.08)'}"><span style="color:${TIER_META[t].color}">${TIER_META[t].name}</span><b>${inv[t] || 0}</b></div>`).join('')}
+        </div>
+        ${craftTier ? `<button class="btn gold full" style="margin-bottom:8px" id="do-craft">Слияние: 3 ${TIER_META[craftTier].name} → 1 ${TIER_META[nextTier].name}</button>` : ''}
+        <div style="display:flex;gap:8px">
+          <button class="btn ${inTeam ? 'ghost' : 'cyan'}" style="flex:1" id="do-equip">${inTeam ? 'В составе ✓' : 'В состав'}</button>
+          <button class="btn ghost" onclick="playAudio('${c.quoteFile}','${c.quoteKr}')">🔊 Фраза</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('do-equip').onclick = () => {
+      st.team[c.roleKey] = cardId; save(); haptic('ok'); sfx('ok');
+      renderBinder(); openArtistModal(cardId);
+    };
+
+    const craftBtn = document.getElementById('do-craft');
+    if (craftBtn) {
+      craftBtn.onclick = () => runFusionAnim(cardId, craftTier, nextTier);
+    }
+  }
+
+  // Анимация слияния 3 в 1
+  function runFusionAnim(cardId, fromTier, toTier) {
+    const c = CARDS.find(x => x.id === cardId);
+    const modal = document.getElementById('pack-modal');
+    haptic('heavy'); sfx('tap');
+    modal.innerHTML = `
+      <div style="font-size:14px;font-weight:900;color:${TIER_META[toTier].color};margin-bottom:12px">СЛИЯНИЕ В ${TIER_META[toTier].name.toUpperCase()}...</div>
+      <div class="fusion-stage">
+        <div class="f-orb o1"></div><div class="f-orb o2"></div><div class="f-orb o3"></div>
+      </div>`;
+
+    setTimeout(() => {
+      st.inv[cardId][fromTier] -= 3;
+      st.inv[cardId][toTier] = (st.inv[cardId][toTier] || 0) + 1;
+      save(); renderBinder();
+      haptic('ok'); sfx('win'); fireConfetti();
+      if (c.quoteFile) playAudio(c.quoteFile, c.quoteKr);
+
+      modal.innerHTML = `
+        <div style="font-size:15px;font-weight:900;color:${TIER_META[toTier].color};margin-bottom:14px">НОВЫЙ РАНГ: ${TIER_META[toTier].name.toUpperCase()}!</div>
+        <div class="photocard tier-${toTier} reveal-card">
+          <div class="pc-rarity" style="color:${TIER_META[toTier].color}">${TIER_META[toTier].name}</div>
+          ${cardArtHtml(c)}
+          <div class="pc-name" style="font-size:16px">${c.name}</div>
+          <div class="pc-bonus" style="font-size:12px;margin-top:6px">Фандом: ${TIER_META[toTier].power}</div>
+        </div>
+        <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
+    }, 850);
+  }
+
+  // Открытие Кейсов (Серебро / Золото / Платина)
+  window.openCaseModal = function (type) {
+    initStudioState();
+    const prices = { silver: 50, gold: 120, platinum: 0 };
+    const hasFree = st.cases[type] > 0;
+    if (!hasFree) {
+      if (type === 'platinum') return alert('Платиновый кейс выдаётся за сдачу Большого экзамена!');
+      if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} микрофонов!`);
+      st.coins -= prices[type];
+    } else {
+      st.cases[type]--;
+    }
+    save(); updateStudioBadge(); renderBinder();
+    haptic('medium');
+
+    const titleMap = { silver: "СЕРЕБРЯНЫЙ КЕЙС", gold: "ЗОЛОТОЙ КЕЙС", platinum: "ПЛАТИНОВЫЙ КЕЙС" };
+    const modal = document.getElementById('pack-modal');
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div style="font-size:13px;color:var(--cyan);font-weight:800;letter-spacing:1px;margin-bottom:18px">НАЖМИ НА КЕЙС, ЧТОБЫ ОТКРЫТЬ</div>
+      <div class="pack-foil" id="gacha-pack"><div class="pack-inner">
+        <div style="font-size:11px;color:#ff85cb;font-weight:900;letter-spacing:2px">K-POP LINGUA</div>
+        <div style="font-size:20px;font-weight:900;margin:14px 0">${titleMap[type]}</div>
+        <div style="font-size:11px;color:var(--muted)">Нажми для открытия</div>
+      </div></div>`;
+
+    document.getElementById('gacha-pack').onclick = () => {
+      document.getElementById('gacha-pack').classList.add('shaking');
+      haptic('heavy'); sfx('tap');
+      setTimeout(() => {
+        const luck = getTeamBonuses().luck / 100;
+        const r = Math.random();
+        let tier = 'silver';
+        if (type === 'platinum') tier = 'platinum';
+        else if (type === 'gold') tier = r < (0.2 + luck * 0.5) ? 'platinum' : 'gold';
+        else tier = r < (0.02 + luck * 0.2) ? 'platinum' : (r < (0.2 + luck) ? 'gold' : 'silver');
+
+        const c = CARDS[Math.floor(Math.random() * CARDS.length)];
+        addCardCopy(c.id, tier);
+
+        let trophyMsg = '';
+        if ((type === 'gold' && Math.random() < 0.12) || (type === 'platinum' && Math.random() < 0.35)) {
+          if (!st.trophies.includes('gold_mic')) {
+            st.trophies.push('gold_mic');
+            trophyMsg = `<div style="margin-top:8px;color:var(--gold);font-size:12px;font-weight:800">★ ВЫБИТ ТРОФЕЙ: Золотой микрофон!</div>`;
+          }
+        }
+        save(); renderBinder();
+        haptic('ok'); sfx('win');
+        if (tier !== 'silver') fireConfetti();
+        if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 250);
+
+        const tm = TIER_META[tier];
+        const cnt = st.inv[c.id][tier];
+        modal.innerHTML = `
+          <div style="font-size:14px;font-weight:900;color:${tm.color};margin-bottom:14px">${tm.name.toUpperCase()} • КОПИЙ: ${cnt}${cnt >= 3 ? ' (ДОСТУПНО СЛИЯНИЕ!)' : ''}</div>
+          <div class="photocard tier-${tier} reveal-card">
+            <div class="pc-rarity" style="color:${tm.color}">${tm.name}</div>
+            ${cardArtHtml(c)}
+            <div class="pc-name" style="font-size:16px">${c.name}</div>
+            <div class="pc-role">${c.role}</div>
+            <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${c.quoteKr}»</div>
+            ${trophyMsg}
+          </div>
+          <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
+      }, 550);
+    };
+  };
+
+  // Перехваты для контрактов и выдачи кейсов за уроки/экзамен
+  const origSwitchTab = window.switchTab;
+  window.switchTab = function (t) {
+    origSwitchTab(t);
+    if (t === 'studio') renderStudio();
+  };
+
+  const origFinishLesson = window.finishLesson;
+  window.finishLesson = function () {
+    const passed = !(curL && curL.isExam && mistakes > 4);
+    if (passed) {
+      initStudioState();
+      st.daily.lessons++;
+      if (curL && !st.done.includes(curL.id)) {
+        const b = getTeamBonuses();
+        st.xp += Math.round(curL.xp * (b.xp / 100));
+        st.coins += Math.round(curL.coins * (b.coins / 100));
+        if (curL.isExam) {
+          st.cases.platinum++;
+          if (!st.trophies.includes('hangul_master')) st.trophies.push('hangul_master');
+        } else if (curL.id % 4 === 0) {
+          st.cases.gold++;
+        }
+      }
+      save(); updateStudioBadge();
+    }
+    origFinishLesson();
+  };
+
+  const origMountDraw = window.mountDrawWidget;
+  window.mountDrawWidget = function (container, item, blindMode, onSuccess, onFail, noPeek) {
+    origMountDraw(container, item, blindMode, () => {
+      if (document.getElementById('screen-vocab').classList.contains('active')) {
+        initStudioState(); st.daily.dict++; save(); updateStudioBadge();
+      }
+      if (onSuccess) onSuccess();
+    }, onFail, noPeek);
+  };
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#fc-card') && e.target.id !== 'fc-audio') {
+      initStudioState(); st.daily.cards++; save(); updateStudioBadge();
+    }
+  });
+
+  initStudioState();
+})();
