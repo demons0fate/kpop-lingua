@@ -233,7 +233,7 @@
     renderBinder();
   };
 
-  // ГЛАВНЫЙ ЭКРАН СТУДИИ (внутри #screen-binder)
+// ГЛАВНЫЙ ЭКРАН СТУДИИ (внутри #screen-binder)
   window.renderBinder = function () {
     if (typeof CARDS === 'undefined') return;
     initStudioState();
@@ -249,7 +249,10 @@
             <div class="agency-rank">${getRankTitle(st.xp)} • Серия ${st.streak.count} дн. • Фандом ${b.power}</div>
             <div class="agency-name">${st.agencyName}</div>
           </div>
-          <button class="btn ghost" style="padding:6px 10px;font-size:11px" id="rename-agency">Имя</button>
+          <div style="display:flex;gap:6px">
+            <button class="btn cyan" style="padding:6px 9px;font-size:11px" id="test-add-coins">+500</button>
+            <button class="btn ghost" style="padding:6px 10px;font-size:11px" id="rename-agency">Имя</button>
+          </div>
         </div>
         <div class="agency-buffs">
           <span style="color:var(--cyan);font-weight:800">+${b.xp}% XP</span>
@@ -271,6 +274,14 @@
       </div>
       <div id="studio-sub-body"></div>
     `;
+
+    document.getElementById('test-add-coins').onclick = () => {
+      st.coins += 500;
+      save();
+      haptic('ok');
+      sfx('tap');
+      renderBinder();
+    };
 
     document.getElementById('rename-agency').onclick = () => {
       const n = prompt('Название твоего агентства:', st.agencyName);
