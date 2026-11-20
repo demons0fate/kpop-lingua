@@ -1,0 +1,64 @@
+name: Auto Korean TTS
+
+on:
+  push:
+    paths:
+      - 'lessons.js'
+      - '.github/workflows/tts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install edge-tts
+        run: pip install edge-tts
+
+      - name: Generate missing MP3 files
+        run: |
+          python - << 'EOF'
+          import asyncio, os, re, edge_tts
+
+          os.makedirs("audio", exist_ok=True)
+          with open("lessons.js", "r", encoding="utf-8") as f:
+              text = f.read()
+
+          items = {}
+          for kr, path in re.findall(r'kr:\s*"([^"]+)"[^\n]*?file:\s*"(audio/[^"]+\.mp3)"', text):
+              items[path] = kr
+          for path, kr in re.findall(r'file:\s*"(audio/[^"]+\.mp3)"[^\n]*?audioText:\s*"([^"]+)"', text):
+              items[path] = kr
+
+          async def main():
+              for path, kr in items.items():
+                  if os.path.exists(path):
+                      continue
+                  try:
+                      print(f"Озвучиваю: {kr} -> {path}")
+                      comm = edge_tts.Communicate(kr, "ko-KR-SunHiNeural", rate="-10%")
+                      await comm.save(path)
+                      await asyncio.sleep(0.2)
+                  except Exception as e:
+                      print(f"Ошибка для {path}: {e}")
+
+          asyncio.run(main())
+          EOF
+
+      - name: Commit and push audio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add audio/
+          git diff --staged --quiet || git commit -m "Автоозвучка новых слов"
+          git push
