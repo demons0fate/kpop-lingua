@@ -7,51 +7,57 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  --bg: #0e0b16; --surface: #191426; --surface-2: #241e38;
+  --bg: #0b0814; --surface: #161124; --surface-2: #221b36;
   --accent: #ff2e93; --purple: #8a2be2; --cyan: #00e5ff;
   --gold: #ffd700; --success: #00e676; --danger: #ff4757;
-  --text: #ffffff; --muted: #9b93b3;
+  --text: #ffffff; --muted: #988fb3;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; user-select: none; }
+body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 92px; user-select: none; overflow-x: hidden; }
+svg { display: block; flex-shrink: 0; }
 
-.header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(25,20,38,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; gap: 8px; }
-.brand { font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #ff7ac6, #a56eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+#confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+
+.header { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; background: rgba(18,13,30,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; gap: 8px; }
+.brand { font-weight: 900; font-size: 15px; letter-spacing: 0.3px; background: linear-gradient(90deg, #ff7ac6, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
 .stats { display: flex; gap: 6px; align-items: center; }
-.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 16px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 3px; cursor: pointer; white-space: nowrap; }
-.pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); }
-.pill.energy { border-color: rgba(0,229,255,0.45); background: rgba(0,229,255,0.1); }
-.pill.hearts { border-color: rgba(255,71,87,0.45); background: rgba(255,71,87,0.12); }
-.pill.xp { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); }
+.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 5px 9px; border-radius: 16px; font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: transform 0.2s var(--spring); }
+.pill:active { transform: scale(0.92); }
+.pill.energy { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.1); color: #bdf7ff; }
+.pill.hearts { border-color: rgba(255,71,87,0.4); background: rgba(255,71,87,0.12); color: #ffb3ba; }
+.pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); color: #ffb3dc; }
+.pill.xp { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); color: #ffe98a; }
 
-.screen { display: none; padding: 18px; animation: fadeIn 0.2s ease; }
+.screen { display: none; padding: 16px; animation: screenIn 0.28s var(--spring); }
 .screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes screenIn { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-.module-banner { background: linear-gradient(135deg, #2d144d, #4d1344); border: 1px solid rgba(255,46,147,0.4); border-radius: 20px; padding: 18px; margin-bottom: 14px; }
+.module-banner { background: linear-gradient(135deg, #2a124a, #4d1143); border: 1px solid rgba(255,46,147,0.4); border-radius: 22px; padding: 18px; margin-bottom: 14px; box-shadow: 0 10px 28px rgba(77,17,67,0.28); }
 .module-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
-.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 10px; color: #ff99d6; }
+.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 10px; color: #ff99d6; }
 .module-banner h2 { margin: 0 0 6px; font-size: 20px; }
 .module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
-.bar-bg { background: rgba(0,0,0,0.35); height: 8px; border-radius: 8px; overflow: hidden; }
-.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.35s ease; }
+.bar-bg { background: rgba(0,0,0,0.4); height: 8px; border-radius: 8px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.45s var(--spring); }
 
-.trainer-banner { background: linear-gradient(135deg, #162447, #2b174a); border: 1px solid rgba(0,229,255,0.4); border-radius: 18px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.trainer-banner { background: linear-gradient(135deg, #132245, #291547); border: 1px solid rgba(0,229,255,0.35); border-radius: 18px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
-.lesson-card { background: var(--surface); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; transition: opacity 0.2s; }
-.lesson-card.done { border-color: rgba(0,230,118,0.45); }
-.lesson-card.exam { background: linear-gradient(135deg, #23193b, #361c3d); border: 1px solid rgba(255,215,0,0.45); }
-.lesson-card.locked { opacity: 0.5; filter: grayscale(0.4); }
+.lesson-card { background: var(--surface); border-radius: 18px; padding: 15px 16px; margin-bottom: 11px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; transition: transform 0.2s var(--spring), opacity 0.2s; }
+.lesson-card:active { transform: scale(0.985); }
+.lesson-card.done { border-color: rgba(0,230,118,0.4); }
+.lesson-card.exam { background: linear-gradient(135deg, #24173d, #3a1a3f); border: 1px solid rgba(255,215,0,0.45); }
+.lesson-card.locked { opacity: 0.48; filter: grayscale(0.5); }
 .l-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
 .l-title { font-weight: 700; font-size: 15px; }
 
-.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 16px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; }
-.btn:active { transform: scale(0.96); }
+.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 16px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; transition: transform 0.18s var(--spring), box-shadow 0.2s; box-shadow: 0 4px 14px rgba(255,46,147,0.25); }
+.btn:active { transform: scale(0.93); }
 .btn:disabled { opacity: 0.5; }
 .btn.full { width: 100%; padding: 15px; font-size: 15px; }
-.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); }
-.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); }
-.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; }
+.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
+.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 14px rgba(0,198,255,0.28); }
+.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; box-shadow: 0 4px 14px rgba(255,184,0,0.3); }
 
 .study-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .close-btn { background: var(--surface-2); color: #fff; border: none; width: 36px; height: 36px; border-radius: 12px; font-size: 18px; cursor: pointer; }
@@ -69,7 +75,8 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .tip-box { background: rgba(0,229,255,0.08); border-left: 3px solid var(--cyan); padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #ccf7ff; margin: 12px 0; }
 
 .example-list { display: grid; gap: 9px; margin-top: 12px; }
-.example-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 11px 13px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; }
+.example-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 11px 13px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: transform 0.15s; }
+.example-row:active { transform: scale(0.98); }
 .ex-kr { font-size: 24px; font-weight: 800; min-width: 74px; }
 .ex-info { flex: 1; padding: 0 10px; }
 .ex-tr { font-size: 13px; color: var(--cyan); font-weight: 700; }
@@ -81,37 +88,39 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .big-tr { font-size: 14px; color: var(--cyan); margin-top: 6px; font-weight: 600; }
 .audio-pill { margin-top: 12px; background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; }
 .listen-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0 4px; }
-.big-listen-btn { width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); border: none; color: #fff; font-size: 32px; cursor: pointer; box-shadow: 0 0 24px rgba(255,46,147,0.45); }
-.slow-listen-btn { width: 52px; height: 52px; border-radius: 50%; background: var(--surface-2); border: 1.5px solid rgba(0,229,255,0.45); color: #fff; font-size: 22px; cursor: pointer; }
-.big-listen-btn:active, .slow-listen-btn:active { transform: scale(0.92); }
+.big-listen-btn { width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); border: none; color: #fff; font-size: 30px; cursor: pointer; box-shadow: 0 0 24px rgba(255,46,147,0.45); display: flex; align-items: center; justify-content: center; }
+.slow-listen-btn { width: 52px; height: 52px; border-radius: 50%; background: var(--surface-2); border: 1.5px solid rgba(0,229,255,0.45); color: #fff; font-size: 20px; cursor: pointer; }
+.big-listen-btn:active, .slow-listen-btn:active { transform: scale(0.9); }
 
-.opt-btn { display: block; width: 100%; text-align: left; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.opt-btn { display: block; width: 100%; text-align: left; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.15s var(--spring), border-color 0.2s; }
+.opt-btn:active { transform: scale(0.98); }
 .opt-btn.correct { background: rgba(0,230,118,0.18); border-color: var(--success); }
 .opt-btn.wrong { background: rgba(255,71,87,0.18); border-color: var(--danger); }
 
 .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .match-col { display: flex; flex-direction: column; gap: 10px; }
-.match-btn { background: var(--surface); border: 1.5px solid rgba(255,255,255,0.12); color: #fff; padding: 14px 10px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; min-height: 54px; transition: 0.15s; }
+.match-btn { background: var(--surface); border: 1.5px solid rgba(255,255,255,0.12); color: #fff; padding: 14px 10px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; min-height: 54px; transition: 0.15s var(--spring); }
 .match-btn.kr { font-size: 20px; }
-.match-btn.sel { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
-.match-btn.matched { opacity: 0.25; border-color: var(--success); background: rgba(0,230,118,0.15); pointer-events: none; }
+.match-btn.sel { border-color: var(--cyan); background: rgba(0,229,255,0.16); transform: scale(1.02); }
+.match-btn.matched { opacity: 0.22; border-color: var(--success); background: rgba(0,230,118,0.15); pointer-events: none; transform: scale(0.95); }
 .match-btn.wrong { border-color: var(--danger); background: rgba(255,71,87,0.25); }
 
 .build-slots { min-height: 64px; background: var(--surface); border: 2px dashed rgba(255,255,255,0.18); border-radius: 16px; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-bottom: 16px; }
 .build-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 18px; }
-.chip { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; padding: 12px 18px; border-radius: 14px; font-size: 20px; font-weight: 800; cursor: pointer; }
-.chip.used { opacity: 0.25; pointer-events: none; }
+.chip { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; padding: 12px 18px; border-radius: 14px; font-size: 20px; font-weight: 800; cursor: pointer; transition: transform 0.15s var(--spring); }
+.chip:active { transform: scale(0.9); }
+.chip.used { opacity: 0.22; pointer-events: none; }
 .chip.in-slot { background: rgba(138,43,226,0.35); border-color: var(--purple); }
 
 /* Drawing / Propisi */
 .mode-switch { display: flex; background: var(--surface); border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); }
-.mode-btn { flex: 1; border: none; background: transparent; color: var(--muted); padding: 9px 6px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.mode-btn { flex: 1; border: none; background: transparent; color: var(--muted); padding: 9px 6px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; }
 .mode-btn.active { background: var(--surface-2); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 
 .draw-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
 .draw-meta-title { font-size: 17px; font-weight: 800; color: #fff; }
 .draw-hint { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
-.draw-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; min-height: 250px; margin: 0 auto 14px; border-radius: 20px; background: #2c2d38; border: 2px solid rgba(255,255,255,0.14); box-shadow: inset 0 0 24px rgba(0,0,0,0.35); overflow: hidden; touch-action: none; }
+.draw-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; min-height: 250px; margin: 0 auto 14px; border-radius: 20px; background: #262733; border: 2px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 24px rgba(0,0,0,0.35); overflow: hidden; touch-action: none; }
 .draw-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
 .draw-controls { display: flex; gap: 8px; margin-bottom: 12px; }
 .draw-controls .btn { flex: 1; padding: 12px 10px; font-size: 13px; }
@@ -120,64 +129,104 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .char-pill.active { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
 .char-pill.done { border-color: var(--success); color: var(--success); }
 
-/* Vocab / Flashcards */
+/* Vocab & True 3D Flashcards */
 .vocab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.vocab-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 12px 14px; margin-bottom: 9px; cursor: pointer; }
-.vocab-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-.flashcard-wrap { perspective: 900px; margin: 14px 0 16px; }
-.flashcard { background: linear-gradient(155deg, #241b3d, #161126); border: 1.5px solid rgba(0,229,255,0.35); border-radius: 24px; min-height: 270px; padding: 26px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,0.35); transition: transform 0.18s ease, border-color 0.2s; }
-.flashcard.flipped { border-color: var(--accent); background: linear-gradient(155deg, #32163b, #191229); }
-.flashcard:active { transform: scale(0.98); }
-.fc-emoji { font-size: 58px; margin-bottom: 12px; }
-.fc-kr { font-size: 40px; font-weight: 800; letter-spacing: 1px; }
+.vocab-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 12px 14px; margin-bottom: 9px; cursor: pointer; transition: transform 0.15s; }
+.vocab-row:active { transform: scale(0.98); }
+.vocab-tag { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, rgba(255,46,147,0.2), rgba(0,229,255,0.15)); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: #ff99d6; flex-shrink: 0; }
+
+.fc-scene { perspective: 1100px; margin: 14px 0 18px; height: 290px; }
+.fc-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s var(--spring); cursor: pointer; }
+.fc-inner.flipped { transform: rotateY(180deg); }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 24px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 14px 34px rgba(0,0,0,0.45); overflow: hidden; }
+.fc-front { background: radial-gradient(circle at 20% 20%, rgba(0,229,255,0.18), transparent 55%), linear-gradient(155deg, #21183b, #120d21); border: 1.5px solid rgba(0,229,255,0.38); }
+.fc-back { background: radial-gradient(circle at 80% 20%, rgba(255,46,147,0.22), transparent 55%), linear-gradient(155deg, #301438, #140e24); border: 1.5px solid rgba(255,46,147,0.5); transform: rotateY(180deg); }
+.fc-badge { position: absolute; top: 14px; left: 16px; font-size: 11px; font-weight: 800; color: var(--cyan); background: rgba(0,229,255,0.12); padding: 4px 10px; border-radius: 10px; }
+.fc-kr { font-size: 48px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 24px rgba(0,229,255,0.3); }
 .fc-tr { font-size: 18px; color: var(--cyan); font-weight: 700; margin-top: 8px; }
-.fc-ru { font-size: 22px; font-weight: 800; color: #fff; margin-top: 6px; }
-.fc-hint { font-size: 12px; color: var(--muted); margin-top: 18px; }
+.fc-ru { font-size: 24px; font-weight: 800; color: #fff; margin-top: 10px; }
+.fc-hint { position: absolute; bottom: 16px; font-size: 11px; color: var(--muted); letter-spacing: 0.3px; }
 .fc-nav { display: flex; gap: 10px; }
 .fc-nav .btn { flex: 1; }
+
+/* Photocard Binder + Holographic Shimmer */
+.tabs-row { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; }
+.subtab { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.subtab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bias-banner { background: linear-gradient(135deg, rgba(255,46,147,0.16), rgba(0,229,255,0.12)); border: 1px solid rgba(255,46,147,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+
+.binder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.photocard { background: linear-gradient(160deg, #251e3d, #140f24); border-radius: 18px; padding: 10px; text-align: center; border: 1.5px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s var(--spring); }
+.photocard:active { transform: scale(0.95); }
+.photocard.locked { filter: grayscale(1) opacity(0.42); cursor: default; }
+.photocard.sr { border-color: #c278ff; box-shadow: 0 0 14px rgba(194,120,255,0.22); }
+.photocard.ssr { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+.photocard.bias-active { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.photocard.sr::after, .photocard.ssr::after { content: ''; position: absolute; inset: -60%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.22) 50%, transparent 65%); transform: rotate(18deg); animation: holo 3.8s infinite linear; pointer-events: none; }
+@keyframes holo { 0% { transform: translateX(-110%) rotate(18deg); } 100% { transform: translateX(110%) rotate(18deg); } }
+
+.pc-rarity { position: absolute; top: 14px; right: 14px; z-index: 2; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px; background: rgba(10,8,18,0.75); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.18); }
+.pc-bias-tag { position: absolute; top: 14px; left: 14px; z-index: 2; font-size: 9px; font-weight: 900; padding: 3px 7px; border-radius: 8px; background: var(--cyan); color: #09121a; }
+.pc-art { height: 145px; border-radius: 13px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 9px; }
+.pc-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-monogram { font-size: 38px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.85); text-shadow: 0 0 18px rgba(255,46,147,0.6); }
+.pc-name { font-weight: 800; font-size: 13px; }
+.pc-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pc-bonus { font-size: 10px; color: var(--cyan); font-weight: 700; margin-top: 4px; }
+
+/* Gacha Pack Modal */
+.modal-bg { position: fixed; inset: 0; background: rgba(7,5,14,0.88); backdrop-filter: blur(12px); z-index: 60; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.modal-bg.open { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.pack-foil { width: 210px; height: 295px; border-radius: 22px; background: linear-gradient(145deg, #ff2e93, #7b2cbf, #00c6ff); padding: 3px; cursor: pointer; box-shadow: 0 0 42px rgba(255,46,147,0.5); animation: packFloat 2s infinite ease-in-out; }
+.pack-foil.shaking { animation: packShake 0.45s linear infinite; }
+.pack-inner { width: 100%; height: 100%; border-radius: 19px; background: linear-gradient(160deg, #1b1130, #110b1f); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 18px; }
+@keyframes packFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes packShake { 0%,100% { transform: rotate(0deg) scale(1.04); } 25% { transform: rotate(-4deg) scale(1.06); } 75% { transform: rotate(4deg) scale(1.06); } }
+.reveal-card { width: 240px; animation: popReveal 0.55s var(--spring); }
+@keyframes popReveal { 0% { opacity: 0; transform: scale(0.4) rotateY(180deg); } 100% { opacity: 1; transform: scale(1) rotateY(0deg); } }
 
 .feedback-bar { padding: 13px 15px; border-radius: 14px; margin-bottom: 14px; font-size: 13px; font-weight: 600; display: none; line-height: 1.4; }
 .feedback-bar.ok { display: block; background: rgba(0,230,118,0.15); border: 1px solid var(--success); color: #9effc7; }
 .feedback-bar.err { display: block; background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: #ffb3ba; }
 
-.tabs-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
-.subtab { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.subtab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.binder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.photocard { background: linear-gradient(160deg, #251e3d, #171226); border-radius: 18px; padding: 14px 12px; text-align: center; border: 1.5px solid rgba(255,255,255,0.1); position: relative; }
-.photocard.locked { filter: grayscale(1) opacity(0.4); }
-.photocard.sr { border-color: #b46eff; }
-.photocard.ssr { border: 2px solid var(--gold); box-shadow: 0 0 16px rgba(255,215,0,0.28); }
-.pc-rarity { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 8px; background: rgba(0,0,0,0.45); }
-.pc-art { height: 105px; border-radius: 12px; background: radial-gradient(circle, rgba(255,46,147,0.22), rgba(18,14,30,0.6)); display: flex; align-items: center; justify-content: center; font-size: 50px; margin-bottom: 10px; }
-.pc-name { font-weight: 800; font-size: 14px; }
-.pc-role { font-size: 11px; color: var(--muted); margin-top: 3px; }
-
 .res-status { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .res-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; text-align: center; }
-.res-val { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+.res-val { font-size: 19px; font-weight: 800; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .res-sub { font-size: 11px; color: var(--muted); }
-.shop-sec { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 16px 0 8px; }
+.shop-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin: 16px 0 8px; }
 .shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .shop-item.vip { background: linear-gradient(135deg, #2f1d4a, #42183f); border-color: var(--gold); }
 .league-card { background: linear-gradient(135deg, #1b2142, #2e1842); border: 1px solid rgba(0,229,255,0.3); border-radius: 18px; padding: 16px; margin-bottom: 16px; text-align: center; }
 .rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 14px; margin-bottom: 8px; }
 .rank-row.me { border: 1px solid var(--accent); background: rgba(255,46,147,0.12); }
 
-.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20,16,32,0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 9px 4px 13px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
-.nav-item { color: var(--muted); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
-.nav-item span { font-size: 19px; }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,11,26,0.96); backdrop-filter: blur(14px); display: flex; justify-content: space-around; padding: 8px 4px 13px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
+.nav-item { color: var(--muted); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; transition: color 0.2s, transform 0.2s var(--spring); position: relative; }
+.nav-item:active { transform: scale(0.9); }
 .nav-item.active { color: var(--accent); }
+.nav-item.active svg { filter: drop-shadow(0 0 8px rgba(255,46,147,0.65)); }
 </style>
 </head>
 <body>
 
+<canvas id="confetti-canvas"></canvas>
+
 <div class="header">
-  <div class="brand">✨ K-Pop Lingua</div>
+  <div class="brand">K-POP LINGUA</div>
   <div class="stats">
-    <div class="pill energy" onclick="showResInfo('energy')">⚡ <span id="energy-val">5/5</span></div>
-    <div class="pill hearts" onclick="showResInfo('hearts')">❤️ <span id="hearts-val">3/3</span></div>
-    <div class="pill coins" onclick="switchTab('shop')">🎤 <span id="coins-val">50</span></div>
+    <div class="pill energy" onclick="showResInfo('energy')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="energy-val">5/5</span>
+    </div>
+    <div class="pill hearts" onclick="showResInfo('hearts')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4757" stroke="#ff4757" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span id="hearts-val">3/3</span>
+    </div>
+    <div class="pill coins" onclick="switchTab('shop')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff2e93" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      <span id="coins-val">50</span>
+    </div>
   </div>
 </div>
 
@@ -189,14 +238,14 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
       <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
     </div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Новый урок тратит 1 ⚡. Повтор и Словарь — бесплатно. Экзамен требует ❤️.</p>
+    <p>Новый урок тратит 1 заряд. Повтор и Словарь — бесплатно. Экзамен требует попытку.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
   <div class="trainer-banner">
     <div>
-      <div class="l-title">✍️ Прописи и Диктант</div>
-      <div class="l-meta">Умное распознавание почерка • +5 🎤</div>
+      <div class="l-title">Прописи и Диктант</div>
+      <div class="l-meta">Умное распознавание почерка • +5 микрофонов</div>
     </div>
     <button class="btn cyan" onclick="openDrawTrainer()">Писать</button>
   </div>
@@ -207,12 +256,12 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <!-- VOCAB / DICTIONARY -->
 <div id="screen-vocab" class="screen">
   <div class="vocab-head">
-    <h3 style="margin:0">📖 Мой словарь</h3>
+    <h3 style="margin:0">Мой словарь</h3>
     <div class="pill energy" id="vocab-count">0 / 0</div>
   </div>
   <div class="mode-switch">
-    <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">📖 Список слов</button>
-    <button class="mode-btn" id="vmode-cards" onclick="setVocabMode('cards')">🃏 Карточки</button>
+    <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">Список слов</button>
+    <button class="mode-btn" id="vmode-cards" onclick="setVocabMode('cards')">3D-Карточки</button>
   </div>
   <div id="vocab-body"></div>
 </div>
@@ -221,19 +270,16 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <div id="screen-draw" class="screen">
   <div class="study-top">
     <button class="close-btn" onclick="switchTab('lessons')">←</button>
-    <div style="font-weight:800;font-size:17px">✍️ Прописи и Диктант</div>
+    <div style="font-weight:800;font-size:17px">Прописи и Диктант</div>
   </div>
-
   <div class="mode-switch">
     <button class="mode-btn active" id="cat-letters" onclick="setDrawCat('letters')">Буквы (12)</button>
     <button class="mode-btn" id="cat-words" onclick="setDrawCat('words')">Слова K-Pop (8)</button>
   </div>
-
   <div class="mode-switch">
-    <button class="mode-btn active" id="mode-blind" onclick="setDrawBlind(true)">🎧 На слух (чистый экран)</button>
-    <button class="mode-btn" id="mode-guide" onclick="setDrawBlind(false)">📝 С трафаретом</button>
+    <button class="mode-btn active" id="mode-blind" onclick="setDrawBlind(true)">На слух (чистый экран)</button>
+    <button class="mode-btn" id="mode-guide" onclick="setDrawBlind(false)">С трафаретом</button>
   </div>
-
   <div class="draw-selector" id="draw-selector"></div>
   <div id="draw-trainer-body"></div>
 </div>
@@ -250,47 +296,48 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
 <!-- BINDER -->
 <div id="screen-binder" class="screen">
-  <h3 style="margin:0 0 12px">🃏 Витрина и Альбомы</h3>
+  <h3 style="margin:0 0 12px">Витрина и Альбомы</h3>
+  <div id="bias-banner-wrap"></div>
   <div class="tabs-row">
     <button class="subtab active" onclick="setAlbum('all', this)">Все карты</button>
     <button class="subtab" onclick="setAlbum('trainee', this)">Эра: Трейни</button>
     <button class="subtab" onclick="setAlbum('debut', this)">Эра: Дебют</button>
   </div>
-  <button class="btn full" style="margin-bottom:16px" onclick="buyPack(50)">🎁 Открыть Чиби-пак (50 🎤)</button>
+  <button class="btn full" style="margin-bottom:16px" onclick="openPackModal(50)">Открыть Чиби-пак (50)</button>
   <div class="binder-grid" id="binder-grid"></div>
 </div>
 
 <!-- SHOP -->
 <div id="screen-shop" class="screen">
-  <h3 style="margin:0 0 12px">🛍 Магазин агентства</h3>
+  <h3 style="margin:0 0 12px">Магазин агентства</h3>
   <div class="res-status" id="shop-res-status"></div>
 
-  <div class="shop-sec">Пополнение за микрофоны 🎤</div>
+  <div class="shop-sec">Пополнение за микрофоны</div>
   <div class="shop-item">
-    <div><div class="l-title">⚡ Батарейка лайтстика (+1 ⚡)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div>
-    <button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button>
+    <div><div class="l-title">Батарейка лайтстика (+1)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div>
+    <button class="btn cyan" onclick="buyEnergy(1, 30)">30</button>
   </div>
   <div class="shop-item">
-    <div><div class="l-title">🔋 Полный заряд (5/5 ⚡)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div>
-    <button class="btn cyan" onclick="buyEnergy(5, 100)">100 🎤</button>
+    <div><div class="l-title">Полный заряд (5/5)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div>
+    <button class="btn cyan" onclick="buyEnergy(5, 100)">100</button>
   </div>
   <div class="shop-item">
-    <div><div class="l-title">❤️ Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит 1 сердечко для сдачи</div></div>
-    <button class="btn" onclick="buyHeart(1, 40)">40 🎤</button>
+    <div><div class="l-title">Попытка экзамена (+1)</div><div class="l-meta">Восстановит 1 сердечко для сдачи</div></div>
+    <button class="btn" onclick="buyHeart(1, 40)">40</button>
   </div>
 
-  <div class="shop-sec">Премиум и наборы (Telegram Stars ⭐)</div>
+  <div class="shop-sec">Премиум и наборы (Telegram Stars)</div>
   <div class="shop-item vip">
-    <div><div class="l-title">👑 VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит ⚡ и ❤️, ×2 опыта и 🎤</div></div>
-    <button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ⭐</button>
+    <div><div class="l-title">VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит энергии и попыток, ×2 награды</div></div>
+    <button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ★</button>
   </div>
   <div class="shop-item">
-    <div><div class="l-title">⚡ Энергопак (Безлимит на 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div>
-    <button class="btn gold" onclick="alert('Болванка под Telegram Stars ⭐')">35 ⭐</button>
+    <div><div class="l-title">Энергопак (Безлимит 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div>
+    <button class="btn gold" onclick="alert('Болванка под Telegram Stars')">35 ★</button>
   </div>
   <div class="shop-item">
-    <div><div class="l-title">💿 Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div>
-    <button class="btn" onclick="alert('Болванка под Telegram Stars ⭐')">75 ⭐</button>
+    <div><div class="l-title">Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div>
+    <button class="btn" onclick="alert('Болванка под Telegram Stars')">75 ★</button>
   </div>
 </div>
 
@@ -298,107 +345,178 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <div id="screen-rank" class="screen">
   <div class="league-card">
     <div class="module-tag">Недельный зачёт • Лига Трейни</div>
-    <h3 style="margin:4px 0 6px">🏆 Топ-3 получают SSR-карту!</h3>
+    <h3 style="margin:6px 0 6px">Топ-3 получают SSR-карту!</h3>
     <div style="font-size:13px;color:#c9bedf">Обновление рейтинга в воскресенье</div>
   </div>
   <div id="rank-list"></div>
 </div>
 
+<!-- PACK MODAL -->
+<div class="modal-bg" id="pack-modal"></div>
+
 <div class="nav">
-  <div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')"><span>📚</span>Уроки</div>
-  <div class="nav-item" id="nav-vocab" onclick="switchTab('vocab')"><span>📖</span>Словарь</div>
-  <div class="nav-item" id="nav-binder" onclick="switchTab('binder')"><span>🃏</span>Альбомы</div>
-  <div class="nav-item" id="nav-shop" onclick="switchTab('shop')"><span>🛍</span>Магазин</div>
-  <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
+  <div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Уроки
+  </div>
+  <div class="nav-item" id="nav-vocab" onclick="switchTab('vocab')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="14" x2="13" y2="14"/></svg>
+    Словарь
+  </div>
+  <div class="nav-item" id="nav-binder" onclick="switchTab('binder')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="17" rx="2"/><path d="M16 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1"/></svg>
+    Альбомы
+  </div>
+  <div class="nav-item" id="nav-shop" onclick="switchTab('shop')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    Магазин
+  </div>
+  <div class="nav-item" id="nav-rank" onclick="switchTab('rank')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+    Топ
+  </div>
 </div>
 
-<script src="lessons.js?v=7"></script>
+<script src="cards.js?v=1"></script>
+<script src="lessons.js?v=8"></script>
 <script>
-if (window.Telegram && window.Telegram.WebApp) {
-  window.Telegram.WebApp.expand();
-  if (window.Telegram.WebApp.disableVerticalSwipes) {
-    window.Telegram.WebApp.disableVerticalSwipes();
-  }
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) {
+  tg.expand();
+  if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+}
+
+/* ====== ВИБРООТКЛИК + ЗВУКИ + КОНФЕТТИ ====== */
+function haptic(type = 'light') {
+  try {
+    if (!tg || !tg.HapticFeedback) return;
+    if (type === 'ok') tg.HapticFeedback.notificationOccurred('success');
+    else if (type === 'err') tg.HapticFeedback.notificationOccurred('error');
+    else tg.HapticFeedback.impactOccurred(type);
+  } catch (e) {}
+}
+
+let audioCtx = null;
+function sfx(type) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const t = audioCtx.currentTime;
+    const playTone = (freq, start, dur, wave = 'sine', vol = 0.08) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = wave; o.frequency.setValueAtTime(freq, start);
+      g.gain.setValueAtTime(vol, start);
+      g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(start); o.stop(start + dur);
+    };
+    if (type === 'ok') { playTone(523.25, t, 0.12); playTone(783.99, t + 0.08, 0.18); }
+    else if (type === 'err') { playTone(220, t, 0.15, 'triangle', 0.1); playTone(165, t + 0.09, 0.2, 'triangle', 0.1); }
+    else if (type === 'win') { [523, 659, 784, 1046].forEach((f, i) => playTone(f, t + i * 0.08, 0.22)); }
+    else if (type === 'tap') { playTone(440, t, 0.05, 'sine', 0.04); }
+  } catch (e) {}
+}
+
+function fireConfetti() {
+  const c = document.getElementById('confetti-canvas');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const colors = ['#ff2e93', '#00e5ff', '#ffd700', '#8a2be2', '#00e676'];
+  const parts = Array.from({ length: 65 }, () => ({
+    x: c.width / 2, y: c.height * 0.42,
+    vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.85) * 14,
+    s: Math.random() * 6 + 4, col: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * 360, vr: (Math.random() - 0.5) * 12, life: 1
+  }));
+  const tick = () => {
+    ctx.clearRect(0, 0, c.width, c.height);
+    let alive = false;
+    parts.forEach(p => {
+      if (p.life <= 0) return;
+      alive = true;
+      p.x += p.vx; p.y += p.vy; p.vy += 0.35; p.rot += p.vr; p.life -= 0.018;
+      ctx.save(); ctx.globalAlpha = Math.max(0, p.life);
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6);
+      ctx.restore();
+    });
+    if (alive) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, c.width, c.height);
+  };
+  tick();
 }
 
 const MAX_ENERGY = 5;
-const ENERGY_REGEN_MS = 2 * 60 * 60 * 1000; // 2 часа за 1 энергию
+const BASE_ENERGY_MS = 2 * 60 * 60 * 1000;
 const MAX_HEARTS = 3;
-const HEART_REGEN_MS = 4 * 60 * 60 * 1000; // 4 часа за 1 сердечко
-
-const CARDS = [
-  { id: 1, album: "trainee", name: "Чиби-Стажёр Мина", role: "Вокал • Зал практики", r: "R", art: "🎧" },
-  { id: 2, album: "trainee", name: "Чиби-Танцор Кай", role: "Хореография • Зеркальный зал", r: "R", art: "🕺" },
-  { id: 3, album: "trainee", name: "Ночной Рамён", role: "Перерыв после репетиции", r: "SR", art: "🍜" },
-  { id: 4, album: "debut", name: "Чиби-Рэпер Джин", role: "Студия звукозаписи", r: "SR", art: "🎙️" },
-  { id: 5, album: "debut", name: "Сцена Дебюта", role: "Лимитка за Экзамен", r: "SSR", art: "🌟" },
-  { id: 6, album: "debut", name: "Золотой Лайтстик", role: "Секретная карта", r: "SSR", art: "👑" }
-];
+const HEART_REGEN_MS = 4 * 60 * 60 * 1000;
 
 const VOCAB = [
-  { l: 1, kr: "아이", tr: "[а-и]", ru: "Ребёнок", icon: "👶", file: "audio/ai.mp3" },
-  { l: 1, kr: "우유", tr: "[у-ю]", ru: "Молоко", icon: "🥛", file: "audio/uyu.mp3" },
-  { l: 1, kr: "여우", tr: "[ё-у]", ru: "Лиса", icon: "🦊", file: "audio/yeou.mp3" },
-  { l: 1, kr: "오이", tr: "[о-и]", ru: "Огурец", icon: "🥒", file: "audio/oi.mp3" },
-  { l: 1, kr: "이유", tr: "[и-ю]", ru: "Причина", icon: "💡", file: "audio/iyu.mp3" },
-  { l: 1, kr: "아이유", tr: "[А-и-ю]", ru: "Певица IU", icon: "🎤", file: "audio/iu.mp3" },
-  { l: 2, kr: "가수", tr: "[ка-су]", ru: "Певец / Артист", icon: "🎙️", file: "audio/gasu.mp3" },
-  { l: 2, kr: "드라마", tr: "[ты-ра-ма]", ru: "Дорама", icon: "🎬", file: "audio/drama.mp3" },
-  { l: 2, kr: "바다", tr: "[па-да]", ru: "Море", icon: "🌊", file: "audio/bada.mp3" },
-  { l: 2, kr: "미소", tr: "[ми-со]", ru: "Улыбка", icon: "😊", file: "audio/miso.mp3" },
-  { l: 2, kr: "바보", tr: "[па-бо]", ru: "Дурачок", icon: "🤪", file: "audio/babo.mp3" },
-  { l: 2, kr: "나비", tr: "[на-би]", ru: "Бабочка", icon: "🦋", file: "audio/nabi.mp3" },
-  { l: 2, kr: "고기", tr: "[ко-ги]", ru: "Мясо", icon: "🥩", file: "audio/gogi.mp3" },
-  { l: 3, kr: "하나", tr: "[ха-на]", ru: "Один", icon: "1️⃣", file: "audio/hana.mp3" },
-  { l: 3, kr: "모자", tr: "[мо-джа]", ru: "Шапка / Кепка", icon: "🧢", file: "audio/moja.mp3" },
-  { l: 3, kr: "차", tr: "[чха]", ru: "Чай / Машина", icon: "🍵", file: "audio/cha.mp3" },
-  { l: 3, kr: "커피", tr: "[кхо-пхи]", ru: "Кофе", icon: "☕", file: "audio/keopi.mp3" },
-  { l: 3, kr: "카메라", tr: "[кха-ме-ра]", ru: "Камера", icon: "📷", file: "audio/kamera.mp3" },
-  { l: 3, kr: "피아노", tr: "[пхи-а-но]", ru: "Пианино", icon: "🎹", file: "audio/piano.mp3" },
-  { l: 3, kr: "포도", tr: "[пхо-до]", ru: "Виноград", icon: "🍇", file: "audio/podo.mp3" },
-  { l: 3, kr: "치마", tr: "[чхи-ма]", ru: "Юбка", icon: "👗", file: "audio/chima.mp3" },
-  { l: 4, kr: "오빠", tr: "[оп-па]", ru: "Оппа (старший брат)", icon: "🫰", file: "audio/oppa.mp3" },
-  { l: 4, kr: "아빠", tr: "[ап-па]", ru: "Папа", icon: "👨", file: "audio/appa.mp3" },
-  { l: 4, kr: "뽀뽀", tr: "[ппо-ппо]", ru: "Чмок / Поцелуй", icon: "💋", file: "audio/ppoppo.mp3" },
-  { l: 4, kr: "쓰다", tr: "[ссы-да]", ru: "Писать / Горький", icon: "✍️", file: "audio/sseuda.mp3" },
-  { l: 4, kr: "싸다", tr: "[сса-да]", ru: "Дешёвый", icon: "🏷️", file: "audio/ssada.mp3" },
-  { l: 4, kr: "꼬리", tr: "[кко-ри]", ru: "Хвост", icon: "🐾", file: "audio/kkori.mp3" },
-  { l: 5, kr: "노래", tr: "[но-рэ]", ru: "Песня", icon: "🎵", file: "audio/norae.mp3" },
-  { l: 5, kr: "카페", tr: "[кха-пхе]", ru: "Кафе", icon: "🏪", file: "audio/kape.mp3" },
-  { l: 5, kr: "세계", tr: "[се-ге]", ru: "Мир / Вселенная", icon: "🌍", file: "audio/segye.mp3" },
-  { l: 5, kr: "뭐", tr: "[мво]", ru: "Что?", icon: "❓", file: "audio/mwo.mp3" },
-  { l: 5, kr: "최고", tr: "[чхве-го]", ru: "Лучший / Супер!", icon: "👍", file: "audio/choego.mp3" },
-  { l: 5, kr: "사과", tr: "[са-гва]", ru: "Яблоко / Извинение", icon: "🍎", file: "audio/sagwa.mp3" },
-  { l: 5, kr: "과자", tr: "[ква-джа]", ru: "Снеки / Печенье", icon: "🍪", file: "audio/gwaja.mp3" },
-  { l: 5, kr: "의자", tr: "[ый-джа]", ru: "Стул", icon: "🪑", file: "audio/uija.mp3" },
-  { l: 5, kr: "가위", tr: "[ка-ви]", ru: "Ножницы", icon: "✂️", file: "audio/gawi.mp3" },
-  { l: 6, kr: "별", tr: "[пёль]", ru: "Звезда", icon: "⭐", file: "audio/byeol.mp3" },
-  { l: 6, kr: "팬", tr: "[пхэн]", ru: "Фанат", icon: "🎉", file: "audio/paen.mp3" },
-  { l: 6, kr: "봄", tr: "[пом]", ru: "Весна", icon: "🌸", file: "audio/bom.mp3" },
-  { l: 6, kr: "밤", tr: "[пам]", ru: "Ночь", icon: "🌙", file: "audio/bam.mp3" },
-  { l: 6, kr: "달", tr: "[таль]", ru: "Луна", icon: "🌕", file: "audio/dal.mp3" },
-  { l: 6, kr: "물", tr: "[муль]", ru: "Вода", icon: "💧", file: "audio/mul.mp3" },
-  { l: 6, kr: "사랑", tr: "[са-ран]", ru: "Любовь", icon: "❤️", file: "audio/sarang.mp3" },
-  { l: 6, kr: "안녕", tr: "[ан-нён]", ru: "Привет / Пока", icon: "👋", file: "audio/annyeong.mp3" },
-  { l: 6, kr: "마음", tr: "[ма-ым]", ru: "Сердце / Душа", icon: "💖", file: "audio/maeum.mp3" },
-  { l: 6, kr: "사람", tr: "[са-рам]", ru: "Человек", icon: "🧑", file: "audio/saram.mp3" },
-  { l: 6, kr: "바람", tr: "[па-рам]", ru: "Ветер", icon: "💨", file: "audio/baram.mp3" },
-  { l: 7, kr: "책", tr: "[чхэк]", ru: "Книга", icon: "📕", file: "audio/chaek.mp3" },
-  { l: 7, kr: "밥", tr: "[пап]", ru: "Рис / Еда", icon: "🍚", file: "audio/bap.mp3" },
-  { l: 7, kr: "집", tr: "[чип]", ru: "Дом", icon: "🏠", file: "audio/jip.mp3" },
-  { l: 7, kr: "옷", tr: "[от]", ru: "Одежда", icon: "👕", file: "audio/ot.mp3" },
-  { l: 7, kr: "꽃", tr: "[ккот]", ru: "Цветок", icon: "💐", file: "audio/kkot.mp3" },
-  { l: 7, kr: "음악", tr: "[ы-мак]", ru: "Музыка", icon: "🎶", file: "audio/eumak.mp3" },
-  { l: 7, kr: "한국어", tr: "[хан-гу-го]", ru: "Корейский язык", icon: "🇰🇷", file: "audio/hangugeo.mp3" },
-  { l: 7, kr: "서울", tr: "[со-уль]", ru: "Сеул", icon: "🏙️", file: "audio/seoul.mp3" },
-  { l: 7, kr: "한국", tr: "[хан-гук]", ru: "Корея", icon: "🗺️", file: "audio/hanguk.mp3" },
-  { l: 8, kr: "사랑해", tr: "[са-ран-хэ]", ru: "Я тебя люблю", icon: "💘", file: "audio/saranghae.mp3" },
-  { l: 8, kr: "고마워", tr: "[ко-ма-во]", ru: "Спасибо", icon: "🙏", file: "audio/gomawo.mp3" },
-  { l: 8, kr: "미안해", tr: "[ми-ан-хэ]", ru: "Извини / Прости", icon: "🥺", file: "audio/mianhae.mp3" },
-  { l: 8, kr: "대박", tr: "[тэ-бак]", ru: "Супер / Вау!", icon: "🤯", file: "audio/daebak.mp3" },
-  { l: 8, kr: "화이팅", tr: "[файтин]", ru: "Удачи / Вперёд!", icon: "🔥", file: "audio/fighting.mp3" },
-  { l: 8, kr: "진짜", tr: "[чин-чча]", ru: "Правда? / Реально?", icon: "😲", file: "audio/jinjja.mp3" },
-  { l: 8, kr: "보고 싶어", tr: "[по-го щи-по]", ru: "Я скучаю по тебе", icon: "💭", file: "audio/bogoshipo.mp3" }
+  { l: 1, kr: "아이", tr: "[а-и]", ru: "Ребёнок", file: "audio/ai.mp3" },
+  { l: 1, kr: "우유", tr: "[у-ю]", ru: "Молоко", file: "audio/uyu.mp3" },
+  { l: 1, kr: "여우", tr: "[ё-у]", ru: "Лиса", file: "audio/yeou.mp3" },
+  { l: 1, kr: "오이", tr: "[о-и]", ru: "Огурец", file: "audio/oi.mp3" },
+  { l: 1, kr: "이유", tr: "[и-ю]", ru: "Причина", file: "audio/iyu.mp3" },
+  { l: 1, kr: "아이유", tr: "[А-и-ю]", ru: "Певица IU", file: "audio/iu.mp3" },
+  { l: 2, kr: "가수", tr: "[ка-су]", ru: "Певец / Артист", file: "audio/gasu.mp3" },
+  { l: 2, kr: "드라마", tr: "[ты-ра-ма]", ru: "Дорама", file: "audio/drama.mp3" },
+  { l: 2, kr: "바다", tr: "[па-да]", ru: "Море", file: "audio/bada.mp3" },
+  { l: 2, kr: "미소", tr: "[ми-со]", ru: "Улыбка", file: "audio/miso.mp3" },
+  { l: 2, kr: "바보", tr: "[па-бо]", ru: "Дурачок", file: "audio/babo.mp3" },
+  { l: 2, kr: "나비", tr: "[на-би]", ru: "Бабочка", file: "audio/nabi.mp3" },
+  { l: 2, kr: "고기", tr: "[ко-ги]", ru: "Мясо", file: "audio/gogi.mp3" },
+  { l: 3, kr: "하나", tr: "[ха-на]", ru: "Один", file: "audio/hana.mp3" },
+  { l: 3, kr: "모자", tr: "[мо-джа]", ru: "Шапка / Кепка", file: "audio/moja.mp3" },
+  { l: 3, kr: "차", tr: "[чха]", ru: "Чай / Машина", file: "audio/cha.mp3" },
+  { l: 3, kr: "커피", tr: "[кхо-пхи]", ru: "Кофе", file: "audio/keopi.mp3" },
+  { l: 3, kr: "카메라", tr: "[кха-ме-ра]", ru: "Камера", file: "audio/kamera.mp3" },
+  { l: 3, kr: "피아노", tr: "[пхи-а-но]", ru: "Пианино", file: "audio/piano.mp3" },
+  { l: 3, kr: "포도", tr: "[пхо-до]", ru: "Виноград", file: "audio/podo.mp3" },
+  { l: 3, kr: "치마", tr: "[чхи-ма]", ru: "Юбка", file: "audio/chima.mp3" },
+  { l: 4, kr: "오빠", tr: "[оп-па]", ru: "Оппа (старший брат)", file: "audio/oppa.mp3" },
+  { l: 4, kr: "아빠", tr: "[ап-па]", ru: "Папа", file: "audio/appa.mp3" },
+  { l: 4, kr: "뽀뽀", tr: "[ппо-ппо]", ru: "Чмок / Поцелуй", file: "audio/ppoppo.mp3" },
+  { l: 4, kr: "쓰다", tr: "[ссы-да]", ru: "Писать / Горький", file: "audio/sseuda.mp3" },
+  { l: 4, kr: "싸다", tr: "[сса-да]", ru: "Дешёвый", file: "audio/ssada.mp3" },
+  { l: 4, kr: "꼬리", tr: "[кко-ри]", ru: "Хвост", file: "audio/kkori.mp3" },
+  { l: 5, kr: "노래", tr: "[но-рэ]", ru: "Песня", file: "audio/norae.mp3" },
+  { l: 5, kr: "카페", tr: "[кха-пхе]", ru: "Кафе", file: "audio/kape.mp3" },
+  { l: 5, kr: "세계", tr: "[се-ге]", ru: "Мир / Вселенная", file: "audio/segye.mp3" },
+  { l: 5, kr: "뭐", tr: "[мво]", ru: "Что?", file: "audio/mwo.mp3" },
+  { l: 5, kr: "최고", tr: "[чхве-го]", ru: "Лучший / Супер!", file: "audio/choego.mp3" },
+  { l: 5, kr: "사과", tr: "[са-гва]", ru: "Яблоко / Извинение", file: "audio/sagwa.mp3" },
+  { l: 5, kr: "과자", tr: "[ква-джа]", ru: "Снеки / Печенье", file: "audio/gwaja.mp3" },
+  { l: 5, kr: "의자", tr: "[ый-джа]", ru: "Стул", file: "audio/uija.mp3" },
+  { l: 5, kr: "가위", tr: "[ка-ви]", ru: "Ножницы", file: "audio/gawi.mp3" },
+  { l: 6, kr: "별", tr: "[пёль]", ru: "Звезда", file: "audio/byeol.mp3" },
+  { l: 6, kr: "팬", tr: "[пхэн]", ru: "Фанат", file: "audio/paen.mp3" },
+  { l: 6, kr: "봄", tr: "[пом]", ru: "Весна", file: "audio/bom.mp3" },
+  { l: 6, kr: "밤", tr: "[пам]", ru: "Ночь", file: "audio/bam.mp3" },
+  { l: 6, kr: "달", tr: "[таль]", ru: "Луна", file: "audio/dal.mp3" },
+  { l: 6, kr: "물", tr: "[муль]", ru: "Вода", file: "audio/mul.mp3" },
+  { l: 6, kr: "사랑", tr: "[са-ран]", ru: "Любовь", file: "audio/sarang.mp3" },
+  { l: 6, kr: "안녕", tr: "[ан-нён]", ru: "Привет / Пока", file: "audio/annyeong.mp3" },
+  { l: 6, kr: "마음", tr: "[ма-ым]", ru: "Сердце / Душа", file: "audio/maeum.mp3" },
+  { l: 6, kr: "사람", tr: "[са-рам]", ru: "Человек", file: "audio/saram.mp3" },
+  { l: 6, kr: "바람", tr: "[па-рам]", ru: "Ветер", file: "audio/baram.mp3" },
+  { l: 7, kr: "책", tr: "[чхэк]", ru: "Книга", file: "audio/chaek.mp3" },
+  { l: 7, kr: "밥", tr: "[пап]", ru: "Рис / Еда", file: "audio/bap.mp3" },
+  { l: 7, kr: "집", tr: "[чип]", ru: "Дом", file: "audio/jip.mp3" },
+  { l: 7, kr: "옷", tr: "[от]", ru: "Одежда", file: "audio/ot.mp3" },
+  { l: 7, kr: "꽃", tr: "[ккот]", ru: "Цветок", file: "audio/kkot.mp3" },
+  { l: 7, kr: "음악", tr: "[ы-мак]", ru: "Музыка", file: "audio/eumak.mp3" },
+  { l: 7, kr: "한국어", tr: "[хан-гу-го]", ru: "Корейский язык", file: "audio/hangugeo.mp3" },
+  { l: 7, kr: "서울", tr: "[со-уль]", ru: "Сеул", file: "audio/seoul.mp3" },
+  { l: 7, kr: "한국", tr: "[хан-гук]", ru: "Корея", file: "audio/hanguk.mp3" },
+  { l: 8, kr: "사랑해", tr: "[са-ран-хэ]", ru: "Я тебя люблю", file: "audio/saranghae.mp3" },
+  { l: 8, kr: "고마워", tr: "[ко-ма-во]", ru: "Спасибо", file: "audio/gomawo.mp3" },
+  { l: 8, kr: "미안해", tr: "[ми-ан-хэ]", ru: "Извини / Прости", file: "audio/mianhae.mp3" },
+  { l: 8, kr: "대박", tr: "[тэ-бак]", ru: "Супер / Вау!", file: "audio/daebak.mp3" },
+  { l: 8, kr: "화이팅", tr: "[файтин]", ru: "Удачи / Вперёд!", file: "audio/fighting.mp3" },
+  { l: 8, kr: "진짜", tr: "[чин-чча]", ru: "Правда? / Реально?", file: "audio/jinjja.mp3" },
+  { l: 8, kr: "보고 싶어", tr: "[по-го щи-по]", ru: "Я скучаю по тебе", file: "audio/bogoshipo.mp3" }
 ];
 
 const DRAW_DATA = {
@@ -429,7 +547,7 @@ const DRAW_DATA = {
 };
 
 let st = {
-  coins: 50, xp: 0, done: [], cards: [], drawn: [],
+  coins: 50, xp: 0, done: [], cards: [], drawn: [], biasId: null,
   energy: MAX_ENERGY, lastEnergyTs: Date.now(),
   hearts: MAX_HEARTS, lastHeartTs: Date.now()
 };
@@ -443,22 +561,33 @@ try {
   }
 } catch (e) {}
 
+function getBias() {
+  if (!st.biasId || typeof CARDS === 'undefined') return null;
+  return CARDS.find(c => c.id === st.biasId && st.cards.includes(c.id)) || null;
+}
+
+function getEnergyRegenMs() {
+  const b = getBias();
+  const cut = (b && b.bonusType === 'energy') ? b.bonusVal * 60 * 1000 : 0;
+  return Math.max(30 * 60 * 1000, BASE_ENERGY_MS - cut);
+}
+
 function syncResources() {
-  const now = Date.now();
+  const now = Date.now(), eMs = getEnergyRegenMs();
   let changed = false;
   if (st.energy < MAX_ENERGY) {
-    const gained = Math.floor((now - st.lastEnergyTs) / ENERGY_REGEN_MS);
-    if (gained > 0) {
-      st.energy = Math.min(MAX_ENERGY, st.energy + gained);
-      st.lastEnergyTs = st.energy >= MAX_ENERGY ? now : st.lastEnergyTs + gained * ENERGY_REGEN_MS;
+    const g = Math.floor((now - st.lastEnergyTs) / eMs);
+    if (g > 0) {
+      st.energy = Math.min(MAX_ENERGY, st.energy + g);
+      st.lastEnergyTs = st.energy >= MAX_ENERGY ? now : st.lastEnergyTs + g * eMs;
       changed = true;
     }
   }
   if (st.hearts < MAX_HEARTS) {
-    const gained = Math.floor((now - st.lastHeartTs) / HEART_REGEN_MS);
-    if (gained > 0) {
-      st.hearts = Math.min(MAX_HEARTS, st.hearts + gained);
-      st.lastHeartTs = st.hearts >= MAX_HEARTS ? now : st.lastHeartTs + gained * HEART_REGEN_MS;
+    const g = Math.floor((now - st.lastHeartTs) / HEART_REGEN_MS);
+    if (g > 0) {
+      st.hearts = Math.min(MAX_HEARTS, st.hearts + g);
+      st.lastHeartTs = st.hearts >= MAX_HEARTS ? now : st.lastHeartTs + g * HEART_REGEN_MS;
       changed = true;
     }
   }
@@ -476,19 +605,13 @@ function fmtWait(ms) {
 }
 
 function showResInfo(type) {
-  syncResources();
+  haptic('light'); syncResources();
   if (type === 'energy') {
-    if (st.energy >= MAX_ENERGY) alert('⚡ Энергия полная (5/5)! Запуск нового урока тратит 1 ⚡.');
-    else {
-      const left = ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs);
-      alert(`⚡ Энергия: ${st.energy}/${MAX_ENERGY}\n+1 ⚡ восстановится через ${fmtWait(left)}.\nМожно пополнить в Магазине.`);
-    }
+    if (st.energy >= MAX_ENERGY) alert('Заряд лайтстика полный (5/5). Новый урок тратит 1 заряд.');
+    else alert(`Энергия: ${st.energy}/${MAX_ENERGY}\n+1 заряд через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}.`);
   } else {
-    if (st.hearts >= MAX_HEARTS) alert('❤️ Сердечки полные (3/3)! Они тратятся только при провале экзамена.');
-    else {
-      const left = HEART_REGEN_MS - (Date.now() - st.lastHeartTs);
-      alert(`❤️ Сердечки: ${st.hearts}/${MAX_HEARTS}\n+1 ❤️ восстановится через ${fmtWait(left)}.\nМожно пополнить в Магазине.`);
-    }
+    if (st.hearts >= MAX_HEARTS) alert('Попытки экзамена полные (3/3). Тратятся только при провале экзамена.');
+    else alert(`Попытки: ${st.hearts}/${MAX_HEARTS}\n+1 попытка через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}.`);
   }
 }
 
@@ -499,34 +622,30 @@ function save(doSync = true) {
 
 function renderShop() {
   syncResources();
-  const eSub = st.energy >= MAX_ENERGY ? 'Полный заряд' : `+1 через ${fmtWait(ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs))}`;
+  const eSub = st.energy >= MAX_ENERGY ? 'Полный заряд' : `+1 через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}`;
   const hSub = st.hearts >= MAX_HEARTS ? 'Все попытки есть' : `+1 через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}`;
   document.getElementById('shop-res-status').innerHTML = `
-    <div class="res-box"><div class="res-val" style="color:var(--cyan)">⚡ ${st.energy}/${MAX_ENERGY}</div><div class="res-sub">${eSub}</div></div>
-    <div class="res-box"><div class="res-val" style="color:var(--danger)">❤️ ${st.hearts}/${MAX_HEARTS}</div><div class="res-sub">${hSub}</div></div>
+    <div class="res-box"><div class="res-val" style="color:var(--cyan)">${st.energy}/${MAX_ENERGY} Энергия</div><div class="res-sub">${eSub}</div></div>
+    <div class="res-box"><div class="res-val" style="color:var(--danger)">${st.hearts}/${MAX_HEARTS} Попытки</div><div class="res-sub">${hSub}</div></div>
   `;
 }
 
 function buyEnergy(amount, price) {
   syncResources();
-  if (st.energy >= MAX_ENERGY) return alert('⚡ Энергия уже полная!');
-  if (st.coins < price) return alert(`Не хватает микрофонов (нужно ${price} 🎤).`);
-  st.coins -= price;
-  st.energy = Math.min(MAX_ENERGY, st.energy + amount);
+  if (st.energy >= MAX_ENERGY) return alert('Энергия уже полная!');
+  if (st.coins < price) return alert(`Нужно ${price} микрофонов.`);
+  st.coins -= price; st.energy = Math.min(MAX_ENERGY, st.energy + amount);
   if (st.energy >= MAX_ENERGY) st.lastEnergyTs = Date.now();
-  save(); renderShop();
-  alert('⚡ Энергия пополнена!');
+  haptic('ok'); sfx('ok'); save(); renderShop();
 }
 
 function buyHeart(amount, price) {
   syncResources();
-  if (st.hearts >= MAX_HEARTS) return alert('❤️ Сердечки уже полные!');
-  if (st.coins < price) return alert(`Не хватает микрофонов (нужно ${price} 🎤).`);
-  st.coins -= price;
-  st.hearts = Math.min(MAX_HEARTS, st.hearts + amount);
+  if (st.hearts >= MAX_HEARTS) return alert('Попытки уже полные!');
+  if (st.coins < price) return alert(`Нужно ${price} микрофонов.`);
+  st.coins -= price; st.hearts = Math.min(MAX_HEARTS, st.hearts + amount);
   if (st.hearts >= MAX_HEARTS) st.lastHeartTs = Date.now();
-  save(); renderShop();
-  alert('❤️ Сердечко восстановлено!');
+  haptic('ok'); sfx('ok'); save(); renderShop();
 }
 
 let curAudio = null;
@@ -541,15 +660,12 @@ function playAudio(file, text, rate = 1.0) {
     }
   };
   if (!file) return fallback();
-  const a = new Audio(file);
-  a.playbackRate = rate;
-  curAudio = a;
-  a.onerror = fallback;
-  a.play().catch(fallback);
+  const a = new Audio(file); a.playbackRate = rate; curAudio = a;
+  a.onerror = fallback; a.play().catch(fallback);
 }
 
 function switchTab(t) {
-  syncResources();
+  haptic('light'); syncResources();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + t).classList.add('active');
@@ -562,48 +678,39 @@ function switchTab(t) {
   if (t === 'rank') renderRank();
 }
 
-/* ====== СЛОВАРЬ И КАРТОЧКИ ====== */
+/* ====== СЛОВАРЬ И 3D-КАРТОЧКИ ====== */
 let vocabMode = 'list', vocabDeck = [], fcIdx = 0, fcFlipped = false;
 
 function getUnlockedVocab() { return VOCAB.filter(w => st.done.includes(w.l)); }
 function setVocabMode(m) {
-  vocabMode = m;
+  haptic('light'); vocabMode = m;
   document.getElementById('vmode-list').classList.toggle('active', m === 'list');
   document.getElementById('vmode-cards').classList.toggle('active', m === 'cards');
-  fcIdx = 0; fcFlipped = false;
-  vocabDeck = getUnlockedVocab();
+  fcIdx = 0; fcFlipped = false; vocabDeck = getUnlockedVocab();
   renderVocab();
 }
 
 function renderVocab() {
   const unlocked = getUnlockedVocab();
   document.getElementById('vocab-count').innerText = `${unlocked.length} / ${VOCAB.length}`;
-  const body = document.getElementById('vocab-body');
-  body.innerHTML = '';
+  const body = document.getElementById('vocab-body'); body.innerHTML = '';
 
   if (!unlocked.length) {
-    body.innerHTML = `
-      <div class="card-box" style="text-align:center;padding:28px 18px">
-        <div style="font-size:44px;margin-bottom:8px">📖</div>
-        <h3 style="margin:0 0 8px">Словарь пока пуст</h3>
-        <p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь!</p>
-        <button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">Перейти к урокам</button>
-      </div>`;
+    body.innerHTML = `<div class="card-box" style="text-align:center;padding:28px 18px"><h3>Словарь пока пуст</h3><p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь!</p><button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">К урокам</button></div>`;
     return;
   }
 
   if (vocabMode === 'list') {
     unlocked.forEach(w => {
-      const row = document.createElement('div');
-      row.className = 'vocab-row';
+      const row = document.createElement('div'); row.className = 'vocab-row';
       row.innerHTML = `
-        <div class="vocab-icon">${w.icon}</div>
+        <div class="vocab-tag">${w.kr[0]}</div>
         <div style="flex:1">
           <div style="font-size:20px;font-weight:800">${w.kr} <span style="font-size:13px;color:var(--cyan);font-weight:700">${w.tr}</span></div>
           <div style="font-size:13px;color:var(--muted)">${w.ru}</div>
         </div>
         <div class="ex-play">🔊</div>`;
-      row.onclick = () => playAudio(w.file, w.kr);
+      row.onclick = () => { haptic('light'); playAudio(w.file, w.kr); };
       body.appendChild(row);
     });
   } else {
@@ -613,47 +720,159 @@ function renderVocab() {
 
     body.innerHTML = `
       <div style="text-align:center;font-size:12px;color:var(--muted);font-weight:700">Карточка ${fcIdx + 1} из ${vocabDeck.length}</div>
-      <div class="flashcard-wrap">
-        <div class="flashcard ${fcFlipped ? 'flipped' : ''}" id="fc-card">
-          ${!fcFlipped ? `
-            <div class="fc-emoji">${w.icon}</div>
+      <div class="fc-scene">
+        <div class="fc-inner ${fcFlipped ? 'flipped' : ''}" id="fc-card">
+          <div class="fc-face fc-front">
+            <div class="fc-badge">Урок ${w.l}</div>
             <div class="fc-kr">${w.kr}</div>
             <button class="audio-pill" id="fc-audio">🔊 Послушать</button>
-            <div class="fc-hint">Нажми на карточку, чтобы увидеть перевод</div>
-          ` : `
-            <div class="fc-emoji">${w.icon}</div>
-            <div class="fc-kr">${w.kr}</div>
+            <div class="fc-hint">Нажми на карточку, чтобы перевернуть</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-badge" style="color:#ff85cb;background:rgba(255,46,147,0.16)">Перевод</div>
+            <div class="fc-kr" style="font-size:36px">${w.kr}</div>
             <div class="fc-tr">${w.tr}</div>
             <div class="fc-ru">${w.ru}</div>
-            <div class="fc-hint">Нажми ещё раз, чтобы перевернуть обратно</div>
-          `}
+            <div class="fc-hint">Нажми ещё раз, чтобы вернуть</div>
+          </div>
         </div>
       </div>
       <div class="fc-nav">
         <button class="btn ghost" id="fc-prev">← Назад</button>
-        <button class="btn ghost" id="fc-shuf">🔀</button>
+        <button class="btn ghost" id="fc-shuf">Перемешать</button>
         <button class="btn cyan" id="fc-next">Дальше →</button>
       </div>
     `;
 
-    document.getElementById('fc-card').onclick = (e) => { if (e.target.id !== 'fc-audio') { fcFlipped = !fcFlipped; renderVocab(); } };
-    const ab = document.getElementById('fc-audio');
-    if (ab) ab.onclick = (e) => { e.stopPropagation(); playAudio(w.file, w.kr); };
-    document.getElementById('fc-prev').onclick = () => { fcIdx = (fcIdx - 1 + vocabDeck.length) % vocabDeck.length; fcFlipped = false; renderVocab(); };
-    document.getElementById('fc-next').onclick = () => { fcIdx = (fcIdx + 1) % vocabDeck.length; fcFlipped = false; renderVocab(); };
-    document.getElementById('fc-shuf').onclick = () => { vocabDeck = shuffle(unlocked); fcIdx = 0; fcFlipped = false; renderVocab(); };
+    document.getElementById('fc-card').onclick = (e) => {
+      if (e.target.id === 'fc-audio') return;
+      haptic('light'); sfx('tap');
+      fcFlipped = !fcFlipped;
+      document.getElementById('fc-card').classList.toggle('flipped', fcFlipped);
+    };
+    document.getElementById('fc-audio').onclick = (e) => { e.stopPropagation(); haptic('light'); playAudio(w.file, w.kr); };
+    document.getElementById('fc-prev').onclick = () => { haptic('light'); fcIdx = (fcIdx - 1 + vocabDeck.length) % vocabDeck.length; fcFlipped = false; renderVocab(); };
+    document.getElementById('fc-next').onclick = () => { haptic('light'); fcIdx = (fcIdx + 1) % vocabDeck.length; fcFlipped = false; renderVocab(); };
+    document.getElementById('fc-shuf').onclick = () => { haptic('light'); vocabDeck = shuffle(unlocked); fcIdx = 0; fcFlipped = false; renderVocab(); };
   }
 }
 
-/* ====== РАСПОЗНАВАНИЕ РУКОПИСНОГО КОРЕЙСКОГО ПО ШТРИХАМ ====== */
+/* ====== ВИТРИНА КАРТ + БИАС + ГАЧА-ОТКРЫТИЕ ПАКА ====== */
+function cardArtHtml(c) {
+  return `<div class="pc-art" style="background:${c.grad}">
+    <img src="${c.img}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%">
+      <div class="pc-monogram">${c.tag}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">${c.r} PHOTOCARD</div>
+    </div>
+  </div>`;
+}
+
+let curAlbum = 'all';
+function setAlbum(a, btn) {
+  haptic('light'); curAlbum = a;
+  document.querySelectorAll('.subtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderBinder();
+}
+
+function setBias(id) {
+  st.biasId = id; save(); haptic('ok'); sfx('ok');
+  const c = CARDS.find(x => x.id === id);
+  if (c && c.quoteFile) playAudio(c.quoteFile, c.quoteKr);
+  renderBinder();
+}
+
+function renderBinder() {
+  if (typeof CARDS === 'undefined') return;
+  const bWrap = document.getElementById('bias-banner-wrap');
+  const b = getBias();
+  bWrap.innerHTML = b
+    ? `<div class="bias-banner"><div><div style="font-size:11px;color:var(--cyan);font-weight:800">АКТИВНЫЙ БИАС</div><div style="font-weight:800;font-size:14px">${b.name}</div><div style="font-size:12px;color:#e0d4f5">${b.bonusText}</div></div><button class="btn ghost" style="padding:8px 12px;font-size:12px" onclick="playAudio('${b.quoteFile}','${b.quoteKr}')">🔊 Фраза</button></div>`
+    : `<div class="bias-banner"><div style="font-size:12px;color:#d8cce8">Нажми на любую открытую карту ниже, чтобы поставить её <b>Биасом</b> и включить пассивный бонус!</div></div>`;
+
+  const g = document.getElementById('binder-grid'); g.innerHTML = '';
+  (curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum)).forEach(c => {
+    const has = st.cards.includes(c.id);
+    const isBias = st.biasId === c.id;
+    const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
+    const el = document.createElement('div');
+    el.className = `photocard ${has ? rc : 'locked'} ${isBias ? 'bias-active' : ''}`;
+    el.innerHTML = `
+      ${isBias ? '<div class="pc-bias-tag">BIAS</div>' : ''}
+      <div class="pc-rarity">${c.r}</div>
+      ${has ? cardArtHtml(c) : '<div class="pc-art" style="background:#181326"><div class="pc-monogram" style="opacity:0.25">?</div></div>'}
+      <div class="pc-name">${has ? c.name : 'Скрытая карта'}</div>
+      <div class="pc-role">${has ? c.role : 'Пройди урок или открой пак'}</div>
+      ${has ? `<div class="pc-bonus">${c.bonusText}</div>` : ''}
+    `;
+    if (has) el.onclick = () => setBias(c.id);
+    g.appendChild(el);
+  });
+}
+
+function rollCard() {
+  const r = Math.random();
+  const tier = r < 0.08 ? 'SSR' : (r < 0.35 ? 'SR' : 'R');
+  const pool = CARDS.filter(c => c.r === tier);
+  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : CARDS[Math.floor(Math.random() * CARDS.length)];
+}
+
+function openPackModal(price) {
+  if (st.coins < price) return alert(`Нужно ${price} микрофонов!`);
+  haptic('medium');
+  st.coins -= price; save();
+
+  const modal = document.getElementById('pack-modal');
+  modal.classList.add('open');
+  modal.innerHTML = `
+    <div style="font-size:13px;color:var(--cyan);font-weight:800;letter-spacing:1px;margin-bottom:18px">НАЖМИ НА ПАК, ЧТОБЫ ОТКРЫТЬ</div>
+    <div class="pack-foil" id="gacha-pack">
+      <div class="pack-inner">
+        <div style="font-size:12px;color:#ff85cb;font-weight:900;letter-spacing:2px">K-POP LINGUA</div>
+        <div style="font-size:26px;font-weight:900;margin:14px 0">CHIBI PACK</div>
+        <div style="font-size:11px;color:var(--muted)">R • SR • SSR</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('gacha-pack').onclick = () => {
+    const pack = document.getElementById('gacha-pack');
+    pack.classList.add('shaking');
+    haptic('heavy'); sfx('tap');
+    setTimeout(() => {
+      const c = rollCard();
+      const isDup = st.cards.includes(c.id);
+      if (!isDup) st.cards.push(c.id);
+      else st.coins += 20;
+      save(); renderBinder();
+      haptic('ok'); sfx('win');
+      if (c.r !== 'R') fireConfetti();
+      if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 250);
+
+      const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
+      modal.innerHTML = `
+        <div style="font-size:14px;font-weight:900;color:${c.r === 'SSR' ? 'var(--gold)' : 'var(--cyan)'};margin-bottom:14px">
+          ${isDup ? 'ПОВТОРКА • ВОЗВРАТ +20 МИКРОФОНОВ' : 'НОВАЯ КАРТА В АЛЬБОМ!'}
+        </div>
+        <div class="photocard ${rc} reveal-card">
+          <div class="pc-rarity">${c.r}</div>
+          ${cardArtHtml(c)}
+          <div class="pc-name" style="font-size:16px">${c.name}</div>
+          <div class="pc-role">${c.role}</div>
+          <div class="pc-bonus" style="font-size:12px;margin-top:6px">${c.bonusText}</div>
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:#ff99d6">«${c.quoteKr}» — ${c.quoteRu}</div>
+        </div>
+        <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>
+      `;
+    }, 550);
+  };
+}
+
+/* ====== РАСПОЗНАВАНИЕ ПОЧЕРКА ====== */
 async function recognizeKoreanStrokes(strokes, w, h) {
   const res = await fetch('https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      options: 'enable_pre_space',
-      requests: [{ writing_guide: { writing_area_width: w, writing_area_height: h }, ink: strokes, language: 'ko' }]
-    })
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ options: 'enable_pre_space', requests: [{ writing_guide: { writing_area_width: w, writing_area_height: h }, ink: strokes, language: 'ko' }] })
   });
   const data = await res.json();
   if (data[0] === 'SUCCESS' && data[1] && data[1][0] && Array.isArray(data[1][0][1])) return data[1][0][1];
@@ -664,27 +883,22 @@ function fallbackSectorCheck(inkC, targetText, FONT, W, H) {
   const getBox = (ctx) => {
     const d = ctx.getImageData(0, 0, W, H).data;
     let minX = W, minY = H, maxX = -1, maxY = -1, c = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      if (d[(y * W + x) * 4 + 3] > 35) { c++; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
-    }
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3] > 35) { c++; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
     return { minX, minY, w: maxX - minX + 1, h: maxY - minY + 1, c };
   };
   const norm = (src, b, N = 64) => {
     const c = document.createElement('canvas'); c.width = N; c.height = N;
-    const ctx = c.getContext('2d');
-    const sc = Math.min((N - 12) / b.w, (N - 12) / b.h);
+    const ctx = c.getContext('2d'); const sc = Math.min((N - 12) / b.w, (N - 12) / b.h);
     ctx.drawImage(src, b.minX, b.minY, b.w, b.h, (N - b.w * sc) / 2, (N - b.h * sc) / 2, b.w * sc, b.h * sc);
-    const d = ctx.getImageData(0, 0, N, N).data;
-    const bin = new Uint8Array(N * N);
+    const d = ctx.getImageData(0, 0, N, N).data; const bin = new Uint8Array(N * N);
     for (let i = 0; i < N * N; i++) if (d[i * 4 + 3] > 30) bin[i] = 1;
     return bin;
   };
   const dil = (bin, N, r) => {
     const o = new Uint8Array(N * N);
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (bin[y * N + x]) {
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (bin[y * N + x])
       for (let yy = Math.max(0, y - r); yy <= Math.min(N - 1, y + r); yy++)
         for (let xx = Math.max(0, x - r); xx <= Math.min(N - 1, x + r); xx++) o[yy * N + xx] = 1;
-    }
     return o;
   };
   const uBox = getBox(inkC.getContext('2d'));
@@ -696,9 +910,7 @@ function fallbackSectorCheck(inkC, targetText, FONT, W, H) {
   const uD = dil(uB, N, 2), tD = dil(tB, N, 2);
   for (let sy = 0; sy < 2; sy++) for (let sx = 0; sx < 2; sx++) {
     let tt = 0, th = 0;
-    for (let y = sy * 32; y < (sy + 1) * 32; y++) for (let x = sx * 32; x < (sx + 1) * 32; x++) {
-      if (tB[y * N + x]) { tt++; if (uD[y * N + x]) th++; }
-    }
+    for (let y = sy * 32; y < (sy + 1) * 32; y++) for (let x = sx * 32; x < (sx + 1) * 32; x++) if (tB[y * N + x]) { tt++; if (uD[y * N + x]) th++; }
     if (tt > 15 && th / tt < 0.45) return false;
   }
   let ut = 0, uh = 0;
@@ -716,19 +928,19 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek =
     <div class="card-box" style="padding:15px">
       <div class="draw-header">
         <div>
-          <div class="draw-meta-title">${blindMode ? '🎧 Напиши на слух: ' + (item.ru || item.tr) : '✍️ Напиши: ' + item.kr + ' ' + (item.tr || '')}</div>
+          <div class="draw-meta-title">${blindMode ? 'Напиши на слух: ' + (item.ru || item.tr) : 'Напиши: ' + item.kr + ' ' + (item.tr || '')}</div>
           <div class="draw-hint">${noPeek ? 'Режим экзамена — без подсказок!' : 'Пиши в любом месте поля — система прочитает твой почерк'}</div>
         </div>
-        <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0;width:42px;height:42px;font-size:18px" id="dw-audio">🔊</button>
+        <button class="ex-play" style="border:none;cursor:pointer;width:42px;height:42px;font-size:18px" id="dw-audio">🔊</button>
       </div>
       <div class="draw-stage">
         <canvas id="dw-guide" width="${W}" height="${H}"></canvas>
         <canvas id="dw-ink" width="${W}" height="${H}"></canvas>
       </div>
       <div class="draw-controls">
-        <button class="btn ghost" id="dw-clear">🧹 Стереть</button>
-        ${(blindMode && !noPeek) ? '<button class="btn ghost" id="dw-peek">👁 Подсказка</button>' : ''}
-        <button class="btn" id="dw-check">✅ Проверить</button>
+        <button class="btn ghost" id="dw-clear">Стереть</button>
+        ${(blindMode && !noPeek) ? '<button class="btn ghost" id="dw-peek">Подсказка</button>' : ''}
+        <button class="btn" id="dw-check">Проверить</button>
       </div>
       <div id="dw-fb" class="feedback-bar" style="margin-bottom:0"></div>
     </div>
@@ -737,175 +949,141 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek =
   document.getElementById('dw-audio').onclick = () => playAudio(item.file, item.kr);
   if (blindMode) setTimeout(() => playAudio(item.file, item.kr), 200);
 
-  const guideC = document.getElementById('dw-guide');
-  const gCtx = guideC.getContext('2d');
-  const inkC = document.getElementById('dw-ink');
-  const iCtx = inkC.getContext('2d');
-
+  const guideC = document.getElementById('dw-guide'), gCtx = guideC.getContext('2d');
+  const inkC = document.getElementById('dw-ink'), iCtx = inkC.getContext('2d');
   const drawGuide = (showGhost) => {
     gCtx.clearRect(0, 0, W, H);
-    if (showGhost) {
-      gCtx.font = FONT; gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle';
-      gCtx.fillStyle = 'rgba(255, 255, 255, 0.14)';
-      gCtx.fillText(item.kr, W / 2, H / 2 + 6);
-    }
+    if (showGhost) { gCtx.font = FONT; gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle'; gCtx.fillStyle = 'rgba(255,255,255,0.14)'; gCtx.fillText(item.kr, W / 2, H / 2 + 6); }
   };
   drawGuide(!blindMode);
 
   const peekBtn = document.getElementById('dw-peek');
   if (peekBtn) peekBtn.onclick = () => { drawGuide(true); setTimeout(() => drawGuide(false), 1600); };
 
-  let drawing = false, lastX = 0, lastY = 0;
-  let strokes = [], curStroke = null, startTime = 0;
+  let drawing = false, lastX = 0, lastY = 0, strokes = [], curStroke = null, startTime = 0;
   iCtx.strokeStyle = '#ffffff'; iCtx.lineWidth = 7; iCtx.lineCap = 'round'; iCtx.lineJoin = 'round';
-
-  const getPos = (e) => {
-    const r = inkC.getBoundingClientRect();
-    return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
-  };
+  const getPos = (e) => { const r = inkC.getBoundingClientRect(); return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) }; };
 
   inkC.addEventListener('pointerdown', (e) => {
-    e.preventDefault(); inkC.setPointerCapture(e.pointerId);
-    drawing = true; const p = getPos(e);
+    e.preventDefault(); inkC.setPointerCapture(e.pointerId); drawing = true; const p = getPos(e);
     if (!strokes.length) startTime = Date.now();
-    curStroke = [[Math.round(p.x)], [Math.round(p.y)], [Date.now() - startTime]];
-    strokes.push(curStroke);
-    lastX = p.x; lastY = p.y;
-    iCtx.beginPath(); iCtx.moveTo(p.x, p.y); iCtx.lineTo(p.x + 0.1, p.y + 0.1); iCtx.stroke();
+    curStroke = [[Math.round(p.x)], [Math.round(p.y)], [Date.now() - startTime]]; strokes.push(curStroke);
+    lastX = p.x; lastY = p.y; iCtx.beginPath(); iCtx.moveTo(p.x, p.y); iCtx.lineTo(p.x + 0.1, p.y + 0.1); iCtx.stroke();
   });
   inkC.addEventListener('pointermove', (e) => {
-    if (!drawing) return;
-    e.preventDefault(); const p = getPos(e);
-    if (Math.hypot(p.x - lastX, p.y - lastY) > 2) {
-      curStroke[0].push(Math.round(p.x)); curStroke[1].push(Math.round(p.y)); curStroke[2].push(Date.now() - startTime);
-    }
-    iCtx.beginPath(); iCtx.moveTo(lastX, lastY); iCtx.lineTo(p.x, p.y); iCtx.stroke();
-    lastX = p.x; lastY = p.y;
+    if (!drawing) return; e.preventDefault(); const p = getPos(e);
+    if (Math.hypot(p.x - lastX, p.y - lastY) > 2) { curStroke[0].push(Math.round(p.x)); curStroke[1].push(Math.round(p.y)); curStroke[2].push(Date.now() - startTime); }
+    iCtx.beginPath(); iCtx.moveTo(lastX, lastY); iCtx.lineTo(p.x, p.y); iCtx.stroke(); lastX = p.x; lastY = p.y;
   });
   const endDraw = () => { drawing = false; curStroke = null; };
   inkC.addEventListener('pointerup', endDraw); inkC.addEventListener('pointercancel', endDraw);
 
-  const fb = document.getElementById('dw-fb');
-  const checkBtn = document.getElementById('dw-check');
-  document.getElementById('dw-clear').onclick = () => { iCtx.clearRect(0, 0, W, H); strokes = []; fb.className = 'feedback-bar'; };
+  const fb = document.getElementById('dw-fb'), checkBtn = document.getElementById('dw-check');
+  document.getElementById('dw-clear').onclick = () => { haptic('light'); iCtx.clearRect(0, 0, W, H); strokes = []; fb.className = 'feedback-bar'; };
 
   checkBtn.onclick = async () => {
-    if (!strokes.length) { fb.className = 'feedback-bar err'; fb.innerText = '✍️ Сначала напиши букву или слово на сером поле!'; return; }
-    checkBtn.disabled = true; checkBtn.innerText = '⏳ Читаю...';
+    if (!strokes.length) { fb.className = 'feedback-bar err'; fb.innerText = 'Сначала напиши букву или слово на поле!'; return; }
+    checkBtn.disabled = true; checkBtn.innerText = 'Читаю...';
     const clean = s => s.replace(/\s+/g, ''); const target = clean(item.kr);
     try {
       const cands = await recognizeKoreanStrokes(strokes, W, H);
-      const top = cands.slice(0, 4).map(clean);
-      if (top.includes(target)) {
-        fb.className = 'feedback-bar ok'; fb.innerText = `🔥 Идеально! Распознано: «${item.kr}» ${item.tr || ''}`;
+      if (cands.slice(0, 4).map(clean).includes(target)) {
+        haptic('ok'); sfx('ok'); fb.className = 'feedback-bar ok'; fb.innerText = `Идеально! Распознано: «${item.kr}» ${item.tr || ''}`;
         playAudio(item.file, item.kr); if (onSuccess) onSuccess();
       } else {
-        const readAs = cands[0] || '?';
-        fb.className = 'feedback-bar err';
-        fb.innerText = blindMode ? `❌ Система прочитала это как «${readAs}». Проверь буквы и попробуй ещё раз!` : `❌ Система прочитала это как «${readAs}», а нужно «${item.kr}». Сотри и напиши точнее!`;
+        haptic('err'); sfx('err'); fb.className = 'feedback-bar err';
+        fb.innerText = blindMode ? `Система прочитала это как «${cands[0] || '?'}». Попробуй ещё раз!` : `Прочитано как «${cands[0] || '?'}», а нужно «${item.kr}».`;
         if (onFail) onFail();
       }
     } catch (err) {
-      const ok = fallbackSectorCheck(inkC, item.kr, FONT, W, H);
-      if (ok) { fb.className = 'feedback-bar ok'; fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr || ''}`; playAudio(item.file, item.kr); if (onSuccess) onSuccess(); }
-      else { fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем похоже. Сотри и попробуй написать аккуратнее!'; if (onFail) onFail(); }
-    } finally { checkBtn.disabled = false; checkBtn.innerText = '✅ Проверить'; }
+      if (fallbackSectorCheck(inkC, item.kr, FONT, W, H)) {
+        haptic('ok'); sfx('ok'); fb.className = 'feedback-bar ok'; fb.innerText = `Отлично! Это «${item.kr}» ${item.tr || ''}`;
+        playAudio(item.file, item.kr); if (onSuccess) onSuccess();
+      } else {
+        haptic('err'); sfx('err'); fb.className = 'feedback-bar err'; fb.innerText = 'Не совсем похоже. Сотри и напиши аккуратнее!';
+        if (onFail) onFail();
+      }
+    } finally { checkBtn.disabled = false; checkBtn.innerText = 'Проверить'; }
   };
 }
 
-/* ====== ЭКРАН ПРОПИСЕЙ ====== */
 let drawCat = 'letters', drawBlind = true, curDrawIdx = 0;
 function openDrawTrainer() { switchTab('draw'); renderDrawTrainer(); }
 function setDrawCat(cat) { drawCat = cat; curDrawIdx = 0; document.getElementById('cat-letters').classList.toggle('active', cat === 'letters'); document.getElementById('cat-words').classList.toggle('active', cat === 'words'); renderDrawTrainer(); }
 function setDrawBlind(val) { drawBlind = val; document.getElementById('mode-blind').classList.toggle('active', val); document.getElementById('mode-guide').classList.toggle('active', !val); renderDrawTrainer(); }
 
 function renderDrawTrainer() {
-  const list = DRAW_DATA[drawCat];
-  const sel = document.getElementById('draw-selector'); sel.innerHTML = '';
+  const list = DRAW_DATA[drawCat], sel = document.getElementById('draw-selector'); sel.innerHTML = '';
   list.forEach((it, idx) => {
-    const b = document.createElement('button'); const isDone = st.drawn.includes(it.kr);
+    const b = document.createElement('button'), isDone = st.drawn.includes(it.kr);
     b.className = 'char-pill' + (idx === curDrawIdx ? ' active' : '') + (isDone ? ' done' : '');
-    b.innerText = drawBlind ? (isDone ? '✅ ' + it.kr : '#' + (idx + 1)) : it.kr;
+    b.innerText = drawBlind ? (isDone ? it.kr : '#' + (idx + 1)) : it.kr;
     b.onclick = () => { curDrawIdx = idx; renderDrawTrainer(); };
     sel.appendChild(b);
   });
-  const body = document.getElementById('draw-trainer-body'); const item = list[curDrawIdx];
+  const body = document.getElementById('draw-trainer-body'), item = list[curDrawIdx];
   const widgetWrap = document.createElement('div'); body.innerHTML = ''; body.appendChild(widgetWrap);
   const nextBtn = document.createElement('button'); nextBtn.className = 'btn full cyan'; nextBtn.style.display = 'none';
-  nextBtn.innerText = curDrawIdx < list.length - 1 ? 'Следующее задание →' : '🎉 Раздел пройден! В меню';
+  nextBtn.innerText = curDrawIdx < list.length - 1 ? 'Следующее задание →' : 'Раздел пройден! В меню';
   nextBtn.onclick = () => { if (curDrawIdx < list.length - 1) { curDrawIdx++; renderDrawTrainer(); } else switchTab('lessons'); };
   body.appendChild(nextBtn);
   mountDrawWidget(widgetWrap, item, drawBlind, () => {
-    if (!st.drawn.includes(item.kr)) { st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save(); sel.children[curDrawIdx].classList.add('done'); sel.children[curDrawIdx].innerText = '✅ ' + item.kr; }
+    if (!st.drawn.includes(item.kr)) { st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save(); sel.children[curDrawIdx].classList.add('done'); sel.children[curDrawIdx].innerText = item.kr; }
     nextBtn.style.display = 'block';
   });
 }
 
-/* ====== ЭКРАН УРОКОВ ====== */
+/* ====== УРОКИ И ДВИЖОК ====== */
 function isLessonUnlocked(l, idx) {
   if (st.done.includes(l.id)) return true;
   if (l.isExam) return LESSONS.filter(x => !x.isExam).every(x => st.done.includes(x.id));
-  if (idx === 0) return true;
-  return st.done.includes(LESSONS[idx - 1].id);
+  return idx === 0 || st.done.includes(LESSONS[idx - 1].id);
 }
 
 function renderLessons() {
-  if (typeof LESSONS === 'undefined') { document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>.</div>'; return; }
-  const pct = Math.round((st.done.length / LESSONS.length) * 100);
-  document.getElementById('module-progress').style.width = pct + '%';
+  if (typeof LESSONS === 'undefined') { document.getElementById('lessons-list').innerHTML = '<div class="card-box">Не найден файл <b>lessons.js</b>.</div>'; return; }
+  document.getElementById('module-progress').style.width = Math.round((st.done.length / LESSONS.length) * 100) + '%';
   const list = document.getElementById('lessons-list'); list.innerHTML = '';
   LESSONS.forEach((l, idx) => {
-    const done = st.done.includes(l.id);
-    const unlocked = isLessonUnlocked(l, idx);
+    const done = st.done.includes(l.id), unlocked = isLessonUnlocked(l, idx);
     const el = document.createElement('div');
     el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (!unlocked ? ' locked' : '');
-    const costTag = done ? 'Бесплатный повтор' : (l.isExam ? 'Нужно ❤️' : 'Цена: 1 ⚡');
-    el.innerHTML = `<div><div class="l-title">${done ? '✅ ' : (!unlocked ? '🔒 ' : '')}${l.title}</div><div class="l-meta">${l.desc} • ${costTag} • +${l.xp} XP</div></div>`;
+    const costTag = done ? 'Бесплатный повтор' : (l.isExam ? 'Нужна попытка' : 'Цена: 1 заряд');
+    el.innerHTML = `<div><div class="l-title">${done ? '✓ ' : ''}${l.title}</div><div class="l-meta">${l.desc} • ${costTag} • +${l.xp} XP</div></div>`;
     const btn = document.createElement('button');
     if (!unlocked) {
-      btn.className = 'btn ghost'; btn.innerText = '🔒';
-      btn.onclick = () => alert(l.isExam ? 'Сначала пройди все 8 уроков Блока 1!' : 'Сначала пройди предыдущий урок!');
+      btn.className = 'btn ghost'; btn.innerText = 'Закрыто';
+      btn.onclick = () => { haptic('err'); alert(l.isExam ? 'Сначала пройди все 8 уроков Блока 1!' : 'Сначала пройди предыдущий урок!'); };
     } else {
       btn.className = 'btn' + (l.isExam ? ' gold' : '');
       btn.innerText = done ? 'Повтор' : (l.isExam ? 'Сдать' : 'Учить');
       btn.onclick = () => startLesson(l.id);
     }
-    el.appendChild(btn);
-    list.appendChild(el);
+    el.appendChild(btn); list.appendChild(el);
   });
 }
 
-/* ====== ДВИЖОК УРОКОВ ====== */
 let curL = null, isReplay = false, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
 
 function startLesson(id) {
-  syncResources();
-  curL = LESSONS.find(x => x.id === id);
-  isReplay = st.done.includes(curL.id);
-
+  syncResources(); curL = LESSONS.find(x => x.id === id); isReplay = st.done.includes(curL.id);
   if (!isReplay) {
     if (curL.isExam) {
       if (st.hearts <= 0) {
-        const left = HEART_REGEN_MS - (Date.now() - st.lastHeartTs);
-        if (confirm(`❤️ Закончились попытки экзамена!\nНовое сердечко через ${fmtWait(left)}.\n\nПерейти в Магазин, чтобы пополнить?`)) switchTab('shop');
+        if (confirm(`Закончились попытки экзамена!\nНовая через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}.\n\nПерейти в Магазин?`)) switchTab('shop');
         return;
       }
     } else {
       if (st.energy <= 0) {
-        const left = ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs);
-        if (confirm(`⚡ Закончилась энергия!\n+1 ⚡ восстановится через ${fmtWait(left)}.\n\nПерейти в Магазин, чтобы пополнить?`)) switchTab('shop');
+        if (confirm(`Закончилась энергия!\n+1 заряд через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}.\n\nПерейти в Магазин?`)) switchTab('shop');
         return;
       }
       if (st.energy === MAX_ENERGY) st.lastEnergyTs = Date.now();
-      st.energy--;
-      save();
+      st.energy--; save();
     }
   }
-
-  queue = curL.steps.map(s => ({ ...s, isRetry: false }));
-  qIdx = 0; mistakes = 0;
-  switchTab('study');
-  renderStep();
+  queue = curL.steps.map(s => ({ ...s, isRetry: false })); qIdx = 0; mistakes = 0;
+  switchTab('study'); renderStep();
 }
 
 function renderJumpBar() {
@@ -913,11 +1091,9 @@ function renderJumpBar() {
   const bar = document.createElement('div'); bar.className = 'jump-bar';
   curL.steps.forEach((step, idx) => {
     const b = document.createElement('button');
-    const isCurrent = !queue[qIdx]?.isRetry && qIdx === idx;
-    b.className = 'jump-btn' + (isCurrent ? ' active' : '');
-    const icon = step.type === 'draw' ? '✍️' : (step.type === 'theory' ? '📖' : (step.type.includes('build') ? '🧩' : '•'));
-    b.innerText = `${idx + 1}${icon}`;
-    b.onclick = () => { if (idx < queue.length) { qIdx = idx; renderStep(); } };
+    b.className = 'jump-btn' + (!queue[qIdx]?.isRetry && qIdx === idx ? ' active' : '');
+    b.innerText = `${idx + 1}`;
+    b.onclick = () => { if (idx < queue.length) { haptic('light'); qIdx = idx; renderStep(); } };
     bar.appendChild(b);
   });
   return bar;
@@ -933,27 +1109,21 @@ function renderStep() {
   if (qIdx >= total) return finishLesson();
   const jumpBar = renderJumpBar(); if (jumpBar) body.appendChild(jumpBar);
 
-  const s = queue[qIdx];
-  const isExam = !!(curL && curL.isExam);
-  if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
+  const s = queue[qIdx], isExam = !!(curL && curL.isExam);
+  if (s.isRetry) body.innerHTML += '<div class="retry-badge">Работа над ошибками</div>';
 
   if (s.type === 'draw') {
     const drawList = Array.isArray(s.items) && s.items.length ? s.items : [s];
     let idx = 0;
-    const prog = document.createElement('div');
-    prog.style.cssText = 'font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:8px;text-align:center';
+    const prog = document.createElement('div'); prog.style.cssText = 'font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:8px;text-align:center';
     const box = document.createElement('div');
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
-    nextBtn.onclick = nextStep;
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →'; nextBtn.onclick = nextStep;
     body.append(prog, box, nextBtn);
-
     const runOne = () => {
-      const curItem = drawList[idx];
       prog.innerText = `Пропись ${idx + 1} из ${drawList.length}`;
-      mountDrawWidget(box, curItem, isExam ? true : (s.blind !== false), () => {
-        if (idx < drawList.length - 1) { idx++; setTimeout(runOne, 900); }
-        else { prog.innerText = `✅ Все слова написаны (${drawList.length}/${drawList.length})`; nextBtn.style.display = 'block'; }
+      mountDrawWidget(box, drawList[idx], isExam ? true : (s.blind !== false), () => {
+        if (idx < drawList.length - 1) { idx++; setTimeout(runOne, 850); }
+        else { prog.innerText = `Готово (${drawList.length}/${drawList.length})`; nextBtn.style.display = 'block'; }
       }, () => { if (!stepFailed) { stepFailed = true; mistakes++; } }, isExam);
     };
     runOne();
@@ -961,17 +1131,16 @@ function renderStep() {
 
   if (s.type === 'theory') {
     const wrap = document.createElement('div'); wrap.className = 'card-box';
-    wrap.innerHTML = `<h3>${s.title}</h3><p>${s.text}</p>${s.tip ? `<div class="tip-box">💡 ${s.tip}</div>` : ''}`;
+    wrap.innerHTML = `<h3>${s.title}</h3><p>${s.text}</p>${s.tip ? `<div class="tip-box">${s.tip}</div>` : ''}`;
     const list = document.createElement('div'); list.className = 'example-list';
     s.examples.forEach(e => {
       const row = document.createElement('div'); row.className = 'example-row';
       row.innerHTML = `<div class="ex-kr">${e.kr}</div><div class="ex-info"><div class="ex-tr">${e.tr}</div><div class="ex-ru">${e.ru}</div></div><div class="ex-play">🔊</div>`;
-      row.onclick = () => playAudio(e.file, e.kr);
+      row.onclick = () => { haptic('light'); playAudio(e.file, e.kr); };
       list.appendChild(row);
     });
     wrap.appendChild(list); body.appendChild(wrap);
-    const btn = document.createElement('button'); btn.className = 'btn full'; btn.innerText = 'Понятно, идём дальше →';
-    btn.onclick = nextStep; body.appendChild(btn);
+    const btn = document.createElement('button'); btn.className = 'btn full'; btn.innerText = 'Понятно, дальше →'; btn.onclick = nextStep; body.appendChild(btn);
   }
 
   if (s.type === 'choice' || s.type === 'listen') {
@@ -980,7 +1149,7 @@ function renderStep() {
       prompt.innerHTML = `<div style="font-size:13px;color:var(--muted);margin-bottom:4px">Аудирование • Нажми и слушай</div>`;
       const row = document.createElement('div'); row.className = 'listen-row';
       const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊'; lb.onclick = () => playAudio(s.file, s.kr, 1.0);
-      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢'; sb.onclick = () => playAudio(s.file, s.kr, 0.72);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '0.7x'; sb.style.fontSize = '13px'; sb.style.fontWeight = '800'; sb.onclick = () => playAudio(s.file, s.kr, 0.72);
       row.append(lb, sb); prompt.appendChild(row);
       const rev = document.createElement('div'); rev.id = 'listen-reveal'; rev.className = 'big-tr'; rev.style.visibility = 'hidden';
       rev.innerText = s.kr + ' ' + (s.tr || ''); prompt.appendChild(rev);
@@ -993,7 +1162,7 @@ function renderStep() {
     body.appendChild(prompt);
 
     const h = document.createElement('h3'); h.style.cssText = 'margin:0 0 12px;font-size:16px'; h.innerText = s.q; body.appendChild(h);
-    const optsWrap = document.createElement('div'); const fb = document.createElement('div'); fb.className = 'feedback-bar';
+    const optsWrap = document.createElement('div'), fb = document.createElement('div'); fb.className = 'feedback-bar';
     const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →'; nextBtn.onclick = nextStep;
 
     s.opts.forEach((opt, i) => {
@@ -1001,12 +1170,8 @@ function renderStep() {
       b.onclick = () => {
         optsWrap.querySelectorAll('.opt-btn').forEach(x => x.disabled = true);
         const rev = document.getElementById('listen-reveal'); if (rev) rev.style.visibility = 'visible';
-        if (i === s.correct) { b.classList.add('correct'); fb.className = 'feedback-bar ok'; fb.innerText = '✅ Верно! ' + s.explain; }
-        else {
-          b.classList.add('wrong'); optsWrap.children[s.correct].classList.add('correct');
-          fb.className = 'feedback-bar err'; fb.innerText = (isExam ? '❌ Ошибка. ' : '❌ Ошибка (вернёмся к этому в конце урока). ') + s.explain;
-          mistakes++; if (!isExam) queue.push({ ...s, isRetry: true });
-        }
+        if (i === s.correct) { haptic('ok'); sfx('ok'); b.classList.add('correct'); fb.className = 'feedback-bar ok'; fb.innerText = 'Верно! ' + s.explain; }
+        else { haptic('err'); sfx('err'); b.classList.add('wrong'); optsWrap.children[s.correct].classList.add('correct'); fb.className = 'feedback-bar err'; fb.innerText = (isExam ? 'Ошибка. ' : 'Ошибка (вернёмся в конце). ') + s.explain; mistakes++; if (!isExam) queue.push({ ...s, isRetry: true }); }
         nextBtn.style.display = 'block';
       };
       optsWrap.appendChild(b);
@@ -1015,61 +1180,56 @@ function renderStep() {
   }
 
   if (s.type === 'match') {
-    const h = document.createElement('h3'); h.style.cssText = 'margin:0 0 14px;font-size:16px'; h.innerText = s.q || 'Соедини пары (корейский → значение)'; body.appendChild(h);
+    const h = document.createElement('h3'); h.style.cssText = 'margin:0 0 14px;font-size:16px'; h.innerText = s.q || 'Соедини пары'; body.appendChild(h);
     const grid = document.createElement('div'); grid.className = 'match-grid';
     const colL = document.createElement('div'); colL.className = 'match-col';
     const colR = document.createElement('div'); colR.className = 'match-col';
     const fb = document.createElement('div'); fb.className = 'feedback-bar';
-    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Отлично, дальше →'; nextBtn.onclick = nextStep;
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →'; nextBtn.onclick = nextStep;
 
     let selL = null, selR = null, matched = 0;
-    const leftItems = shuffle(s.pairs.map((p, i) => ({ ...p, id: i })));
-    const rightItems = shuffle(s.pairs.map((p, i) => ({ ...p, id: i })));
-
     const tryMatch = () => {
       if (!selL || !selR) return;
       if (selL.id === selR.id) {
+        haptic('ok'); sfx('ok');
         selL.el.classList.remove('sel'); selR.el.classList.remove('sel');
         selL.el.classList.add('matched'); selR.el.classList.add('matched');
         playAudio(selL.file, selL.kr); matched++; selL = null; selR = null;
-        if (matched === s.pairs.length) { fb.className = 'feedback-bar ok'; fb.innerText = '✅ Все пары собраны!'; nextBtn.style.display = 'block'; }
+        if (matched === s.pairs.length) { fb.className = 'feedback-bar ok'; fb.innerText = 'Все пары собраны!'; nextBtn.style.display = 'block'; }
       } else {
+        haptic('err'); sfx('err');
         const a = selL.el, b = selR.el; a.classList.add('wrong'); b.classList.add('wrong');
         mistakes++; selL = null; selR = null;
         setTimeout(() => { a.classList.remove('sel', 'wrong'); b.classList.remove('sel', 'wrong'); }, 450);
       }
     };
 
-    leftItems.forEach(item => {
+    shuffle(s.pairs.map((p, i) => ({ ...p, id: i }))).forEach(item => {
       const b = document.createElement('button'); b.className = 'match-btn kr'; b.innerText = item.kr;
-      b.onclick = () => { colL.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); playAudio(item.file, item.kr); selL = { ...item, el: b }; tryMatch(); };
+      b.onclick = () => { haptic('light'); colL.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); playAudio(item.file, item.kr); selL = { ...item, el: b }; tryMatch(); };
       colL.appendChild(b);
     });
-    rightItems.forEach(item => {
+    shuffle(s.pairs.map((p, i) => ({ ...p, id: i }))).forEach(item => {
       const b = document.createElement('button'); b.className = 'match-btn'; b.innerText = item.ru;
-      b.onclick = () => { colR.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); selR = { ...item, el: b }; tryMatch(); };
+      b.onclick = () => { haptic('light'); colR.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); selR = { ...item, el: b }; tryMatch(); };
       colR.appendChild(b);
     });
     grid.append(colL, colR); body.append(grid, fb, nextBtn);
   }
 
   if (s.type === 'build' || s.type === 'listen_build') {
-    buildAns = [];
-    const isListen = s.type === 'listen_build';
+    buildAns = []; const isListen = s.type === 'listen_build';
     const prompt = document.createElement('div'); prompt.className = 'prompt-word'; prompt.style.padding = '16px';
     if (isListen) {
-      prompt.innerHTML = `<div style="font-size:15px;font-weight:700;margin-bottom:4px">🎧 ${s.q || 'Послушай и собери фразу'}</div>`;
+      prompt.innerHTML = `<div style="font-size:15px;font-weight:700;margin-bottom:4px">${s.q || 'Послушай и собери фразу'}</div>`;
       const row = document.createElement('div'); row.className = 'listen-row';
       const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊'; lb.onclick = () => playAudio(s.file, s.audioText, 1.0);
-      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢'; sb.onclick = () => playAudio(s.file, s.audioText, 0.72);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '0.7x'; sb.style.fontSize = '13px'; sb.style.fontWeight = '800'; sb.onclick = () => playAudio(s.file, s.audioText, 0.72);
       row.append(lb, sb); prompt.appendChild(row);
       setTimeout(() => playAudio(s.file, s.audioText, 1.0), 250);
     } else {
       prompt.innerHTML = `<div style="font-size:16px;font-weight:700">${s.q}</div>`;
-      if (!isExam) {
-        const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом'; ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
-        prompt.appendChild(ab);
-      }
+      if (!isExam) { const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка'; ab.onclick = () => playAudio(s.file, s.audioText, 1.0); prompt.appendChild(ab); }
     }
 
     const slots = document.createElement('div'); slots.className = 'build-slots';
@@ -1082,25 +1242,23 @@ function renderStep() {
       slots.innerHTML = buildAns.length ? '' : '<span style="color:var(--muted);font-size:13px">Нажимай на блоки ниже</span>';
       buildAns.forEach((item, pos) => {
         const c = document.createElement('button'); c.className = 'chip in-slot'; c.innerText = item.val;
-        c.onclick = () => { buildAns.splice(pos, 1); renderBuild(); };
+        c.onclick = () => { haptic('light'); sfx('tap'); buildAns.splice(pos, 1); renderBuild(); };
         slots.appendChild(c);
       });
       pool.innerHTML = '';
       s.pool.forEach((val, idx) => {
-        const used = buildAns.some(a => a.idx === idx);
-        const c = document.createElement('button'); c.className = 'chip' + (used ? ' used' : ''); c.innerText = val;
-        c.onclick = () => { buildAns.push({ val, idx }); renderBuild(); };
+        const c = document.createElement('button'); c.className = 'chip' + (buildAns.some(a => a.idx === idx) ? ' used' : ''); c.innerText = val;
+        c.onclick = () => { haptic('light'); sfx('tap'); buildAns.push({ val, idx }); renderBuild(); };
         pool.appendChild(c);
       });
     };
 
     checkBtn.onclick = () => {
       if (buildAns.map(a => a.val).join('') === s.answer.join('')) {
-        fb.className = 'feedback-bar ok'; fb.innerText = '✅ ' + s.explain;
-        checkBtn.style.display = 'none'; nextBtn.style.display = 'block';
-        playAudio(s.file, s.audioText, 1.0);
+        haptic('ok'); sfx('ok'); fb.className = 'feedback-bar ok'; fb.innerText = s.explain;
+        checkBtn.style.display = 'none'; nextBtn.style.display = 'block'; playAudio(s.file, s.audioText, 1.0);
       } else {
-        fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем так! Попробуй переставить блоки.';
+        haptic('err'); sfx('err'); fb.className = 'feedback-bar err'; fb.innerText = 'Не совсем так! Попробуй переставить блоки.';
         if (!stepFailed) { stepFailed = true; mistakes++; if (!isExam) queue.push({ ...s, isRetry: true }); }
       }
     };
@@ -1108,75 +1266,55 @@ function renderStep() {
   }
 }
 
-function nextStep() { qIdx++; renderStep(); }
+function nextStep() { haptic('light'); qIdx++; renderStep(); }
 
 function finishLesson() {
   document.getElementById('study-bar').style.width = '100%';
   if (curL.isExam && mistakes > 4) {
-    if (!isReplay) {
-      if (st.hearts === MAX_HEARTS) st.lastHeartTs = Date.now();
-      st.hearts = Math.max(0, st.hearts - 1);
-      save();
-    }
+    haptic('err'); sfx('err');
+    if (!isReplay) { if (st.hearts === MAX_HEARTS) st.lastHeartTs = Date.now(); st.hearts = Math.max(0, st.hearts - 1); save(); }
     document.getElementById('study-body').innerHTML = `
       <div class="card-box" style="text-align:center;padding:26px 18px">
-        <div style="font-size:44px;margin-bottom:6px">💔</div>
-        <h2 style="margin:0 0 6px;color:var(--danger)">Экзамен не сдан</h2>
+        <h2 style="margin:0 0 8px;color:var(--danger)">Экзамен не сдан</h2>
         <p>Допущено ошибок: <b>${mistakes}</b> (нужно не больше 4).</p>
-        <p style="color:var(--muted)">Сгорело 1 сердечко. Осталось попыток: <b>❤️ ${st.hearts}/${MAX_HEARTS}</b></p>
+        <p style="color:var(--muted)">Сгорела 1 попытка. Осталось: <b>${st.hearts}/${MAX_HEARTS}</b></p>
       </div>
-      ${st.hearts > 0 ? `<button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>` : `<button class="btn cyan full" style="margin-bottom:10px" onclick="switchTab('shop')">Пополнить ❤️ в Магазине</button>`}
-      <button class="btn ghost full" onclick="switchTab('vocab')">Повторить слова в Словаре 📖</button>
-    `;
+      ${st.hearts > 0 ? `<button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>` : `<button class="btn cyan full" style="margin-bottom:10px" onclick="switchTab('shop')">Пополнить попытки</button>`}
+      <button class="btn ghost full" onclick="switchTab('vocab')">Повторить слова в Словаре</button>`;
     return;
   }
 
+  haptic('ok'); sfx('win'); fireConfetti();
+  const b = getBias();
+  const xpGain = Math.round(curL.xp * (1 + (b && b.bonusType === 'xp' ? b.bonusVal / 100 : 0)));
+  const coinGain = Math.round(curL.coins * (1 + (b && b.bonusType === 'coins' ? b.bonusVal / 100 : 0)));
+
   let cardHtml = '', vocabHtml = '';
   if (!st.done.includes(curL.id)) {
-    st.done.push(curL.id); st.coins += curL.coins; st.xp += curL.xp;
+    st.done.push(curL.id); st.coins += coinGain; st.xp += xpGain;
     const newWords = VOCAB.filter(w => w.l === curL.id).length;
-    if (newWords > 0) vocabHtml = `<p style="color:var(--cyan);font-weight:700">📖 В словарь добавлено новых слов: +${newWords}</p>`;
-    if (curL.cardId && !st.cards.includes(curL.cardId)) {
+    if (newWords > 0) vocabHtml = `<p style="color:var(--cyan);font-weight:700">В словарь добавлено новых слов: +${newWords}</p>`;
+    if (curL.cardId && typeof CARDS !== 'undefined' && !st.cards.includes(curL.cardId)) {
       st.cards.push(curL.cardId);
       const c = CARDS.find(x => x.id === curL.cardId);
-      cardHtml = `<p style="color:var(--gold);font-weight:800">🎉 Выбита карта: ${c.art} ${c.name} [${c.r}]</p>`;
+      if (c) cardHtml = `<p style="color:var(--gold);font-weight:800">Выбита карта: ${c.name} [${c.r}]</p>`;
     }
     save();
   }
-  const stars = mistakes === 0 ? '⭐⭐⭐ Идеально!' : (mistakes <= 2 ? '⭐⭐ Отлично!' : '⭐ Засчитано (ошибок: ' + mistakes + ')');
+  const stars = mistakes === 0 ? 'Идеально (0 ошибок)!' : (mistakes <= 2 ? 'Отлично!' : 'Засчитано (ошибок: ' + mistakes + ')');
   document.getElementById('study-body').innerHTML = `
     <div class="card-box" style="text-align:center;padding:26px 18px">
-      <div style="font-size:44px;margin-bottom:6px">🔥</div>
       <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
       <div style="color:var(--cyan);font-weight:700;margin-bottom:10px">${stars}</div>
-      <p>Награда: <b>+${curL.coins} 🎤</b> и <b>+${curL.xp} XP</b></p>${vocabHtml}${cardHtml}
+      <p>Награда: <b>+${coinGain} микрофонов</b> и <b>+${xpGain} XP</b></p>${vocabHtml}${cardHtml}
     </div>
     <button class="btn full" style="margin-bottom:10px" onclick="switchTab('lessons')">К урокам</button>
-    <button class="btn ghost full" onclick="switchTab('vocab')">В Словарь 📖</button>
-  `;
+    <button class="btn ghost full" onclick="switchTab('vocab')">Открыть Словарь</button>`;
 }
 
-let curAlbum = 'all';
-function setAlbum(a, btn) { curAlbum = a; document.querySelectorAll('.subtab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderBinder(); }
-function renderBinder() {
-  const g = document.getElementById('binder-grid'); g.innerHTML = '';
-  (curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum)).forEach(c => {
-    const has = st.cards.includes(c.id);
-    const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
-    g.innerHTML += `<div class="photocard ${has ? rc : 'locked'}"><div class="pc-rarity">${c.r}</div><div class="pc-art">${has ? c.art : '❓'}</div><div class="pc-name">${has ? c.name : 'Скрытая карта'}</div><div class="pc-role">${has ? c.role : 'Пройди урок или открой пак'}</div></div>`;
-  });
-}
-function buyPack(price) {
-  if (st.coins < price) return alert('Нужно ' + price + ' 🎤!');
-  st.coins -= price;
-  const rc = CARDS[Math.floor(Math.random() * CARDS.length)];
-  if (!st.cards.includes(rc.id)) { st.cards.push(rc.id); alert('🎉 Новая карта: ' + rc.art + ' ' + rc.name + ' [' + rc.r + ']!'); }
-  else { st.coins += 20; alert('Повторка: ' + rc.name + '. Возвращено +20 🎤'); }
-  save(); renderBinder();
-}
 function renderRank() {
   const bots = [{ name: "Minji_Seoul", xp: 620 }, { name: "Kpop_Sora", xp: 480 }, { name: "V_Army95", xp: 340 }, { name: "Ты (Трейни)", xp: st.xp, me: true }].sort((a, b) => b.xp - a.xp);
-  document.getElementById('rank-list').innerHTML = bots.map((p, i) => `<div class="rank-row ${p.me ? 'me' : ''}"><div style="width:28px;font-weight:800">${i < 3 ? ['🥇','🥈','🥉'][i] : i+1}</div><div style="flex:1;font-weight:700">${p.name}</div><div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div></div>`).join('');
+  document.getElementById('rank-list').innerHTML = bots.map((p, i) => `<div class="rank-row ${p.me ? 'me' : ''}"><div style="width:28px;font-weight:800;color:${i < 3 ? 'var(--gold)' : 'var(--muted)'}">#${i+1}</div><div style="flex:1;font-weight:700">${p.name}</div><div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div></div>`).join('');
 }
 
 syncResources();
