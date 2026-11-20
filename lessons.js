@@ -183,10 +183,10 @@ const LESSONS = [
       }
     ]
   },
-  {
+    {
     id: 2,
     title: "Урок 2. Первые 7 согласных и озвончение",
-    desc: "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ • Читаем 가수 и 드라마",
+    desc: "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ • Прописи пачками, слова 가수 и 드라마",
     coins: 90,
     xp: 180,
     cardId: 2,
@@ -205,11 +205,13 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "나",
-        tr: "[на]",
-        ru: "Слог [на]",
-        file: "audio/na.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "가", tr: "[ка / га]", ru: "Слог [ка]", file: "audio/ga.mp3" },
+          { kr: "나", tr: "[на]", ru: "Слог [на]", file: "audio/na.mp3" },
+          { kr: "다", tr: "[та / да]", ru: "Слог [та]", file: "audio/da.mp3" },
+          { kr: "라", tr: "[ра / ла]", ru: "Слог [ра]", file: "audio/ra.mp3" }
+        ]
       },
       {
         type: "match",
@@ -231,6 +233,16 @@ const LESSONS = [
           { kr: "바", tr: "[па / ба]", ru: "ㅂ — стакан/ведро (Bucket → П/Б)", file: "audio/ba.mp3" },
           { kr: "사", tr: "[са]", ru: "ㅅ — гора/шалаш (С)", file: "audio/sa.mp3" },
           { kr: "시", tr: "[щи]", ru: "ㅅ + ㅣ всегда читается мягко [щи]!", file: "audio/si.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "마", tr: "[ма]", ru: "Слог [ма]", file: "audio/ma.mp3" },
+          { kr: "바", tr: "[па / ба]", ru: "Слог [па]", file: "audio/ba.mp3" },
+          { kr: "사", tr: "[са]", ru: "Слог [са]", file: "audio/sa.mp3" },
+          { kr: "시", tr: "[щи]", ru: "Слог [щи]", file: "audio/si.mp3" }
         ]
       },
       {
@@ -332,11 +344,11 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "리사",
-        tr: "[Ли-са]",
-        ru: "Имя: Лиса",
-        file: "audio/lisa.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "가수", tr: "[ка-су]", ru: "Слово: Певец", file: "audio/gasu.mp3" },
+          { kr: "리사", tr: "[Ли-са]", ru: "Имя: Лиса", file: "audio/lisa.mp3" }
+        ]
       },
       {
         type: "listen_build",
@@ -351,7 +363,7 @@ const LESSONS = [
   {
     id: 3,
     title: "Урок 3. Звуки ㅈ, ㅎ и придыхательные",
-    desc: "ㅈ, ㅎ, ㅊ, ㅋ, ㅌ, ㅍ • Читаем 커피, 카메라, 지수",
+    desc: "ㅈ, ㅎ, ㅊ, ㅋ, ㅌ, ㅍ • Прописи пачками, 커피 и 카메라",
     coins: 90,
     xp: 180,
     cardId: 3,
@@ -367,6 +379,14 @@ const LESSONS = [
           { kr: "지수", tr: "[Чи-су / Джи-су]", ru: "Джису из BLACKPINK (ㅈ+ㅣ, ㅅ+ㅜ)", file: "audio/jisoo.mp3" },
           { kr: "하나", tr: "[ха-на]", ru: "Один (счёт перед фото: «Хана, туль, сет!»)", file: "audio/hana.mp3" },
           { kr: "모자", tr: "[мо-джа]", ru: "Шапка / кепка (ㅈ между гласными → дж!)", file: "audio/moja.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "자", tr: "[ча / джа]", ru: "Слог [ча]", file: "audio/ja.mp3" },
+          { kr: "하", tr: "[ха]", ru: "Слог [ха]", file: "audio/ha.mp3" }
         ]
       },
       {
@@ -386,6 +406,16 @@ const LESSONS = [
           { kr: "타", tr: "[тха]", ru: "ㅌ — резкое [т] с выдохом", file: "audio/ta.mp3" },
           { kr: "파", tr: "[пха]", ru: "ㅍ — резкое [п] с выдохом", file: "audio/pa.mp3" },
           { kr: "차", tr: "[чха]", ru: "ㅊ — резкое [ч] с выдохом (слово «Чай» / «Машина»)", file: "audio/cha.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "카", tr: "[кха]", ru: "Слог [кха]", file: "audio/ka.mp3" },
+          { kr: "타", tr: "[тха]", ru: "Слог [тха]", file: "audio/ta.mp3" },
+          { kr: "파", tr: "[пха]", ru: "Слог [пха]", file: "audio/pa.mp3" },
+          { kr: "차", tr: "[чха]", ru: "Слог [чха]", file: "audio/cha.mp3" }
         ]
       },
       {
@@ -476,11 +506,10 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "커피",
-        tr: "[кхо-пхи]",
-        ru: "Кофе",
-        file: "audio/keopi.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "커피", tr: "[кхо-пхи]", ru: "Слово: Кофе", file: "audio/keopi.mp3" }
+        ]
       },
       {
         type: "choice", kr: "포도", tr: "ㅍ+ㅗ и ㄷ+ㅗ", file: "audio/podo.mp3",
@@ -498,7 +527,7 @@ const LESSONS = [
   {
     id: 4,
     title: "Урок 4. Двойные (напряжённые) согласные",
-    desc: "ㄲ, ㄸ, ㅃ, ㅆ, ㅉ • Секрет слова 오빠 (Оппа)",
+    desc: "ㄲ, ㄸ, ㅃ, ㅆ, ㅉ • Прописи пачками, секрет слова 오빠",
     coins: 100,
     xp: 200,
     cardId: 4,
@@ -514,6 +543,17 @@ const LESSONS = [
           { kr: "빠", tr: "[ппа]", ru: "ㅃ — твёрдое, напряжённое [п]", file: "audio/ppa.mp3" },
           { kr: "싸", tr: "[сса]", ru: "ㅆ — резкое, шипящее [с]", file: "audio/ssa.mp3" },
           { kr: "짜", tr: "[чча]", ru: "ㅉ — твёрдое [чч]", file: "audio/jja.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "까", tr: "[кка]", ru: "Слог [кка]", file: "audio/kka.mp3" },
+          { kr: "따", tr: "[тта]", ru: "Слог [тта]", file: "audio/tta.mp3" },
+          { kr: "빠", tr: "[ппа]", ru: "Слог [ппа]", file: "audio/ppa.mp3" },
+          { kr: "싸", tr: "[сса]", ru: "Слог [сса]", file: "audio/ssa.mp3" },
+          { kr: "짜", tr: "[чча]", ru: "Слог [чча]", file: "audio/jja.mp3" }
         ]
       },
       {
@@ -597,11 +637,10 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "오빠",
-        tr: "[оп-па]",
-        ru: "Слово: Оппа",
-        file: "audio/oppa.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "오빠", tr: "[оп-па]", ru: "Слово: Оппа", file: "audio/oppa.mp3" }
+        ]
       },
       {
         type: "listen_build",
@@ -642,7 +681,7 @@ const LESSONS = [
   {
     id: 5,
     title: "Урок 5. Составные гласные (Дифтонги)",
-    desc: "ㅐ, ㅔ, ㅘ, ㅝ, ㅟ, ㅚ, ㅢ • Читаем 노래, 뭐, 최고",
+    desc: "ㅐ, ㅔ, ㅘ, ㅝ, ㅟ, ㅚ, ㅢ • Прописи дифтонгов, 노래 и 최고",
     coins: 110,
     xp: 220,
     cardId: 6,
@@ -658,6 +697,14 @@ const LESSONS = [
           { kr: "노래", tr: "[но-рэ]", ru: "Песня (главное слово K-pop!)", file: "audio/norae.mp3" },
           { kr: "카페", tr: "[кха-пхе]", ru: "Кафе (ㅋ+ㅏ, ㅍ+ㅔ)", file: "audio/kape.mp3" },
           { kr: "세계", tr: "[се-ге]", ru: "Мир / Вселенная (ㅅ+ㅔ, ㄱ+ㅖ)", file: "audio/segye.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "애", tr: "[э]", ru: "Дифтонг ㅐ [э]", file: "audio/ae.mp3" },
+          { kr: "에", tr: "[э]", ru: "Дифтонг ㅔ [э]", file: "audio/e.mp3" }
         ]
       },
       {
@@ -686,6 +733,17 @@ const LESSONS = [
           { kr: "위", tr: "[ви]", ru: "ㅜ + ㅣ = ㅟ (слово «Вверх / Над»)", file: "audio/wi.mp3" },
           { kr: "외", tr: "[вэ]", ru: "ㅗ + ㅣ = ㅚ (читается [вэ])", file: "audio/oe.mp3" },
           { kr: "의", tr: "[ый]", ru: "ㅡ + ㅣ = ㅢ (быстрое «ы-и»)", file: "audio/ui.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "와", tr: "[ва]", ru: "Дифтонг [ва]", file: "audio/wa.mp3" },
+          { kr: "워", tr: "[во]", ru: "Дифтонг [во]", file: "audio/wo.mp3" },
+          { kr: "위", tr: "[ви]", ru: "Дифтонг [ви]", file: "audio/wi.mp3" },
+          { kr: "외", tr: "[вэ]", ru: "Дифтонг [вэ]", file: "audio/oe.mp3" },
+          { kr: "의", tr: "[ый]", ru: "Дифтонг [ый]", file: "audio/ui.mp3" }
         ]
       },
       {
@@ -751,11 +809,10 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "노래",
-        tr: "[но-рэ]",
-        ru: "Слово: Песня",
-        file: "audio/norae.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "노래", tr: "[но-рэ]", ru: "Слово: Песня", file: "audio/norae.mp3" }
+        ]
       },
       {
         type: "listen", kr: "노래", tr: "[но-рэ]", file: "audio/norae.mp3",
@@ -795,7 +852,7 @@ const LESSONS = [
   {
     id: 6,
     title: "Урок 6. Патчим (Часть 1): Сонорные звуки",
-    desc: "ㄴ, ㄹ, ㅁ, ㅇ внизу слога • Читаем 진, 사랑, 별, 봄",
+    desc: "ㄴ, ㄹ, ㅁ, ㅇ внизу слога • Прописи патчима, 사랑 и 별",
     coins: 110,
     xp: 220,
     steps: [
@@ -809,6 +866,16 @@ const LESSONS = [
           { kr: "감", tr: "[кам]", ru: "ㄱ + ㅏ + ㅁ(снизу) = [кам]", file: "audio/gam.mp3" },
           { kr: "별", tr: "[пёль]", ru: "ㅂ + ㅕ + ㄹ(снизу всегда мягкое [ль]!)", file: "audio/byeol.mp3" },
           { kr: "강", tr: "[кан]", ru: "ㄱ + ㅏ + ㅇ(снизу носовое [н])", file: "audio/gang.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "안", tr: "[ан]", ru: "Слог [ан]", file: "audio/an.mp3" },
+          { kr: "감", tr: "[кам]", ru: "Слог [кам]", file: "audio/gam.mp3" },
+          { kr: "별", tr: "[пёль]", ru: "Слог [пёль]", file: "audio/byeol.mp3" },
+          { kr: "강", tr: "[кан]", ru: "Слог [кан]", file: "audio/gang.mp3" }
         ]
       },
       {
@@ -883,11 +950,11 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "사랑",
-        tr: "[са-ран]",
-        ru: "Слово: Любовь",
-        file: "audio/sarang.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "사랑", tr: "[са-ран]", ru: "Слово: Любовь", file: "audio/sarang.mp3" },
+          { kr: "안녕", tr: "[ан-нён]", ru: "Слово: Привет", file: "audio/annyeong.mp3" }
+        ]
       },
       {
         type: "listen_build",
@@ -929,7 +996,7 @@ const LESSONS = [
   {
     id: 7,
     title: "Урок 7. Глухой патчим и Перенос звука",
-    desc: "ㄱ, ㄷ, ㅂ внизу + магия 연음 • Читаем 음악, 한국어, 밥",
+    desc: "ㄱ, ㄷ, ㅂ внизу + магия 연음 • Прописи, 음악 и 한국어",
     coins: 120,
     xp: 240,
     steps: [
@@ -944,6 +1011,15 @@ const LESSONS = [
           { kr: "집", tr: "[чип]", ru: "Дом", file: "audio/jip.mp3" },
           { kr: "옷", tr: "[от]", ru: "Одежда (ㅅ внизу читается как [т]!)", file: "audio/ot.mp3" },
           { kr: "꽃", tr: "[ккот]", ru: "Цветок (ㅊ внизу тоже читается как [т]!)", file: "audio/kkot.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "책", tr: "[чхэк]", ru: "Слово: Книга", file: "audio/chaek.mp3" },
+          { kr: "밥", tr: "[пап]", ru: "Слово: Рис / Еда", file: "audio/bap.mp3" },
+          { kr: "꽃", tr: "[ккот]", ru: "Слово: Цветок", file: "audio/kkot.mp3" }
         ]
       },
       {
@@ -1024,11 +1100,11 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "음악",
-        tr: "[ы-мак]",
-        ru: "Слово: Музыка",
-        file: "audio/eumak.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "음악", tr: "[ы-мак]", ru: "Слово: Музыка", file: "audio/eumak.mp3" },
+          { kr: "서울", tr: "[со-уль]", ru: "Город: Сеул", file: "audio/seoul.mp3" }
+        ]
       },
       {
         type: "listen", kr: "밥", tr: "[пап]", file: "audio/bap.mp3",
@@ -1061,7 +1137,7 @@ const LESSONS = [
   {
     id: 8,
     title: "Урок 8. Живой K-pop: Читаем без транслитерации",
-    desc: "사랑해, 대박, 화이팅, 고마워, 보고 싶어 • Финал перед экзаменом",
+    desc: "사랑해, 대박, 고마워, 보고 싶어 • Прописи фраз и финал",
     coins: 130,
     xp: 260,
     steps: [
@@ -1076,6 +1152,14 @@ const LESSONS = [
           { kr: "미안해", tr: "[ми-ан-хэ]", ru: "Извини / Прости", file: "audio/mianhae.mp3" },
           { kr: "대박", tr: "[тэ-бак]", ru: "Супер / Вау / Офигеть!", file: "audio/daebak.mp3" },
           { kr: "화이팅", tr: "[хва-и-тин / файтин]", ru: "Вперёд / Удачи / Не сдавайся!", file: "audio/fighting.mp3" }
+        ]
+      },
+      {
+        type: "draw",
+        blind: false,
+        items: [
+          { kr: "사랑해", tr: "[са-ран-хэ]", ru: "Фраза: Я тебя люблю", file: "audio/saranghae.mp3" },
+          { kr: "고마워", tr: "[ко-ма-во]", ru: "Слово: Спасибо", file: "audio/gomawo.mp3" }
         ]
       },
       {
@@ -1152,11 +1236,11 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "고마워",
-        tr: "[ко-ма-во]",
-        ru: "Слово: Спасибо",
-        file: "audio/gomawo.mp3",
-        blind: true
+        blind: false,
+        items: [
+          { kr: "진짜", tr: "[чин-чча]", ru: "Слово: Правда?", file: "audio/jinjja.mp3" },
+          { kr: "미안해", tr: "[ми-ан-хэ]", ru: "Слово: Извини", file: "audio/mianhae.mp3" }
+        ]
       },
       {
         type: "match",
@@ -1185,7 +1269,7 @@ const LESSONS = [
     id: 9,
     isExam: true,
     title: "🏆 Большой экзамен Блока 1",
-    desc: "Оценка трейни без подсказок • +250 🎤 и SSR-карта",
+    desc: "Прописи на слух, аудирование, пары и сборка • +250 🎤 и SSR-карта",
     coins: 250,
     xp: 500,
     cardId: 5,
@@ -1196,6 +1280,14 @@ const LESSONS = [
         opts: ["Лиса", "Айю (IU)", "Джису", "Мина"],
         correct: 1,
         explain: "아 + 이 + 유 = 아이유 (IU)."
+      },
+      {
+        type: "draw",
+        blind: true,
+        items: [
+          { kr: "가수", tr: "[ка-су]", ru: "Слово: Певец", file: "audio/gasu.mp3" },
+          { kr: "오빠", tr: "[оп-па]", ru: "Слово: Оппа", file: "audio/oppa.mp3" }
+        ]
       },
       {
         type: "listen", kr: "가수", tr: "[ка-су]", file: "audio/gasu.mp3",
@@ -1257,11 +1349,11 @@ const LESSONS = [
       },
       {
         type: "draw",
-        kr: "사랑",
-        tr: "[са-ран]",
-        ru: "Слово: Любовь",
-        file: "audio/sarang.mp3",
-        blind: true
+        blind: true,
+        items: [
+          { kr: "사랑", tr: "[са-ран]", ru: "Слово: Любовь", file: "audio/sarang.mp3" },
+          { kr: "음악", tr: "[ы-мак]", ru: "Слово: Музыка", file: "audio/eumak.mp3" }
+        ]
       },
       {
         type: "choice", kr: "꽃", tr: "Без подсказок", file: "audio/kkot.mp3",
