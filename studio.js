@@ -819,6 +819,54 @@
       }
     });
   };
+  /* ====== ТЁМНЫЙ НЕОНОВЫЙ ТОСТ ВМЕСТО СИСТЕМНОГО ALERT ====== */
+  const toastCss = document.createElement('style');
+  toastCss.textContent = `
+    .app-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 86px;
+      transform: translateX(-50%) translateY(18px);
+      background: rgba(20, 14, 34, 0.96);
+      border: 1.5px solid rgba(0, 229, 255, 0.45);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.18);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+      padding: 11px 16px;
+      border-radius: 14px;
+      max-width: calc(100vw - 32px);
+      width: max-content;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+      white-space: pre-line;
+      backdrop-filter: blur(8px);
+    }
+    .app-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+  `;
+  document.head.appendChild(toastCss);
+
+  let toastTimer = null;
+  const toastEl = document.createElement('div');
+  toastEl.className = 'app-toast';
+  toastEl.onclick = () => toastEl.classList.remove('show');
+  document.body.appendChild(toastEl);
+
+  window.alert = function (msg) {
+    toastEl.textContent = String(msg);
+    toastEl.classList.add('show');
+    if (typeof haptic === 'function') haptic('light');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+  };
   initStudioState();
   renderLessons();
 })();
