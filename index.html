@@ -653,16 +653,42 @@ function renderStep() {
   const s = queue[qIdx];
   if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
 
-  // 1. ПРОПИСИ ВНУТРИ УРОКА
+    // 1. ПРОПИСИ ВНУТРИ УРОКА (ПОДДЕРЖКА ОДНОЙ БУКВЫ ИЛИ СПИСКА БУКВ)
   if (s.type === 'draw') {
-    const wrap = document.createElement('div');
+    const drawList = Array.isArray(s.items) && s.items.length ? s.items : [s];
+    let idx = 0;
+    const prog = document.createElement('div');
+    prog.style.cssText = 'font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:8px;text-align:center';
+    const box = document.createElement('div');
     const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
+    nextBtn.className = 'btn full';
+    nextBtn.style.display = 'none';
+    nextBtn.innerText = 'Дальше →';
     nextBtn.onclick = nextStep;
-    body.append(wrap, nextBtn);
-    mountDrawWidget(wrap, s, s.blind !== false, () => { nextBtn.style.display = 'block'; }, () => {
-      if (!stepFailed) { stepFailed = true; mistakes++; }
-    });
+    body.append(prog, box, nextBtn);
+
+    const runOne = () => {
+      const curItem = drawList[idx];
+      prog.innerText = `Пропись ${idx + 1} из ${drawList.length}`;
+      mountDrawWidget(
+        box,
+        curItem,
+        s.blind !== false,
+        () => {
+          if (idx < drawList.length - 1) {
+            idx++;
+            setTimeout(runOne, 900);
+          } else {
+            prog.innerText = `✅ Все буквы написаны (${drawList.length}/${drawList.length})`;
+            nextBtn.style.display = 'block';
+          }
+        },
+        () => {
+          if (!stepFailed) { stepFailed = true; mistakes++; }
+        }
+      );
+    };
+    runOne();
   }
 
   // 2. ТЕОРИЯ
