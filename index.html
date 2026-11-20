@@ -15,19 +15,22 @@
 * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; user-select: none; }
 
-.header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: rgba(25,20,38,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; }
-.brand { font-weight: 800; font-size: 17px; background: linear-gradient(90deg, #ff7ac6, #a56eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.stats { display: flex; gap: 8px; }
-.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 5px 11px; border-radius: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(25,20,38,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; gap: 8px; }
+.brand { font-weight: 800; font-size: 15px; background: linear-gradient(90deg, #ff7ac6, #a56eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+.stats { display: flex; gap: 6px; align-items: center; }
+.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 16px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 3px; cursor: pointer; white-space: nowrap; }
 .pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); }
-.pill.xp { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.1); }
+.pill.energy { border-color: rgba(0,229,255,0.45); background: rgba(0,229,255,0.1); }
+.pill.hearts { border-color: rgba(255,71,87,0.45); background: rgba(255,71,87,0.12); }
+.pill.xp { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); }
 
 .screen { display: none; padding: 18px; animation: fadeIn 0.2s ease; }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 .module-banner { background: linear-gradient(135deg, #2d144d, #4d1344); border: 1px solid rgba(255,46,147,0.4); border-radius: 20px; padding: 18px; margin-bottom: 14px; }
-.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 10px; margin-bottom: 8px; color: #ff99d6; }
+.module-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 10px; color: #ff99d6; }
 .module-banner h2 { margin: 0 0 6px; font-size: 20px; }
 .module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
 .bar-bg { background: rgba(0,0,0,0.35); height: 8px; border-radius: 8px; overflow: hidden; }
@@ -42,7 +45,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .l-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
 .l-title { font-weight: 700; font-size: 15px; }
 
-.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 18px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; }
+.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 16px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; }
 .btn:active { transform: scale(0.96); }
 .btn:disabled { opacity: 0.5; }
 .btn.full { width: 100%; padding: 15px; font-size: 15px; }
@@ -150,7 +153,12 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .pc-name { font-weight: 800; font-size: 14px; }
 .pc-role { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-.shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.res-status { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.res-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; text-align: center; }
+.res-val { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+.res-sub { font-size: 11px; color: var(--muted); }
+.shop-sec { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 16px 0 8px; }
+.shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .shop-item.vip { background: linear-gradient(135deg, #2f1d4a, #42183f); border-color: var(--gold); }
 .league-card { background: linear-gradient(135deg, #1b2142, #2e1842); border: 1px solid rgba(0,229,255,0.3); border-radius: 18px; padding: 16px; margin-bottom: 16px; text-align: center; }
 .rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 14px; margin-bottom: 8px; }
@@ -167,17 +175,21 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <div class="header">
   <div class="brand">✨ K-Pop Lingua</div>
   <div class="stats">
-    <div class="pill xp">⚡ <span id="xp-val">0</span> XP</div>
-    <div class="pill coins">🎤 <span id="coins-val">50</span></div>
+    <div class="pill energy" onclick="showResInfo('energy')">⚡ <span id="energy-val">5/5</span></div>
+    <div class="pill hearts" onclick="showResInfo('hearts')">❤️ <span id="hearts-val">3/3</span></div>
+    <div class="pill coins" onclick="switchTab('shop')">🎤 <span id="coins-val">50</span></div>
   </div>
 </div>
 
 <!-- LESSONS -->
 <div id="screen-lessons" class="screen active">
   <div class="module-banner">
-    <div class="module-tag">Блок 1 • Полный Хангыль (TOPIK 0→1)</div>
+    <div class="module-top">
+      <div class="module-tag">Блок 1 • Хангыль</div>
+      <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
+    </div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Проходи уроки по порядку, пополняй словарь и сдай Большой экзамен без подсказок.</p>
+    <p>Новый урок тратит 1 ⚡. Повтор и Словарь — бесплатно. Экзамен требует ❤️.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
@@ -196,7 +208,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <div id="screen-vocab" class="screen">
   <div class="vocab-head">
     <h3 style="margin:0">📖 Мой словарь</h3>
-    <div class="pill xp" id="vocab-count">0 / 0</div>
+    <div class="pill energy" id="vocab-count">0 / 0</div>
   </div>
   <div class="mode-switch">
     <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">📖 Список слов</button>
@@ -250,14 +262,35 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
 <!-- SHOP -->
 <div id="screen-shop" class="screen">
-  <h3 style="margin:0 0 14px">🛍 Магазин агентства</h3>
+  <h3 style="margin:0 0 12px">🛍 Магазин агентства</h3>
+  <div class="res-status" id="shop-res-status"></div>
+
+  <div class="shop-sec">Пополнение за микрофоны 🎤</div>
+  <div class="shop-item">
+    <div><div class="l-title">⚡ Батарейка лайтстика (+1 ⚡)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div>
+    <button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button>
+  </div>
+  <div class="shop-item">
+    <div><div class="l-title">🔋 Полный заряд (5/5 ⚡)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div>
+    <button class="btn cyan" onclick="buyEnergy(5, 100)">100 🎤</button>
+  </div>
+  <div class="shop-item">
+    <div><div class="l-title">❤️ Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит 1 сердечко для сдачи</div></div>
+    <button class="btn" onclick="buyHeart(1, 40)">40 🎤</button>
+  </div>
+
+  <div class="shop-sec">Премиум и наборы (Telegram Stars ⭐)</div>
   <div class="shop-item vip">
-    <div><div class="l-title">👑 VIP Trainee Pass (30 дней)</div><div class="l-meta">×2 опыта и 🎤, безлимит на экзамены</div></div>
-    <button class="btn gold" onclick="alert('Подключим Telegram Stars вместе с сервером!')">150 ⭐</button>
+    <div><div class="l-title">👑 VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит ⚡ и ❤️, ×2 опыта и 🎤</div></div>
+    <button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ⭐</button>
+  </div>
+  <div class="shop-item">
+    <div><div class="l-title">⚡ Энергопак (Безлимит на 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div>
+    <button class="btn gold" onclick="alert('Болванка под Telegram Stars ⭐')">35 ⭐</button>
   </div>
   <div class="shop-item">
     <div><div class="l-title">💿 Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div>
-    <button class="btn" onclick="alert('Подключим Telegram Stars вместе с сервером!')">75 ⭐</button>
+    <button class="btn" onclick="alert('Болванка под Telegram Stars ⭐')">75 ⭐</button>
   </div>
 </div>
 
@@ -279,7 +312,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
 </div>
 
-<script src="lessons.js?v=6"></script>
+<script src="lessons.js?v=7"></script>
 <script>
 if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.expand();
@@ -287,6 +320,11 @@ if (window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.disableVerticalSwipes();
   }
 }
+
+const MAX_ENERGY = 5;
+const ENERGY_REGEN_MS = 2 * 60 * 60 * 1000; // 2 часа за 1 энергию
+const MAX_HEARTS = 3;
+const HEART_REGEN_MS = 4 * 60 * 60 * 1000; // 4 часа за 1 сердечко
 
 const CARDS = [
   { id: 1, album: "trainee", name: "Чиби-Стажёр Мина", role: "Вокал • Зал практики", r: "R", art: "🎧" },
@@ -298,14 +336,12 @@ const CARDS = [
 ];
 
 const VOCAB = [
-  // Урок 1
   { l: 1, kr: "아이", tr: "[а-и]", ru: "Ребёнок", icon: "👶", file: "audio/ai.mp3" },
   { l: 1, kr: "우유", tr: "[у-ю]", ru: "Молоко", icon: "🥛", file: "audio/uyu.mp3" },
   { l: 1, kr: "여우", tr: "[ё-у]", ru: "Лиса", icon: "🦊", file: "audio/yeou.mp3" },
   { l: 1, kr: "오이", tr: "[о-и]", ru: "Огурец", icon: "🥒", file: "audio/oi.mp3" },
   { l: 1, kr: "이유", tr: "[и-ю]", ru: "Причина", icon: "💡", file: "audio/iyu.mp3" },
   { l: 1, kr: "아이유", tr: "[А-и-ю]", ru: "Певица IU", icon: "🎤", file: "audio/iu.mp3" },
-  // Урок 2
   { l: 2, kr: "가수", tr: "[ка-су]", ru: "Певец / Артист", icon: "🎙️", file: "audio/gasu.mp3" },
   { l: 2, kr: "드라마", tr: "[ты-ра-ма]", ru: "Дорама", icon: "🎬", file: "audio/drama.mp3" },
   { l: 2, kr: "바다", tr: "[па-да]", ru: "Море", icon: "🌊", file: "audio/bada.mp3" },
@@ -313,7 +349,6 @@ const VOCAB = [
   { l: 2, kr: "바보", tr: "[па-бо]", ru: "Дурачок", icon: "🤪", file: "audio/babo.mp3" },
   { l: 2, kr: "나비", tr: "[на-би]", ru: "Бабочка", icon: "🦋", file: "audio/nabi.mp3" },
   { l: 2, kr: "고기", tr: "[ко-ги]", ru: "Мясо", icon: "🥩", file: "audio/gogi.mp3" },
-  // Урок 3
   { l: 3, kr: "하나", tr: "[ха-на]", ru: "Один", icon: "1️⃣", file: "audio/hana.mp3" },
   { l: 3, kr: "모자", tr: "[мо-джа]", ru: "Шапка / Кепка", icon: "🧢", file: "audio/moja.mp3" },
   { l: 3, kr: "차", tr: "[чха]", ru: "Чай / Машина", icon: "🍵", file: "audio/cha.mp3" },
@@ -322,14 +357,12 @@ const VOCAB = [
   { l: 3, kr: "피아노", tr: "[пхи-а-но]", ru: "Пианино", icon: "🎹", file: "audio/piano.mp3" },
   { l: 3, kr: "포도", tr: "[пхо-до]", ru: "Виноград", icon: "🍇", file: "audio/podo.mp3" },
   { l: 3, kr: "치마", tr: "[чхи-ма]", ru: "Юбка", icon: "👗", file: "audio/chima.mp3" },
-  // Урок 4
   { l: 4, kr: "오빠", tr: "[оп-па]", ru: "Оппа (старший брат)", icon: "🫰", file: "audio/oppa.mp3" },
   { l: 4, kr: "아빠", tr: "[ап-па]", ru: "Папа", icon: "👨", file: "audio/appa.mp3" },
   { l: 4, kr: "뽀뽀", tr: "[ппо-ппо]", ru: "Чмок / Поцелуй", icon: "💋", file: "audio/ppoppo.mp3" },
   { l: 4, kr: "쓰다", tr: "[ссы-да]", ru: "Писать / Горький", icon: "✍️", file: "audio/sseuda.mp3" },
   { l: 4, kr: "싸다", tr: "[сса-да]", ru: "Дешёвый", icon: "🏷️", file: "audio/ssada.mp3" },
   { l: 4, kr: "꼬리", tr: "[кко-ри]", ru: "Хвост", icon: "🐾", file: "audio/kkori.mp3" },
-  // Урок 5
   { l: 5, kr: "노래", tr: "[но-рэ]", ru: "Песня", icon: "🎵", file: "audio/norae.mp3" },
   { l: 5, kr: "카페", tr: "[кха-пхе]", ru: "Кафе", icon: "🏪", file: "audio/kape.mp3" },
   { l: 5, kr: "세계", tr: "[се-ге]", ru: "Мир / Вселенная", icon: "🌍", file: "audio/segye.mp3" },
@@ -339,7 +372,6 @@ const VOCAB = [
   { l: 5, kr: "과자", tr: "[ква-джа]", ru: "Снеки / Печенье", icon: "🍪", file: "audio/gwaja.mp3" },
   { l: 5, kr: "의자", tr: "[ый-джа]", ru: "Стул", icon: "🪑", file: "audio/uija.mp3" },
   { l: 5, kr: "가위", tr: "[ка-ви]", ru: "Ножницы", icon: "✂️", file: "audio/gawi.mp3" },
-  // Урок 6
   { l: 6, kr: "별", tr: "[пёль]", ru: "Звезда", icon: "⭐", file: "audio/byeol.mp3" },
   { l: 6, kr: "팬", tr: "[пхэн]", ru: "Фанат", icon: "🎉", file: "audio/paen.mp3" },
   { l: 6, kr: "봄", tr: "[пом]", ru: "Весна", icon: "🌸", file: "audio/bom.mp3" },
@@ -351,7 +383,6 @@ const VOCAB = [
   { l: 6, kr: "마음", tr: "[ма-ым]", ru: "Сердце / Душа", icon: "💖", file: "audio/maeum.mp3" },
   { l: 6, kr: "사람", tr: "[са-рам]", ru: "Человек", icon: "🧑", file: "audio/saram.mp3" },
   { l: 6, kr: "바람", tr: "[па-рам]", ru: "Ветер", icon: "💨", file: "audio/baram.mp3" },
-  // Урок 7
   { l: 7, kr: "책", tr: "[чхэк]", ru: "Книга", icon: "📕", file: "audio/chaek.mp3" },
   { l: 7, kr: "밥", tr: "[пап]", ru: "Рис / Еда", icon: "🍚", file: "audio/bap.mp3" },
   { l: 7, kr: "집", tr: "[чип]", ru: "Дом", icon: "🏠", file: "audio/jip.mp3" },
@@ -361,7 +392,6 @@ const VOCAB = [
   { l: 7, kr: "한국어", tr: "[хан-гу-го]", ru: "Корейский язык", icon: "🇰🇷", file: "audio/hangugeo.mp3" },
   { l: 7, kr: "서울", tr: "[со-уль]", ru: "Сеул", icon: "🏙️", file: "audio/seoul.mp3" },
   { l: 7, kr: "한국", tr: "[хан-гук]", ru: "Корея", icon: "🗺️", file: "audio/hanguk.mp3" },
-  // Урок 8
   { l: 8, kr: "사랑해", tr: "[са-ран-хэ]", ru: "Я тебя люблю", icon: "💘", file: "audio/saranghae.mp3" },
   { l: 8, kr: "고마워", tr: "[ко-ма-во]", ru: "Спасибо", icon: "🙏", file: "audio/gomawo.mp3" },
   { l: 8, kr: "미안해", tr: "[ми-ан-хэ]", ru: "Извини / Прости", icon: "🥺", file: "audio/mianhae.mp3" },
@@ -398,16 +428,105 @@ const DRAW_DATA = {
   ]
 };
 
-let st = { coins: 50, xp: 0, done: [], cards: [], drawn: [] };
+let st = {
+  coins: 50, xp: 0, done: [], cards: [], drawn: [],
+  energy: MAX_ENERGY, lastEnergyTs: Date.now(),
+  hearts: MAX_HEARTS, lastHeartTs: Date.now()
+};
 try {
   const s = localStorage.getItem('kp_lingua_v4');
-  if (s) { st = JSON.parse(s); if (!st.drawn) st.drawn = []; }
+  if (s) {
+    st = { ...st, ...JSON.parse(s) };
+    if (!st.drawn) st.drawn = [];
+    if (typeof st.energy !== 'number') { st.energy = MAX_ENERGY; st.lastEnergyTs = Date.now(); }
+    if (typeof st.hearts !== 'number') { st.hearts = MAX_HEARTS; st.lastHeartTs = Date.now(); }
+  }
 } catch (e) {}
 
-function save() {
-  try { localStorage.setItem('kp_lingua_v4', JSON.stringify(st)); } catch (e) {}
+function syncResources() {
+  const now = Date.now();
+  let changed = false;
+  if (st.energy < MAX_ENERGY) {
+    const gained = Math.floor((now - st.lastEnergyTs) / ENERGY_REGEN_MS);
+    if (gained > 0) {
+      st.energy = Math.min(MAX_ENERGY, st.energy + gained);
+      st.lastEnergyTs = st.energy >= MAX_ENERGY ? now : st.lastEnergyTs + gained * ENERGY_REGEN_MS;
+      changed = true;
+    }
+  }
+  if (st.hearts < MAX_HEARTS) {
+    const gained = Math.floor((now - st.lastHeartTs) / HEART_REGEN_MS);
+    if (gained > 0) {
+      st.hearts = Math.min(MAX_HEARTS, st.hearts + gained);
+      st.lastHeartTs = st.hearts >= MAX_HEARTS ? now : st.lastHeartTs + gained * HEART_REGEN_MS;
+      changed = true;
+    }
+  }
+  if (changed) save(false);
+  document.getElementById('energy-val').innerText = `${st.energy}/${MAX_ENERGY}`;
+  document.getElementById('hearts-val').innerText = `${st.hearts}/${MAX_HEARTS}`;
   document.getElementById('coins-val').innerText = st.coins;
   document.getElementById('xp-val').innerText = st.xp;
+}
+
+function fmtWait(ms) {
+  const m = Math.max(1, Math.ceil(ms / 60000));
+  const h = Math.floor(m / 60), rm = m % 60;
+  return h > 0 ? `${h}ч ${rm}м` : `${rm} мин`;
+}
+
+function showResInfo(type) {
+  syncResources();
+  if (type === 'energy') {
+    if (st.energy >= MAX_ENERGY) alert('⚡ Энергия полная (5/5)! Запуск нового урока тратит 1 ⚡.');
+    else {
+      const left = ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs);
+      alert(`⚡ Энергия: ${st.energy}/${MAX_ENERGY}\n+1 ⚡ восстановится через ${fmtWait(left)}.\nМожно пополнить в Магазине.`);
+    }
+  } else {
+    if (st.hearts >= MAX_HEARTS) alert('❤️ Сердечки полные (3/3)! Они тратятся только при провале экзамена.');
+    else {
+      const left = HEART_REGEN_MS - (Date.now() - st.lastHeartTs);
+      alert(`❤️ Сердечки: ${st.hearts}/${MAX_HEARTS}\n+1 ❤️ восстановится через ${fmtWait(left)}.\nМожно пополнить в Магазине.`);
+    }
+  }
+}
+
+function save(doSync = true) {
+  try { localStorage.setItem('kp_lingua_v4', JSON.stringify(st)); } catch (e) {}
+  if (doSync) syncResources();
+}
+
+function renderShop() {
+  syncResources();
+  const eSub = st.energy >= MAX_ENERGY ? 'Полный заряд' : `+1 через ${fmtWait(ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs))}`;
+  const hSub = st.hearts >= MAX_HEARTS ? 'Все попытки есть' : `+1 через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}`;
+  document.getElementById('shop-res-status').innerHTML = `
+    <div class="res-box"><div class="res-val" style="color:var(--cyan)">⚡ ${st.energy}/${MAX_ENERGY}</div><div class="res-sub">${eSub}</div></div>
+    <div class="res-box"><div class="res-val" style="color:var(--danger)">❤️ ${st.hearts}/${MAX_HEARTS}</div><div class="res-sub">${hSub}</div></div>
+  `;
+}
+
+function buyEnergy(amount, price) {
+  syncResources();
+  if (st.energy >= MAX_ENERGY) return alert('⚡ Энергия уже полная!');
+  if (st.coins < price) return alert(`Не хватает микрофонов (нужно ${price} 🎤).`);
+  st.coins -= price;
+  st.energy = Math.min(MAX_ENERGY, st.energy + amount);
+  if (st.energy >= MAX_ENERGY) st.lastEnergyTs = Date.now();
+  save(); renderShop();
+  alert('⚡ Энергия пополнена!');
+}
+
+function buyHeart(amount, price) {
+  syncResources();
+  if (st.hearts >= MAX_HEARTS) return alert('❤️ Сердечки уже полные!');
+  if (st.coins < price) return alert(`Не хватает микрофонов (нужно ${price} 🎤).`);
+  st.coins -= price;
+  st.hearts = Math.min(MAX_HEARTS, st.hearts + amount);
+  if (st.hearts >= MAX_HEARTS) st.lastHeartTs = Date.now();
+  save(); renderShop();
+  alert('❤️ Сердечко восстановлено!');
 }
 
 let curAudio = null;
@@ -430,6 +549,7 @@ function playAudio(file, text, rate = 1.0) {
 }
 
 function switchTab(t) {
+  syncResources();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + t).classList.add('active');
@@ -438,16 +558,14 @@ function switchTab(t) {
   if (t === 'lessons') renderLessons();
   if (t === 'vocab') renderVocab();
   if (t === 'binder') renderBinder();
+  if (t === 'shop') renderShop();
   if (t === 'rank') renderRank();
 }
 
 /* ====== СЛОВАРЬ И КАРТОЧКИ ====== */
 let vocabMode = 'list', vocabDeck = [], fcIdx = 0, fcFlipped = false;
 
-function getUnlockedVocab() {
-  return VOCAB.filter(w => st.done.includes(w.l));
-}
-
+function getUnlockedVocab() { return VOCAB.filter(w => st.done.includes(w.l)); }
 function setVocabMode(m) {
   vocabMode = m;
   document.getElementById('vmode-list').classList.toggle('active', m === 'list');
@@ -468,7 +586,7 @@ function renderVocab() {
       <div class="card-box" style="text-align:center;padding:28px 18px">
         <div style="font-size:44px;margin-bottom:8px">📖</div>
         <h3 style="margin:0 0 8px">Словарь пока пуст</h3>
-        <p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь в виде списка и карточек!</p>
+        <p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь!</p>
         <button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">Перейти к урокам</button>
       </div>`;
     return;
@@ -518,11 +636,7 @@ function renderVocab() {
       </div>
     `;
 
-    document.getElementById('fc-card').onclick = (e) => {
-      if (e.target.id === 'fc-audio') return;
-      fcFlipped = !fcFlipped;
-      renderVocab();
-    };
+    document.getElementById('fc-card').onclick = (e) => { if (e.target.id !== 'fc-audio') { fcFlipped = !fcFlipped; renderVocab(); } };
     const ab = document.getElementById('fc-audio');
     if (ab) ab.onclick = (e) => { e.stopPropagation(); playAudio(w.file, w.kr); };
     document.getElementById('fc-prev').onclick = () => { fcIdx = (fcIdx - 1 + vocabDeck.length) % vocabDeck.length; fcFlipped = false; renderVocab(); };
@@ -538,17 +652,11 @@ async function recognizeKoreanStrokes(strokes, w, h) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       options: 'enable_pre_space',
-      requests: [{
-        writing_guide: { writing_area_width: w, writing_area_height: h },
-        ink: strokes,
-        language: 'ko'
-      }]
+      requests: [{ writing_guide: { writing_area_width: w, writing_area_height: h }, ink: strokes, language: 'ko' }]
     })
   });
   const data = await res.json();
-  if (data[0] === 'SUCCESS' && data[1] && data[1][0] && Array.isArray(data[1][0][1])) {
-    return data[1][0][1];
-  }
+  if (data[0] === 'SUCCESS' && data[1] && data[1][0] && Array.isArray(data[1][0][1])) return data[1][0][1];
   throw new Error('IME empty');
 }
 
@@ -645,17 +753,11 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek =
   drawGuide(!blindMode);
 
   const peekBtn = document.getElementById('dw-peek');
-  if (peekBtn) {
-    peekBtn.onclick = () => { drawGuide(true); setTimeout(() => drawGuide(false), 1600); };
-  }
+  if (peekBtn) peekBtn.onclick = () => { drawGuide(true); setTimeout(() => drawGuide(false), 1600); };
 
   let drawing = false, lastX = 0, lastY = 0;
   let strokes = [], curStroke = null, startTime = 0;
-
-  iCtx.strokeStyle = '#ffffff';
-  iCtx.lineWidth = 7;
-  iCtx.lineCap = 'round';
-  iCtx.lineJoin = 'round';
+  iCtx.strokeStyle = '#ffffff'; iCtx.lineWidth = 7; iCtx.lineCap = 'round'; iCtx.lineJoin = 'round';
 
   const getPos = (e) => {
     const r = inkC.getBoundingClientRect();
@@ -663,176 +765,105 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek =
   };
 
   inkC.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    inkC.setPointerCapture(e.pointerId);
-    drawing = true;
-    const p = getPos(e);
+    e.preventDefault(); inkC.setPointerCapture(e.pointerId);
+    drawing = true; const p = getPos(e);
     if (!strokes.length) startTime = Date.now();
     curStroke = [[Math.round(p.x)], [Math.round(p.y)], [Date.now() - startTime]];
     strokes.push(curStroke);
     lastX = p.x; lastY = p.y;
     iCtx.beginPath(); iCtx.moveTo(p.x, p.y); iCtx.lineTo(p.x + 0.1, p.y + 0.1); iCtx.stroke();
   });
-
   inkC.addEventListener('pointermove', (e) => {
     if (!drawing) return;
-    e.preventDefault();
-    const p = getPos(e);
+    e.preventDefault(); const p = getPos(e);
     if (Math.hypot(p.x - lastX, p.y - lastY) > 2) {
-      curStroke[0].push(Math.round(p.x));
-      curStroke[1].push(Math.round(p.y));
-      curStroke[2].push(Date.now() - startTime);
+      curStroke[0].push(Math.round(p.x)); curStroke[1].push(Math.round(p.y)); curStroke[2].push(Date.now() - startTime);
     }
     iCtx.beginPath(); iCtx.moveTo(lastX, lastY); iCtx.lineTo(p.x, p.y); iCtx.stroke();
     lastX = p.x; lastY = p.y;
   });
-
   const endDraw = () => { drawing = false; curStroke = null; };
-  inkC.addEventListener('pointerup', endDraw);
-  inkC.addEventListener('pointercancel', endDraw);
+  inkC.addEventListener('pointerup', endDraw); inkC.addEventListener('pointercancel', endDraw);
 
   const fb = document.getElementById('dw-fb');
   const checkBtn = document.getElementById('dw-check');
-
-  document.getElementById('dw-clear').onclick = () => {
-    iCtx.clearRect(0, 0, W, H);
-    strokes = [];
-    fb.className = 'feedback-bar';
-  };
+  document.getElementById('dw-clear').onclick = () => { iCtx.clearRect(0, 0, W, H); strokes = []; fb.className = 'feedback-bar'; };
 
   checkBtn.onclick = async () => {
-    if (!strokes.length) {
-      fb.className = 'feedback-bar err';
-      fb.innerText = '✍️ Сначала напиши букву или слово на сером поле!';
-      return;
-    }
-
-    checkBtn.disabled = true;
-    checkBtn.innerText = '⏳ Читаю...';
-    const clean = s => s.replace(/\s+/g, '');
-    const target = clean(item.kr);
-
+    if (!strokes.length) { fb.className = 'feedback-bar err'; fb.innerText = '✍️ Сначала напиши букву или слово на сером поле!'; return; }
+    checkBtn.disabled = true; checkBtn.innerText = '⏳ Читаю...';
+    const clean = s => s.replace(/\s+/g, ''); const target = clean(item.kr);
     try {
       const cands = await recognizeKoreanStrokes(strokes, W, H);
       const top = cands.slice(0, 4).map(clean);
       if (top.includes(target)) {
-        fb.className = 'feedback-bar ok';
-        fb.innerText = `🔥 Идеально! Распознано: «${item.kr}» ${item.tr || ''}`;
-        playAudio(item.file, item.kr);
-        if (onSuccess) onSuccess();
+        fb.className = 'feedback-bar ok'; fb.innerText = `🔥 Идеально! Распознано: «${item.kr}» ${item.tr || ''}`;
+        playAudio(item.file, item.kr); if (onSuccess) onSuccess();
       } else {
         const readAs = cands[0] || '?';
         fb.className = 'feedback-bar err';
-        fb.innerText = blindMode
-          ? `❌ Система прочитала это как «${readAs}». Проверь буквы и попробуй ещё раз!`
-          : `❌ Система прочитала это как «${readAs}», а нужно «${item.kr}». Сотри и напиши точнее!`;
+        fb.innerText = blindMode ? `❌ Система прочитала это как «${readAs}». Проверь буквы и попробуй ещё раз!` : `❌ Система прочитала это как «${readAs}», а нужно «${item.kr}». Сотри и напиши точнее!`;
         if (onFail) onFail();
       }
     } catch (err) {
       const ok = fallbackSectorCheck(inkC, item.kr, FONT, W, H);
-      if (ok) {
-        fb.className = 'feedback-bar ok';
-        fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr || ''}`;
-        playAudio(item.file, item.kr);
-        if (onSuccess) onSuccess();
-      } else {
-        fb.className = 'feedback-bar err';
-        fb.innerText = '❌ Не совсем похоже. Сотри и попробуй написать аккуратнее!';
-        if (onFail) onFail();
-      }
-    } finally {
-      checkBtn.disabled = false;
-      checkBtn.innerText = '✅ Проверить';
-    }
+      if (ok) { fb.className = 'feedback-bar ok'; fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr || ''}`; playAudio(item.file, item.kr); if (onSuccess) onSuccess(); }
+      else { fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем похоже. Сотри и попробуй написать аккуратнее!'; if (onFail) onFail(); }
+    } finally { checkBtn.disabled = false; checkBtn.innerText = '✅ Проверить'; }
   };
 }
 
 /* ====== ЭКРАН ПРОПИСЕЙ ====== */
 let drawCat = 'letters', drawBlind = true, curDrawIdx = 0;
-
 function openDrawTrainer() { switchTab('draw'); renderDrawTrainer(); }
-function setDrawCat(cat) {
-  drawCat = cat; curDrawIdx = 0;
-  document.getElementById('cat-letters').classList.toggle('active', cat === 'letters');
-  document.getElementById('cat-words').classList.toggle('active', cat === 'words');
-  renderDrawTrainer();
-}
-function setDrawBlind(val) {
-  drawBlind = val;
-  document.getElementById('mode-blind').classList.toggle('active', val);
-  document.getElementById('mode-guide').classList.toggle('active', !val);
-  renderDrawTrainer();
-}
+function setDrawCat(cat) { drawCat = cat; curDrawIdx = 0; document.getElementById('cat-letters').classList.toggle('active', cat === 'letters'); document.getElementById('cat-words').classList.toggle('active', cat === 'words'); renderDrawTrainer(); }
+function setDrawBlind(val) { drawBlind = val; document.getElementById('mode-blind').classList.toggle('active', val); document.getElementById('mode-guide').classList.toggle('active', !val); renderDrawTrainer(); }
 
 function renderDrawTrainer() {
   const list = DRAW_DATA[drawCat];
-  const sel = document.getElementById('draw-selector');
-  sel.innerHTML = '';
+  const sel = document.getElementById('draw-selector'); sel.innerHTML = '';
   list.forEach((it, idx) => {
-    const b = document.createElement('button');
-    const isDone = st.drawn.includes(it.kr);
+    const b = document.createElement('button'); const isDone = st.drawn.includes(it.kr);
     b.className = 'char-pill' + (idx === curDrawIdx ? ' active' : '') + (isDone ? ' done' : '');
     b.innerText = drawBlind ? (isDone ? '✅ ' + it.kr : '#' + (idx + 1)) : it.kr;
     b.onclick = () => { curDrawIdx = idx; renderDrawTrainer(); };
     sel.appendChild(b);
   });
-
-  const body = document.getElementById('draw-trainer-body');
-  const item = list[curDrawIdx];
-  const widgetWrap = document.createElement('div');
-  body.innerHTML = '';
-  body.appendChild(widgetWrap);
-
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'btn full cyan';
-  nextBtn.style.display = 'none';
+  const body = document.getElementById('draw-trainer-body'); const item = list[curDrawIdx];
+  const widgetWrap = document.createElement('div'); body.innerHTML = ''; body.appendChild(widgetWrap);
+  const nextBtn = document.createElement('button'); nextBtn.className = 'btn full cyan'; nextBtn.style.display = 'none';
   nextBtn.innerText = curDrawIdx < list.length - 1 ? 'Следующее задание →' : '🎉 Раздел пройден! В меню';
-  nextBtn.onclick = () => {
-    if (curDrawIdx < list.length - 1) { curDrawIdx++; renderDrawTrainer(); }
-    else switchTab('lessons');
-  };
+  nextBtn.onclick = () => { if (curDrawIdx < list.length - 1) { curDrawIdx++; renderDrawTrainer(); } else switchTab('lessons'); };
   body.appendChild(nextBtn);
-
   mountDrawWidget(widgetWrap, item, drawBlind, () => {
-    if (!st.drawn.includes(item.kr)) {
-      st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save();
-      sel.children[curDrawIdx].classList.add('done');
-      sel.children[curDrawIdx].innerText = '✅ ' + item.kr;
-    }
+    if (!st.drawn.includes(item.kr)) { st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save(); sel.children[curDrawIdx].classList.add('done'); sel.children[curDrawIdx].innerText = '✅ ' + item.kr; }
     nextBtn.style.display = 'block';
   });
 }
 
-/* ====== ЭКРАН УРОКОВ (С ПОСЛЕДОВАТЕЛЬНЫМ ОТКРЫТИЕМ) ====== */
+/* ====== ЭКРАН УРОКОВ ====== */
 function isLessonUnlocked(l, idx) {
   if (st.done.includes(l.id)) return true;
-  if (l.isExam) {
-    const regular = LESSONS.filter(x => !x.isExam);
-    return regular.every(x => st.done.includes(x.id));
-  }
+  if (l.isExam) return LESSONS.filter(x => !x.isExam).every(x => st.done.includes(x.id));
   if (idx === 0) return true;
   return st.done.includes(LESSONS[idx - 1].id);
 }
 
 function renderLessons() {
-  if (typeof LESSONS === 'undefined') {
-    document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>.</div>';
-    return;
-  }
+  if (typeof LESSONS === 'undefined') { document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>.</div>'; return; }
   const pct = Math.round((st.done.length / LESSONS.length) * 100);
   document.getElementById('module-progress').style.width = pct + '%';
-  const list = document.getElementById('lessons-list');
-  list.innerHTML = '';
+  const list = document.getElementById('lessons-list'); list.innerHTML = '';
   LESSONS.forEach((l, idx) => {
     const done = st.done.includes(l.id);
     const unlocked = isLessonUnlocked(l, idx);
     const el = document.createElement('div');
     el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (!unlocked ? ' locked' : '');
-    el.innerHTML = `<div><div class="l-title">${done ? '✅ ' : (!unlocked ? '🔒 ' : '')}${l.title}</div><div class="l-meta">${l.desc} • ${l.steps.length} шагов • +${l.xp} XP</div></div>`;
+    const costTag = done ? 'Бесплатный повтор' : (l.isExam ? 'Нужно ❤️' : 'Цена: 1 ⚡');
+    el.innerHTML = `<div><div class="l-title">${done ? '✅ ' : (!unlocked ? '🔒 ' : '')}${l.title}</div><div class="l-meta">${l.desc} • ${costTag} • +${l.xp} XP</div></div>`;
     const btn = document.createElement('button');
     if (!unlocked) {
-      btn.className = 'btn ghost';
-      btn.innerText = '🔒';
+      btn.className = 'btn ghost'; btn.innerText = '🔒';
       btn.onclick = () => alert(l.isExam ? 'Сначала пройди все 8 уроков Блока 1!' : 'Сначала пройди предыдущий урок!');
     } else {
       btn.className = 'btn' + (l.isExam ? ' gold' : '');
@@ -848,8 +879,29 @@ function renderLessons() {
 let curL = null, isReplay = false, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
 
 function startLesson(id) {
+  syncResources();
   curL = LESSONS.find(x => x.id === id);
   isReplay = st.done.includes(curL.id);
+
+  if (!isReplay) {
+    if (curL.isExam) {
+      if (st.hearts <= 0) {
+        const left = HEART_REGEN_MS - (Date.now() - st.lastHeartTs);
+        if (confirm(`❤️ Закончились попытки экзамена!\nНовое сердечко через ${fmtWait(left)}.\n\nПерейти в Магазин, чтобы пополнить?`)) switchTab('shop');
+        return;
+      }
+    } else {
+      if (st.energy <= 0) {
+        const left = ENERGY_REGEN_MS - (Date.now() - st.lastEnergyTs);
+        if (confirm(`⚡ Закончилась энергия!\n+1 ⚡ восстановится через ${fmtWait(left)}.\n\nПерейти в Магазин, чтобы пополнить?`)) switchTab('shop');
+        return;
+      }
+      if (st.energy === MAX_ENERGY) st.lastEnergyTs = Date.now();
+      st.energy--;
+      save();
+    }
+  }
+
   queue = curL.steps.map(s => ({ ...s, isRetry: false }));
   qIdx = 0; mistakes = 0;
   switchTab('study');
@@ -858,17 +910,14 @@ function startLesson(id) {
 
 function renderJumpBar() {
   if (!isReplay || !curL) return null;
-  const bar = document.createElement('div');
-  bar.className = 'jump-bar';
+  const bar = document.createElement('div'); bar.className = 'jump-bar';
   curL.steps.forEach((step, idx) => {
     const b = document.createElement('button');
     const isCurrent = !queue[qIdx]?.isRetry && qIdx === idx;
     b.className = 'jump-btn' + (isCurrent ? ' active' : '');
     const icon = step.type === 'draw' ? '✍️' : (step.type === 'theory' ? '📖' : (step.type.includes('build') ? '🧩' : '•'));
     b.innerText = `${idx + 1}${icon}`;
-    b.onclick = () => {
-      if (idx < queue.length) { qIdx = idx; renderStep(); }
-    };
+    b.onclick = () => { if (idx < queue.length) { qIdx = idx; renderStep(); } };
     bar.appendChild(b);
   });
   return bar;
@@ -880,20 +929,14 @@ function renderStep() {
   const total = queue.length;
   document.getElementById('study-bar').style.width = Math.round((qIdx / total) * 100) + '%';
   document.getElementById('step-count').innerText = Math.min(qIdx + 1, total) + '/' + total;
-  const body = document.getElementById('study-body');
-  body.innerHTML = '';
-  stepFailed = false;
-
+  const body = document.getElementById('study-body'); body.innerHTML = ''; stepFailed = false;
   if (qIdx >= total) return finishLesson();
-
-  const jumpBar = renderJumpBar();
-  if (jumpBar) body.appendChild(jumpBar);
+  const jumpBar = renderJumpBar(); if (jumpBar) body.appendChild(jumpBar);
 
   const s = queue[qIdx];
   const isExam = !!(curL && curL.isExam);
   if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
 
-  // 1. ПРОПИСИ ВНУТРИ УРОКА (ПАЧКИ БУКВ)
   if (s.type === 'draw') {
     const drawList = Array.isArray(s.items) && s.items.length ? s.items : [s];
     let idx = 0;
@@ -908,104 +951,61 @@ function renderStep() {
     const runOne = () => {
       const curItem = drawList[idx];
       prog.innerText = `Пропись ${idx + 1} из ${drawList.length}`;
-      mountDrawWidget(
-        box,
-        curItem,
-        isExam ? true : (s.blind !== false),
-        () => {
-          if (idx < drawList.length - 1) {
-            idx++;
-            setTimeout(runOne, 900);
-          } else {
-            prog.innerText = `✅ Все слова написаны (${drawList.length}/${drawList.length})`;
-            nextBtn.style.display = 'block';
-          }
-        },
-        () => {
-          if (!stepFailed) { stepFailed = true; mistakes++; }
-        },
-        isExam
-      );
+      mountDrawWidget(box, curItem, isExam ? true : (s.blind !== false), () => {
+        if (idx < drawList.length - 1) { idx++; setTimeout(runOne, 900); }
+        else { prog.innerText = `✅ Все слова написаны (${drawList.length}/${drawList.length})`; nextBtn.style.display = 'block'; }
+      }, () => { if (!stepFailed) { stepFailed = true; mistakes++; } }, isExam);
     };
     runOne();
   }
 
-  // 2. ТЕОРИЯ
   if (s.type === 'theory') {
-    const wrap = document.createElement('div');
-    wrap.className = 'card-box';
+    const wrap = document.createElement('div'); wrap.className = 'card-box';
     wrap.innerHTML = `<h3>${s.title}</h3><p>${s.text}</p>${s.tip ? `<div class="tip-box">💡 ${s.tip}</div>` : ''}`;
-    const list = document.createElement('div');
-    list.className = 'example-list';
+    const list = document.createElement('div'); list.className = 'example-list';
     s.examples.forEach(e => {
-      const row = document.createElement('div');
-      row.className = 'example-row';
+      const row = document.createElement('div'); row.className = 'example-row';
       row.innerHTML = `<div class="ex-kr">${e.kr}</div><div class="ex-info"><div class="ex-tr">${e.tr}</div><div class="ex-ru">${e.ru}</div></div><div class="ex-play">🔊</div>`;
       row.onclick = () => playAudio(e.file, e.kr);
       list.appendChild(row);
     });
-    wrap.appendChild(list);
-    body.appendChild(wrap);
-    const btn = document.createElement('button');
-    btn.className = 'btn full'; btn.innerText = 'Понятно, идём дальше →';
-    btn.onclick = nextStep;
-    body.appendChild(btn);
+    wrap.appendChild(list); body.appendChild(wrap);
+    const btn = document.createElement('button'); btn.className = 'btn full'; btn.innerText = 'Понятно, идём дальше →';
+    btn.onclick = nextStep; body.appendChild(btn);
   }
 
-  // 3. ВЫБОР И АУДИРОВАНИЕ
   if (s.type === 'choice' || s.type === 'listen') {
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt-word';
+    const prompt = document.createElement('div'); prompt.className = 'prompt-word';
     if (s.type === 'listen') {
       prompt.innerHTML = `<div style="font-size:13px;color:var(--muted);margin-bottom:4px">Аудирование • Нажми и слушай</div>`;
       const row = document.createElement('div'); row.className = 'listen-row';
-      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊';
-      lb.onclick = () => playAudio(s.file, s.kr, 1.0);
-      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢';
-      sb.onclick = () => playAudio(s.file, s.kr, 0.72);
-      row.append(lb, sb);
-      prompt.appendChild(row);
-      const rev = document.createElement('div');
-      rev.id = 'listen-reveal'; rev.className = 'big-tr'; rev.style.visibility = 'hidden';
-      rev.innerText = s.kr + ' ' + (s.tr || '');
-      prompt.appendChild(rev);
+      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊'; lb.onclick = () => playAudio(s.file, s.kr, 1.0);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢'; sb.onclick = () => playAudio(s.file, s.kr, 0.72);
+      row.append(lb, sb); prompt.appendChild(row);
+      const rev = document.createElement('div'); rev.id = 'listen-reveal'; rev.className = 'big-tr'; rev.style.visibility = 'hidden';
+      rev.innerText = s.kr + ' ' + (s.tr || ''); prompt.appendChild(rev);
       setTimeout(() => playAudio(s.file, s.kr, 1.0), 250);
     } else {
       prompt.innerHTML = `<div class="big-kr">${s.kr}</div>${!isExam ? `<div class="big-tr">${s.tr || ''}</div>` : ''}`;
-      const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Послушать';
-      ab.onclick = () => playAudio(s.file, s.kr, 1.0);
+      const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Послушать'; ab.onclick = () => playAudio(s.file, s.kr, 1.0);
       prompt.appendChild(ab);
     }
     body.appendChild(prompt);
 
-    const h = document.createElement('h3');
-    h.style.cssText = 'margin:0 0 12px;font-size:16px'; h.innerText = s.q;
-    body.appendChild(h);
-
-    const optsWrap = document.createElement('div');
-    const fb = document.createElement('div'); fb.className = 'feedback-bar';
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
-    nextBtn.onclick = nextStep;
+    const h = document.createElement('h3'); h.style.cssText = 'margin:0 0 12px;font-size:16px'; h.innerText = s.q; body.appendChild(h);
+    const optsWrap = document.createElement('div'); const fb = document.createElement('div'); fb.className = 'feedback-bar';
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →'; nextBtn.onclick = nextStep;
 
     s.opts.forEach((opt, i) => {
-      const b = document.createElement('button');
-      b.className = 'opt-btn'; b.innerText = opt;
+      const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = opt;
       b.onclick = () => {
         optsWrap.querySelectorAll('.opt-btn').forEach(x => x.disabled = true);
-        const rev = document.getElementById('listen-reveal');
-        if (rev) rev.style.visibility = 'visible';
-        if (i === s.correct) {
-          b.classList.add('correct');
-          fb.className = 'feedback-bar ok';
-          fb.innerText = '✅ Верно! ' + s.explain;
-        } else {
-          b.classList.add('wrong');
-          optsWrap.children[s.correct].classList.add('correct');
-          fb.className = 'feedback-bar err';
-          fb.innerText = (isExam ? '❌ Ошибка. ' : '❌ Ошибка (вернёмся к этому в конце урока). ') + s.explain;
-          mistakes++;
-          if (!isExam) queue.push({ ...s, isRetry: true });
+        const rev = document.getElementById('listen-reveal'); if (rev) rev.style.visibility = 'visible';
+        if (i === s.correct) { b.classList.add('correct'); fb.className = 'feedback-bar ok'; fb.innerText = '✅ Верно! ' + s.explain; }
+        else {
+          b.classList.add('wrong'); optsWrap.children[s.correct].classList.add('correct');
+          fb.className = 'feedback-bar err'; fb.innerText = (isExam ? '❌ Ошибка. ' : '❌ Ошибка (вернёмся к этому в конце урока). ') + s.explain;
+          mistakes++; if (!isExam) queue.push({ ...s, isRetry: true });
         }
         nextBtn.style.display = 'block';
       };
@@ -1014,19 +1014,13 @@ function renderStep() {
     body.append(optsWrap, fb, nextBtn);
   }
 
-  // 4. ПАРЫ
   if (s.type === 'match') {
-    const h = document.createElement('h3');
-    h.style.cssText = 'margin:0 0 14px;font-size:16px'; h.innerText = s.q || 'Соедини пары (корейский → значение)';
-    body.appendChild(h);
-
+    const h = document.createElement('h3'); h.style.cssText = 'margin:0 0 14px;font-size:16px'; h.innerText = s.q || 'Соедини пары (корейский → значение)'; body.appendChild(h);
     const grid = document.createElement('div'); grid.className = 'match-grid';
     const colL = document.createElement('div'); colL.className = 'match-col';
     const colR = document.createElement('div'); colR.className = 'match-col';
     const fb = document.createElement('div'); fb.className = 'feedback-bar';
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Отлично, дальше →';
-    nextBtn.onclick = nextStep;
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Отлично, дальше →'; nextBtn.onclick = nextStep;
 
     let selL = null, selR = null, matched = 0;
     const leftItems = shuffle(s.pairs.map((p, i) => ({ ...p, id: i })));
@@ -1037,73 +1031,43 @@ function renderStep() {
       if (selL.id === selR.id) {
         selL.el.classList.remove('sel'); selR.el.classList.remove('sel');
         selL.el.classList.add('matched'); selR.el.classList.add('matched');
-        playAudio(selL.file, selL.kr);
-        matched++;
-        selL = null; selR = null;
-        if (matched === s.pairs.length) {
-          fb.className = 'feedback-bar ok'; fb.innerText = '✅ Все пары собраны!';
-          nextBtn.style.display = 'block';
-        }
+        playAudio(selL.file, selL.kr); matched++; selL = null; selR = null;
+        if (matched === s.pairs.length) { fb.className = 'feedback-bar ok'; fb.innerText = '✅ Все пары собраны!'; nextBtn.style.display = 'block'; }
       } else {
-        const a = selL.el, b = selR.el;
-        a.classList.add('wrong'); b.classList.add('wrong');
-        mistakes++;
-        selL = null; selR = null;
+        const a = selL.el, b = selR.el; a.classList.add('wrong'); b.classList.add('wrong');
+        mistakes++; selL = null; selR = null;
         setTimeout(() => { a.classList.remove('sel', 'wrong'); b.classList.remove('sel', 'wrong'); }, 450);
       }
     };
 
     leftItems.forEach(item => {
-      const b = document.createElement('button');
-      b.className = 'match-btn kr'; b.innerText = item.kr;
-      b.onclick = () => {
-        colL.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel'));
-        b.classList.add('sel');
-        playAudio(item.file, item.kr);
-        selL = { ...item, el: b };
-        tryMatch();
-      };
+      const b = document.createElement('button'); b.className = 'match-btn kr'; b.innerText = item.kr;
+      b.onclick = () => { colL.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); playAudio(item.file, item.kr); selL = { ...item, el: b }; tryMatch(); };
       colL.appendChild(b);
     });
-
     rightItems.forEach(item => {
-      const b = document.createElement('button');
-      b.className = 'match-btn'; b.innerText = item.ru;
-      b.onclick = () => {
-        colR.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel'));
-        b.classList.add('sel');
-        selR = { ...item, el: b };
-        tryMatch();
-      };
+      const b = document.createElement('button'); b.className = 'match-btn'; b.innerText = item.ru;
+      b.onclick = () => { colR.querySelectorAll('.match-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); selR = { ...item, el: b }; tryMatch(); };
       colR.appendChild(b);
     });
-
-    grid.append(colL, colR);
-    body.append(grid, fb, nextBtn);
+    grid.append(colL, colR); body.append(grid, fb, nextBtn);
   }
 
-  // 5. СБОРКА СЛОВ/ПРЕДЛОЖЕНИЙ
   if (s.type === 'build' || s.type === 'listen_build') {
     buildAns = [];
     const isListen = s.type === 'listen_build';
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt-word'; prompt.style.padding = '16px';
-
+    const prompt = document.createElement('div'); prompt.className = 'prompt-word'; prompt.style.padding = '16px';
     if (isListen) {
       prompt.innerHTML = `<div style="font-size:15px;font-weight:700;margin-bottom:4px">🎧 ${s.q || 'Послушай и собери фразу'}</div>`;
       const row = document.createElement('div'); row.className = 'listen-row';
-      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊';
-      lb.onclick = () => playAudio(s.file, s.audioText, 1.0);
-      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢';
-      sb.onclick = () => playAudio(s.file, s.audioText, 0.72);
-      row.append(lb, sb);
-      prompt.appendChild(row);
+      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊'; lb.onclick = () => playAudio(s.file, s.audioText, 1.0);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢'; sb.onclick = () => playAudio(s.file, s.audioText, 0.72);
+      row.append(lb, sb); prompt.appendChild(row);
       setTimeout(() => playAudio(s.file, s.audioText, 1.0), 250);
     } else {
       prompt.innerHTML = `<div style="font-size:16px;font-weight:700">${s.q}</div>`;
       if (!isExam) {
-        const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом';
-        ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
+        const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом'; ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
         prompt.appendChild(ab);
       }
     }
@@ -1112,8 +1076,7 @@ function renderStep() {
     const pool = document.createElement('div'); pool.className = 'build-pool';
     const fb = document.createElement('div'); fb.className = 'feedback-bar';
     const checkBtn = document.createElement('button'); checkBtn.className = 'btn full'; checkBtn.innerText = 'Проверить';
-    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
-    nextBtn.onclick = nextStep;
+    const nextBtn = document.createElement('button'); nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →'; nextBtn.onclick = nextStep;
 
     const renderBuild = () => {
       slots.innerHTML = buildAns.length ? '' : '<span style="color:var(--muted);font-size:13px">Нажимай на блоки ниже</span>';
@@ -1141,9 +1104,7 @@ function renderStep() {
         if (!stepFailed) { stepFailed = true; mistakes++; if (!isExam) queue.push({ ...s, isRetry: true }); }
       }
     };
-
-    renderBuild();
-    body.append(prompt, slots, pool, fb, checkBtn, nextBtn);
+    renderBuild(); body.append(prompt, slots, pool, fb, checkBtn, nextBtn);
   }
 }
 
@@ -1152,15 +1113,20 @@ function nextStep() { qIdx++; renderStep(); }
 function finishLesson() {
   document.getElementById('study-bar').style.width = '100%';
   if (curL.isExam && mistakes > 4) {
+    if (!isReplay) {
+      if (st.hearts === MAX_HEARTS) st.lastHeartTs = Date.now();
+      st.hearts = Math.max(0, st.hearts - 1);
+      save();
+    }
     document.getElementById('study-body').innerHTML = `
       <div class="card-box" style="text-align:center;padding:26px 18px">
-        <div style="font-size:44px;margin-bottom:6px">😅</div>
+        <div style="font-size:44px;margin-bottom:6px">💔</div>
         <h2 style="margin:0 0 6px;color:var(--danger)">Экзамен не сдан</h2>
-        <p>Допущено ошибок: <b>${mistakes}</b> (для сдачи нужно не больше 4).</p>
-        <p style="color:var(--muted)">Повтори слова в Словаре и попробуй ещё раз — SSR-карта ждёт!</p>
+        <p>Допущено ошибок: <b>${mistakes}</b> (нужно не больше 4).</p>
+        <p style="color:var(--muted)">Сгорело 1 сердечко. Осталось попыток: <b>❤️ ${st.hearts}/${MAX_HEARTS}</b></p>
       </div>
-      <button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>
-      <button class="btn ghost full" onclick="switchTab('vocab')">Открыть словарь 📖</button>
+      ${st.hearts > 0 ? `<button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>` : `<button class="btn cyan full" style="margin-bottom:10px" onclick="switchTab('shop')">Пополнить ❤️ в Магазине</button>`}
+      <button class="btn ghost full" onclick="switchTab('vocab')">Повторить слова в Словаре 📖</button>
     `;
     return;
   }
@@ -1213,8 +1179,9 @@ function renderRank() {
   document.getElementById('rank-list').innerHTML = bots.map((p, i) => `<div class="rank-row ${p.me ? 'me' : ''}"><div style="width:28px;font-weight:800">${i < 3 ? ['🥇','🥈','🥉'][i] : i+1}</div><div style="flex:1;font-weight:700">${p.name}</div><div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div></div>`).join('');
 }
 
-save();
+syncResources();
 renderLessons();
+setInterval(syncResources, 30000);
 </script>
 </body>
 </html>
