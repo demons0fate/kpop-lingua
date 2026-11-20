@@ -1,4 +1,4 @@
-/* ====== МОДУЛЬ СТУДИИ, КОМАНДЫ, КОНТРАКТОВ И ПРОКАЧКИ КАРТ ====== */
+/* ====== МОДУЛЬ СТУДИИ, ЕДИНОЙ КОМАНДЫ (4 РОЛИ), КОНТРАКТОВ И ПРОКАЧКИ ====== */
 (function () {
   const ROLES = [
     { key: "vocal", title: "Вокал", desc: "Бонус XP" },
@@ -7,11 +7,15 @@
     { key: "visual", title: "Вижуал", desc: "Удача паков" }
   ];
 
-  // 1. Внедряем стили Студии
+  // 1. Стили Студии и обновлённой кнопки профиля
   const css = document.createElement('style');
   css.textContent = `
-    .studio-btn { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(255,46,147,0.2), rgba(138,43,226,0.2)); border: 1px solid rgba(255,46,147,0.45); padding: 5px 10px; border-radius: 14px; color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; }
-    .studio-btn:active { transform: scale(0.94); }
+    .studio-btn { display: flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #2b144a, #1c1233); border: 1.5px solid rgba(255,46,147,0.65); padding: 4px 11px 4px 5px; border-radius: 20px; color: #fff; font-weight: 800; font-size: 12px; cursor: pointer; box-shadow: 0 0 14px rgba(255,46,147,0.28); position: relative; transition: transform 0.18s var(--spring); }
+    .studio-btn:active { transform: scale(0.93); }
+    .studio-ava { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #0b0814; }
+    .studio-dot { position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--success); border: 2px solid #120d1e; display: none; }
+    .studio-dot.show { display: block; }
+
     .agency-card { background: linear-gradient(135deg, #271345, #171029); border: 1px solid rgba(0,229,255,0.35); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
     .agency-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
     .agency-name { font-size: 19px; font-weight: 900; color: #fff; }
@@ -27,17 +31,17 @@
     .team-slot:active { transform: scale(0.96); }
     .slot-role { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--cyan); margin-bottom: 6px; }
     .slot-stars { font-size: 11px; color: var(--gold); letter-spacing: 1px; margin-top: 3px; }
-    .synergy-box { background: rgba(0,230,118,0.12); border: 1px solid var(--success); border-radius: 14px; padding: 10px 12px; font-size: 12px; color: #b8ffd6; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .synergy-box { background: rgba(0,230,118,0.12); border: 1px solid var(--success); border-radius: 14px; padding: 10px 12px; font-size: 12px; color: #b8ffd6; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
     .synergy-box.off { background: var(--surface); border-color: rgba(255,255,255,0.08); color: var(--muted); }
 
     .contract-row { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .contract-row.done { border-color: rgba(0,230,118,0.45); background: rgba(0,230,118,0.08); }
     .c-title { font-size: 13px; font-weight: 700; }
-    .c-prog { font-size: 11px; color: var(--cyan); font-weight: 800; }
+    .c-prog { font-size: 12px; color: var(--cyan); font-weight: 800; }
+    .daily-prize { background: linear-gradient(135deg, rgba(255,184,0,0.15), rgba(255,46,147,0.15)); border: 1px solid rgba(255,215,0,0.4); border-radius: 16px; padding: 12px 14px; margin-top: 10px; }
   `;
   document.head.appendChild(css);
 
-  // 2. Инициализация новых полей в сохранении (st)
   function todayKey() {
     const d = new Date();
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -50,7 +54,6 @@
     if (typeof st.dust !== 'number') st.dust = 0;
     if (typeof st.packTickets !== 'number') st.packTickets = 0;
 
-    // Серия дней (Streak)
     const today = todayKey();
     if (!st.streak) st.streak = { count: 1, lastDate: today };
     else if (st.streak.lastDate !== today) {
@@ -60,17 +63,17 @@
       st.streak.lastDate = today;
     }
 
-    // Ежедневные контракты
     if (!st.daily || st.daily.date !== today) {
       st.daily = { date: today, lessons: 0, dict: 0, cards: 0, claimed: false };
     }
 
-    // Выдаём 1★ всем уже открытым картам
     st.cards.forEach(id => { if (!st.cardStars[id]) st.cardStars[id] = 1; });
+    st.biasId = null; // Отключаем старую одиночную систему Биаса
+    updateStudioBadge();
     save(false);
   }
 
-  // 3. Создаём экран Студии и кнопку в шапке
+  // 2. Создаём экран Студии и заметную кнопку в шапке
   const studioScreen = document.createElement('div');
   studioScreen.id = 'screen-studio';
   studioScreen.className = 'screen';
@@ -78,23 +81,34 @@
 
   const brandEl = document.querySelector('.brand');
   if (brandEl) {
-    brandEl.innerHTML = `<div class="studio-btn"><span>★</span> Студия</div>`;
+    brandEl.innerHTML = `<div class="studio-btn"><div class="studio-ava" id="st-ava">N</div><span>Студия</span><div class="studio-dot" id="st-dot"></div></div>`;
     brandEl.style.background = 'none';
     brandEl.style.webkitTextFillColor = 'initial';
     brandEl.onclick = () => switchTab('studio');
   }
 
-  // 4. Расчёт силы группы, бонусов и синергии
+  function updateStudioBadge() {
+    const ava = document.getElementById('st-ava');
+    const dot = document.getElementById('st-dot');
+    if (ava && st.agencyName) ava.innerText = st.agencyName[0].toUpperCase();
+    if (dot && st.daily) {
+      const allDone = st.daily.lessons >= 1 && st.daily.dict >= 2 && st.daily.cards >= 3;
+      dot.classList.toggle('show', (allDone && !st.daily.claimed) || st.packTickets > 0);
+    }
+  }
+
+  // 3. Единый расчёт бонусов всей команды (4 роли + звёзды + синергия)
   window.getTeamBonuses = function () {
-    let xp = 0, coins = 0, energyMin = 0, luck = 0, power = 0;
+    let xp = 0, coins = 0, energyMin = 0, luck = 0, power = 0, count = 0;
     const albums = [];
     ROLES.forEach(r => {
       const cid = st.team[r.key];
       if (!cid || !st.cards.includes(cid)) return;
       const c = CARDS.find(x => x.id === cid);
       if (!c) return;
+      count++;
       const stars = st.cardStars[cid] || 1;
-      const mult = 1 + (stars - 1) * 0.25; // +25% к силе карты за каждую звезду
+      const mult = 1 + (stars - 1) * 0.25;
       const val = Math.round(c.bonusVal * mult);
       if (c.bonusType === 'xp') xp += val;
       if (c.bonusType === 'coins') coins += val;
@@ -106,7 +120,13 @@
     });
     const synergy = albums.length === 4 && albums.every(a => a === albums[0]);
     if (synergy) { xp += 15; coins += 15; power = Math.round(power * 1.15); }
-    return { xp, coins, energyMin, luck, power, synergy, era: synergy ? albums[0] : null };
+    return { xp, coins, energyMin, luck, power, count, synergy };
+  };
+
+  // Подключаем ускорение энергии от Танцора в команде
+  window.getEnergyRegenMs = function () {
+    const cut = (getTeamBonuses().energyMin || 0) * 60 * 1000;
+    return Math.max(30 * 60 * 1000, BASE_ENERGY_MS - cut);
   };
 
   function getRankTitle(xp) {
@@ -116,12 +136,13 @@
     return "Стажёр агентства";
   }
 
-  // 5. Отрисовка экрана Студии
+  // 4. Экран Студии
   window.renderStudio = function () {
     initStudioState();
     const b = getTeamBonuses();
     const d = st.daily;
-    const allDone = d.lessons >= 1 && d.dict >= 2 && d.cards >= 3;
+    const doneCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
+    const allDone = doneCnt === 3;
 
     studioScreen.innerHTML = `
       <div class="agency-card">
@@ -132,6 +153,9 @@
           </div>
           <button class="btn ghost" style="padding:7px 11px;font-size:12px" id="rename-agency">Имя</button>
         </div>
+        <div style="font-size:12px;color:#d8cce8;margin-bottom:8px">
+          Бонусы группы: <b style="color:var(--cyan)">+${b.xp}% XP</b> • <b style="color:#ff85cb">+${b.coins}% 🎤</b> • <b style="color:var(--gold)">-${b.energyMin}м ⚡</b>
+        </div>
         <div class="studio-stats">
           <div class="st-box"><div class="st-val" style="color:var(--accent)">${b.power}</div><div class="st-lbl">Фандом</div></div>
           <div class="st-box"><div class="st-val" style="color:var(--cyan)">${st.cards.length}/${CARDS.length}</div><div class="st-lbl">Карты</div></div>
@@ -139,45 +163,54 @@
         </div>
       </div>
 
-      <h3 style="margin:0 0 8px;font-size:15px">Состав группы (4 роли)</h3>
+      <h3 style="margin:0 0 8px;font-size:15px">Состав группы (${b.count}/4)</h3>
       <div class="team-grid" id="team-grid"></div>
 
       <div class="synergy-box ${b.synergy ? '' : 'off'}">
         <span>${b.synergy ? 'Синергия эры активна! (+15% XP, +15% 🎤)' : 'Поставь 4 карты одной Эры для бонуса Синергии'}</span>
-        <b>${b.synergy ? 'ON' : '0/4'}</b>
+        <b>${b.synergy ? 'ON' : `${b.count}/4`}</b>
       </div>
 
-      <h3 style="margin:0 0 8px;font-size:15px">Ежедневные контракты</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px">
+        <h3 style="margin:0;font-size:15px">Ежедневные контракты</h3>
+        <span style="font-size:12px;color:var(--cyan);font-weight:800">${doneCnt}/3 выполнено</span>
+      </div>
       <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}">
-        <div><div class="c-title">Пройти 1 урок или повтор</div><div class="l-meta">Награда в зачёт дня</div></div>
+        <div><div class="c-title">Пройти 1 урок или повтор</div><div class="l-meta">Вкладка Уроки</div></div>
         <div class="c-prog">${Math.min(d.lessons, 1)}/1</div>
       </div>
       <div class="contract-row ${d.dict >= 2 ? 'done' : ''}">
-        <div><div class="c-title">Написать 2 слова в Диктанте</div><div class="l-meta">Раздел Словарь → Диктант</div></div>
+        <div><div class="c-title">Написать 2 слова в Диктанте</div><div class="l-meta">Словарь → Диктант</div></div>
         <div class="c-prog">${Math.min(d.dict, 2)}/2</div>
       </div>
       <div class="contract-row ${d.cards >= 3 ? 'done' : ''}">
-        <div><div class="c-title">Повторить 3 карточки в Словаре</div><div class="l-meta">Раздел Словарь → 3D-Карточки</div></div>
+        <div><div class="c-title">Перевернуть 3 карточки</div><div class="l-meta">Словарь → 3D-Карточки</div></div>
         <div class="c-prog">${Math.min(d.cards, 3)}/3</div>
       </div>
 
-      ${allDone && !d.claimed
-        ? `<button class="btn gold full" style="margin-top:8px" id="claim-daily">Забрать бесплатный Чиби-пак!</button>`
-        : (d.claimed ? `<div style="text-align:center;font-size:12px;color:var(--success);font-weight:700;margin-top:8px">Награда дня получена! Возвращайся завтра.</div>` : '')
-      }
-      ${st.packTickets > 0 ? `<button class="btn full" style="margin-top:10px" onclick="openPackModal(0)">Открыть бесплатный пак (Билетов: ${st.packTickets})</button>` : ''}
+      <div class="daily-prize">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase">Награда за все 3 контракта</div>
+        <div style="font-size:14px;font-weight:800;margin:4px 0 8px">Бесплатный Чиби-пак + 25 микрофонов</div>
+        ${allDone && !d.claimed
+          ? `<button class="btn gold full" id="claim-daily">Забрать награду!</button>`
+          : (d.claimed
+              ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Награда получена! Новые контракты завтра.</div>`
+              : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((doneCnt / 3) * 100)}%"></div></div>`)
+        }
+      </div>
+      ${st.packTickets > 0 ? `<button class="btn full" style="margin-top:12px" onclick="openPackModal(0)">Открыть бесплатный пак (Билетов: ${st.packTickets})</button>` : ''}
     `;
 
     document.getElementById('rename-agency').onclick = () => {
       const n = prompt('Придумай название своего агентства:', st.agencyName);
-      if (n && n.trim()) { st.agencyName = n.trim().slice(0, 22); save(); renderStudio(); }
+      if (n && n.trim()) { st.agencyName = n.trim().slice(0, 22); save(); updateStudioBadge(); renderStudio(); }
     };
 
     const claimBtn = document.getElementById('claim-daily');
     if (claimBtn) {
       claimBtn.onclick = () => {
         st.daily.claimed = true; st.packTickets++; st.coins += 25;
-        save(); haptic('ok'); sfx('win'); fireConfetti(); renderStudio();
+        save(); updateStudioBadge(); haptic('ok'); sfx('win'); fireConfetti(); renderStudio();
       };
     }
 
@@ -220,12 +253,87 @@
     });
   }
 
-  // 6. Перехватываем switchTab, чтобы открывать Студию
+  // 5. Единая витрина Альбомов (вместо старого Биаса — сразу состав группы)
+  window.renderBinder = function () {
+    if (typeof CARDS === 'undefined') return;
+    initStudioState();
+    const b = getTeamBonuses();
+    document.getElementById('bias-banner-wrap').innerHTML = `
+      <div class="bias-banner">
+        <div>
+          <div style="font-size:11px;color:var(--cyan);font-weight:800">СОСТАВ ГРУППЫ: ${b.count}/4 • ФАНДОМ ${b.power}</div>
+          <div style="font-size:12px;color:#e0d4f5;margin-top:2px">Нажми на открытую карту, чтобы поставить её в состав Студии</div>
+        </div>
+        <button class="btn cyan" style="padding:8px 12px;font-size:12px" onclick="switchTab('studio')">Студия</button>
+      </div>`;
+
+    const g = document.getElementById('binder-grid'); g.innerHTML = '';
+    (curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum)).forEach(c => {
+      const has = st.cards.includes(c.id);
+      const inTeam = st.team[c.roleKey] === c.id;
+      const stars = st.cardStars[c.id] || 1;
+      const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
+      const el = document.createElement('div');
+      el.className = `photocard ${has ? rc : 'locked'} ${inTeam ? 'bias-active' : ''}`;
+      el.innerHTML = `
+        ${inTeam ? '<div class="pc-bias-tag">В СОСТАВЕ</div>' : ''}
+        <div class="pc-rarity">${c.r}</div>
+        ${has ? cardArtHtml(c) : '<div class="pc-art" style="background:#181326"><div class="pc-monogram" style="opacity:0.25">?</div></div>'}
+        <div class="pc-name">${has ? c.name : 'Скрытая карта'}</div>
+        ${has ? `<div class="slot-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>` : ''}
+        <div class="pc-role">${has ? c.role : 'Пройди урок или открой пак'}</div>
+        ${has ? `<div class="pc-bonus">${c.bonusText}</div>` : ''}
+      `;
+      if (has) {
+        el.onclick = () => {
+          st.team[c.roleKey] = c.id; save(); haptic('ok'); sfx('ok');
+          if (c.quoteFile) playAudio(c.quoteFile, c.quoteKr);
+          renderBinder();
+        };
+      }
+      g.appendChild(el);
+    });
+  };
+
+  // 6. Перехваты для контрактов (уроки, диктант, 3D-карточки)
   const origSwitchTab = window.switchTab;
   window.switchTab = function (t) {
     origSwitchTab(t);
     if (t === 'studio') renderStudio();
   };
+
+  const origFinishLesson = window.finishLesson;
+  window.finishLesson = function () {
+    const passed = !(curL && curL.isExam && mistakes > 4);
+    if (passed) {
+      initStudioState();
+      st.daily.lessons++;
+      // Добавляем бонус команды за новый урок
+      if (curL && !st.done.includes(curL.id)) {
+        const b = getTeamBonuses();
+        st.xp += Math.round(curL.xp * (b.xp / 100));
+        st.coins += Math.round(curL.coins * (b.coins / 100));
+      }
+      save(); updateStudioBadge();
+    }
+    origFinishLesson();
+  };
+
+  const origMountDraw = window.mountDrawWidget;
+  window.mountDrawWidget = function (container, item, blindMode, onSuccess, onFail, noPeek) {
+    origMountDraw(container, item, blindMode, () => {
+      if (document.getElementById('screen-vocab').classList.contains('active')) {
+        initStudioState(); st.daily.dict++; save(); updateStudioBadge();
+      }
+      if (onSuccess) onSuccess();
+    }, onFail, noPeek);
+  };
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#fc-card') && e.target.id !== 'fc-audio') {
+      initStudioState(); st.daily.cards++; save(); updateStudioBadge();
+    }
+  });
 
   // 7. Прокачка карт (1★→5★) и бесплатные билеты в openPackModal
   window.openPackModal = function (price) {
@@ -235,7 +343,7 @@
     haptic('medium');
     if (useTicket) st.packTickets--;
     else st.coins -= price;
-    save();
+    save(); updateStudioBadge();
 
     const modal = document.getElementById('pack-modal');
     modal.classList.add('open');
