@@ -761,6 +761,64 @@
       initStudioState(); st.daily.cards++; checkDailyMonthlyPts(); save(); updateNavDots();
     }
   });
+/* ====== АВТОСОХРАНЕНИЕ ПРОГРЕССА УРОКА (БЕЗ ПОВТОРНОЙ ТРАТЫ ЭНЕРГИИ) ====== */
+  const origStartLesson = window.startLesson;
+  window.startLesson = function (id) {
+    if (!st.inProgress) st.inProgress = {};
+    const saved = st.inProgress[id];
+    if (saved && Array.isArray(saved.queue) && saved.qIdx < saved.queue.length) {
+      syncResources();
+      curL = LESSONS.find(x => x.id === id);
+      isReplay = st.done.includes(curL.id);
+      queue = saved.queue;
+      qIdx = saved.qIdx;
+      mistakes = saved.mistakes || 0;
+      switchTab('study');
+      renderStep();
+      return;
+    }
+    origStartLesson(id);
+    if (document.getElementById('screen-study').classList.contains('active') && curL && curL.id === id) {
+      st.inProgress[id] = { qIdx, mistakes, queue };
+      save(false);
+    }
+  };
 
+  const origRenderStep = window.renderStep;
+  window.renderStep = function () {
+    if (curL && qIdx < queue.length) {
+      if (!st.inProgress) st.inProgress = {};
+      st.inProgress[curL.id] = { qIdx, mistakes, queue };
+      save(false);
+    }
+    origRenderStep();
+  };
+
+  const origFinishForSave = window.finishLesson;
+  window.finishLesson = function () {
+    if (curL && st.inProgress && st.inProgress[curL.id]) {
+      delete st.inProgress[curL.id];
+      save(false);
+    }
+    origFinishForSave();
+  };
+
+  const origRenderLessons = window.renderLessons;
+  window.renderLessons = function () {
+    origRenderLessons();
+    if (!st.inProgress || typeof LESSONS === 'undefined') return;
+    const cards = document.querySelectorAll('#lessons-list .lesson-card');
+    LESSONS.forEach((l, idx) => {
+      const saved = st.inProgress[l.id];
+      if (saved && cards[idx]) {
+        const btn = cards[idx].querySelector('button');
+        if (btn) {
+          btn.innerText = `Продолжить (${saved.qIdx + 1}/${saved.queue.length})`;
+          btn.className = 'btn cyan';
+        }
+      }
+    });
+  };
   initStudioState();
+  renderLessons();
 })();
