@@ -43,6 +43,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
 .btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 18px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; }
 .btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.5; }
 .btn.full { width: 100%; padding: 15px; font-size: 15px; }
 .btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); }
 .btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); }
@@ -67,12 +68,14 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .ex-ru { font-size: 12px; color: var(--muted); }
 .ex-play { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,46,147,0.2); color: #ff7ac6; display: flex; align-items: center; justify-content: center; }
 
-.prompt-word { text-align: center; background: linear-gradient(180deg, rgba(138,43,226,0.2), rgba(255,46,147,0.1)); border: 1px solid rgba(138,43,226,0.4); border-radius: 20px; padding: 22px 16px; margin-bottom: 16px; }
+.prompt-word { text-align: center; background: linear-gradient(180deg, rgba(138,43,226,0.2), rgba(255,46,147,0.1)); border: 1px solid rgba(138,43,226,0.4); border-radius: 20px; padding: 20px 16px; margin-bottom: 16px; }
 .big-kr { font-size: 44px; font-weight: 800; letter-spacing: 2px; }
 .big-tr { font-size: 14px; color: var(--cyan); margin-top: 6px; font-weight: 600; }
 .audio-pill { margin-top: 12px; background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; }
-.big-listen-btn { width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); border: none; color: #fff; font-size: 36px; cursor: pointer; box-shadow: 0 0 24px rgba(255,46,147,0.45); margin: 8px 0; }
-.big-listen-btn:active { transform: scale(0.93); }
+.listen-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0 4px; }
+.big-listen-btn { width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); border: none; color: #fff; font-size: 32px; cursor: pointer; box-shadow: 0 0 24px rgba(255,46,147,0.45); }
+.slow-listen-btn { width: 52px; height: 52px; border-radius: 50%; background: var(--surface-2); border: 1.5px solid rgba(0,229,255,0.45); color: #fff; font-size: 22px; cursor: pointer; }
+.big-listen-btn:active, .slow-listen-btn:active { transform: scale(0.92); }
 
 .opt-btn { display: block; width: 100%; text-align: left; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
 .opt-btn.correct { background: rgba(0,230,118,0.18); border-color: var(--success); }
@@ -92,7 +95,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .chip.used { opacity: 0.25; pointer-events: none; }
 .chip.in-slot { background: rgba(138,43,226,0.35); border-color: var(--purple); }
 
-/* Drawing / Propisi (Free Slate Canvas) */
+/* Drawing / Propisi */
 .mode-switch { display: flex; background: var(--surface); border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); }
 .mode-btn { flex: 1; border: none; background: transparent; color: var(--muted); padding: 9px 6px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 .mode-btn.active { background: var(--surface-2); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
@@ -153,14 +156,14 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="module-banner">
     <div class="module-tag">Блок 1 • Полный Хангыль (TOPIK 0→1)</div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Длинные глубокие уроки: произношение, аудирование, пары, сборка слов и работа над ошибками.</p>
+    <p>Длинные глубокие уроки: произношение, аудирование, пары, сборка слов, прописи и работа над ошибками.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
   <div class="trainer-banner">
     <div>
       <div class="l-title">✍️ Прописи и Диктант</div>
-      <div class="l-meta">Пиши буквы и слова на слух • +5 🎤</div>
+      <div class="l-meta">Умное распознавание почерка • +5 🎤</div>
     </div>
     <button class="btn cyan" onclick="openDrawTrainer()">Писать</button>
   </div>
@@ -241,7 +244,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
 </div>
 
-<script src="lessons.js?v=4"></script>
+<script src="lessons.js?v=5"></script>
 <script>
 if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.expand();
@@ -299,18 +302,19 @@ function save() {
 }
 
 let curAudio = null;
-function playAudio(file, text) {
+function playAudio(file, text, rate = 1.0) {
   if (curAudio) { curAudio.pause(); curAudio = null; }
   const fallback = () => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR'; u.rate = 0.85;
+      u.lang = 'ko-KR'; u.rate = rate * 0.85;
       window.speechSynthesis.speak(u);
     }
   };
   if (!file) return fallback();
   const a = new Audio(file);
+  a.playbackRate = rate;
   curAudio = a;
   a.onerror = fallback;
   a.play().catch(fallback);
@@ -327,61 +331,75 @@ function switchTab(t) {
   if (t === 'rank') renderRank();
 }
 
-/* ====== УМНЫЙ ДВИЖОК РАСПОЗНАВАНИЯ ПО ВСЕМУ ПОЛЮ ====== */
-function getBBox(imgData, w, h) {
-  const d = imgData.data;
-  let minX = w, minY = h, maxX = -1, maxY = -1, count = 0;
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (d[(y * w + x) * 4 + 3] > 35) {
-        count++;
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-      }
+/* ====== РАСПОЗНАВАНИЕ РУКОПИСНОГО КОРЕЙСКОГО ПО ШТРИХАМ ====== */
+async function recognizeKoreanStrokes(strokes, w, h) {
+  const res = await fetch('https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      options: 'enable_pre_space',
+      requests: [{
+        writing_guide: { writing_area_width: w, writing_area_height: h },
+        ink: strokes,
+        language: 'ko'
+      }]
+    })
+  });
+  const data = await res.json();
+  if (data[0] === 'SUCCESS' && data[1] && data[1][0] && Array.isArray(data[1][0][1])) {
+    return data[1][0][1];
+  }
+  throw new Error('IME empty');
+}
+
+/* Запасная строгая проверка (если нет доступа к Google IME) */
+function fallbackSectorCheck(inkC, targetText, FONT, W, H) {
+  const getBox = (ctx) => {
+    const d = ctx.getImageData(0, 0, W, H).data;
+    let minX = W, minY = H, maxX = -1, maxY = -1, c = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (d[(y * W + x) * 4 + 3] > 35) { c++; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
     }
-  }
-  return { minX, minY, maxX, maxY, w: maxX - minX + 1, h: maxY - minY + 1, count };
-}
-
-function normalizeToGrid(srcCanvas, bbox, N = 64, pad = 6) {
-  const c = document.createElement('canvas');
-  c.width = N; c.height = N;
-  const ctx = c.getContext('2d');
-  const inner = N - pad * 2;
-  const scale = Math.min(inner / bbox.w, inner / bbox.h);
-  const dw = bbox.w * scale;
-  const dh = bbox.h * scale;
-  const dx = (N - dw) / 2;
-  const dy = (N - dh) / 2;
-  ctx.drawImage(srcCanvas, bbox.minX, bbox.minY, bbox.w, bbox.h, dx, dy, dw, dh);
-  const data = ctx.getImageData(0, 0, N, N).data;
-  const bin = new Uint8Array(N * N);
-  for (let i = 0; i < N * N; i++) {
-    if (data[i * 4 + 3] > 30) bin[i] = 1;
-  }
-  return bin;
-}
-
-function dilateGrid(bin, N, r) {
-  const out = new Uint8Array(N * N);
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      if (!bin[y * N + x]) continue;
-      const y0 = Math.max(0, y - r), y1 = Math.min(N - 1, y + r);
-      const x0 = Math.max(0, x - r), x1 = Math.min(N - 1, x + r);
-      for (let yy = y0; yy <= y1; yy++) {
-        for (let xx = x0; xx <= x1; xx++) {
-          out[yy * N + xx] = 1;
-        }
-      }
+    return { minX, minY, w: maxX - minX + 1, h: maxY - minY + 1, c };
+  };
+  const norm = (src, b, N = 64) => {
+    const c = document.createElement('canvas'); c.width = N; c.height = N;
+    const ctx = c.getContext('2d');
+    const sc = Math.min((N - 12) / b.w, (N - 12) / b.h);
+    ctx.drawImage(src, b.minX, b.minY, b.w, b.h, (N - b.w * sc) / 2, (N - b.h * sc) / 2, b.w * sc, b.h * sc);
+    const d = ctx.getImageData(0, 0, N, N).data;
+    const bin = new Uint8Array(N * N);
+    for (let i = 0; i < N * N; i++) if (d[i * 4 + 3] > 30) bin[i] = 1;
+    return bin;
+  };
+  const dil = (bin, N, r) => {
+    const o = new Uint8Array(N * N);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (bin[y * N + x]) {
+      for (let yy = Math.max(0, y - r); yy <= Math.min(N - 1, y + r); yy++)
+        for (let xx = Math.max(0, x - r); xx <= Math.min(N - 1, x + r); xx++) o[yy * N + xx] = 1;
     }
+    return o;
+  };
+  const uBox = getBox(inkC.getContext('2d'));
+  const tC = document.createElement('canvas'); tC.width = W; tC.height = H;
+  const tCtx = tC.getContext('2d'); tCtx.font = FONT; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle'; tCtx.fillStyle = '#fff';
+  tCtx.fillText(targetText, W / 2, H / 2 + 6);
+  const tBox = getBox(tCtx);
+  const N = 64, uB = norm(inkC, uBox, N), tB = norm(tC, tBox, N);
+  const uD = dil(uB, N, 2), tD = dil(tB, N, 2);
+  for (let sy = 0; sy < 2; sy++) for (let sx = 0; sx < 2; sx++) {
+    let tt = 0, th = 0;
+    for (let y = sy * 32; y < (sy + 1) * 32; y++) for (let x = sx * 32; x < (sx + 1) * 32; x++) {
+      if (tB[y * N + x]) { tt++; if (uD[y * N + x]) th++; }
+    }
+    if (tt > 15 && th / tt < 0.45) return false;
   }
-  return out;
+  let ut = 0, uh = 0;
+  for (let i = 0; i < N * N; i++) if (uB[i]) { ut++; if (tD[i]) uh++; }
+  return ut > 0 && (uh / ut) >= 0.55;
 }
 
-function mountDrawWidget(container, item, blindMode, onSuccess) {
+function mountDrawWidget(container, item, blindMode, onSuccess, onFail) {
   const W = 400, H = 300;
   const len = item.kr.length;
   const fontSize = len === 1 ? 155 : (len === 2 ? 115 : 88);
@@ -392,7 +410,7 @@ function mountDrawWidget(container, item, blindMode, onSuccess) {
       <div class="draw-header">
         <div>
           <div class="draw-meta-title">${blindMode ? '🎧 Напиши на слух: ' + (item.ru || item.tr) : '✍️ Напиши: ' + item.kr + ' ' + (item.tr || '')}</div>
-          <div class="draw-hint">${blindMode ? 'Пиши в любом месте серого поля, любого размера' : 'Можно писать в любом месте поля или по трафарету'}</div>
+          <div class="draw-hint">Пиши в любом месте поля — система прочитает твой почерк</div>
         </div>
         <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0;width:42px;height:42px;font-size:18px" id="dw-audio">🔊</button>
       </div>
@@ -420,9 +438,7 @@ function mountDrawWidget(container, item, blindMode, onSuccess) {
   const drawGuide = (showGhost) => {
     gCtx.clearRect(0, 0, W, H);
     if (showGhost) {
-      gCtx.font = FONT;
-      gCtx.textAlign = 'center';
-      gCtx.textBaseline = 'middle';
+      gCtx.font = FONT; gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle';
       gCtx.fillStyle = 'rgba(255, 255, 255, 0.14)';
       gCtx.fillText(item.kr, W / 2, H / 2 + 6);
     }
@@ -431,14 +447,12 @@ function mountDrawWidget(container, item, blindMode, onSuccess) {
 
   const peekBtn = document.getElementById('dw-peek');
   if (peekBtn) {
-    peekBtn.onclick = () => {
-      drawGuide(true);
-      setTimeout(() => drawGuide(false), 1600);
-    };
+    peekBtn.onclick = () => { drawGuide(true); setTimeout(() => drawGuide(false), 1600); };
   }
 
-  // Тонкая чёткая линия
   let drawing = false, lastX = 0, lastY = 0;
+  let strokes = [], curStroke = null, startTime = 0;
+
   iCtx.strokeStyle = '#ffffff';
   iCtx.lineWidth = 7;
   iCtx.lineCap = 'round';
@@ -446,10 +460,7 @@ function mountDrawWidget(container, item, blindMode, onSuccess) {
 
   const getPos = (e) => {
     const r = inkC.getBoundingClientRect();
-    return {
-      x: (e.clientX - r.left) * (W / r.width),
-      y: (e.clientY - r.top) * (H / r.height)
-    };
+    return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
   };
 
   inkC.addEventListener('pointerdown', (e) => {
@@ -457,97 +468,90 @@ function mountDrawWidget(container, item, blindMode, onSuccess) {
     inkC.setPointerCapture(e.pointerId);
     drawing = true;
     const p = getPos(e);
+    if (!strokes.length) startTime = Date.now();
+    curStroke = [[Math.round(p.x)], [Math.round(p.y)], [Date.now() - startTime]];
+    strokes.push(curStroke);
     lastX = p.x; lastY = p.y;
-    iCtx.beginPath();
-    iCtx.moveTo(p.x, p.y);
-    iCtx.lineTo(p.x + 0.1, p.y + 0.1);
-    iCtx.stroke();
+    iCtx.beginPath(); iCtx.moveTo(p.x, p.y); iCtx.lineTo(p.x + 0.1, p.y + 0.1); iCtx.stroke();
   });
 
   inkC.addEventListener('pointermove', (e) => {
     if (!drawing) return;
     e.preventDefault();
     const p = getPos(e);
-    iCtx.beginPath();
-    iCtx.moveTo(lastX, lastY);
-    iCtx.lineTo(p.x, p.y);
-    iCtx.stroke();
+    if (Math.hypot(p.x - lastX, p.y - lastY) > 2) {
+      curStroke[0].push(Math.round(p.x));
+      curStroke[1].push(Math.round(p.y));
+      curStroke[2].push(Date.now() - startTime);
+    }
+    iCtx.beginPath(); iCtx.moveTo(lastX, lastY); iCtx.lineTo(p.x, p.y); iCtx.stroke();
     lastX = p.x; lastY = p.y;
   });
 
-  const endDraw = () => { drawing = false; };
+  const endDraw = () => { drawing = false; curStroke = null; };
   inkC.addEventListener('pointerup', endDraw);
   inkC.addEventListener('pointercancel', endDraw);
 
   const fb = document.getElementById('dw-fb');
+  const checkBtn = document.getElementById('dw-check');
+
   document.getElementById('dw-clear').onclick = () => {
     iCtx.clearRect(0, 0, W, H);
+    strokes = [];
     fb.className = 'feedback-bar';
   };
 
-  // Независимая от позиции и размера проверка
-  document.getElementById('dw-check').onclick = () => {
-    const uBox = getBBox(iCtx.getImageData(0, 0, W, H), W, H);
-    if (uBox.count < 70 || (uBox.w < 14 && uBox.h < 14)) {
+  checkBtn.onclick = async () => {
+    if (!strokes.length) {
       fb.className = 'feedback-bar err';
       fb.innerText = '✍️ Сначала напиши букву или слово на сером поле!';
       return;
     }
 
-    const tCanvas = document.createElement('canvas');
-    tCanvas.width = W; tCanvas.height = H;
-    const tCtx = tCanvas.getContext('2d');
-    tCtx.font = FONT; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
-    tCtx.fillStyle = '#fff';
-    tCtx.fillText(item.kr, W / 2, H / 2 + 6);
-    const tBox = getBBox(tCtx.getImageData(0, 0, W, H), W, H);
+    checkBtn.disabled = true;
+    checkBtn.innerText = '⏳ Читаю...';
+    const clean = s => s.replace(/\s+/g, '');
+    const target = clean(item.kr);
 
-    const uRatio = uBox.w / Math.max(1, uBox.h);
-    const tRatio = tBox.w / Math.max(1, tBox.h);
-    const ratioDiff = Math.max(uRatio / tRatio, tRatio / uRatio);
-
-    if (ratioDiff > 2.15) {
-      fb.className = 'feedback-bar err';
-      fb.innerText = '❌ Не совпадают пропорции. Попробуй написать ещё раз' + (blindMode ? ' (или нажми 👁 Подсказка).' : '.');
-      return;
+    try {
+      const cands = await recognizeKoreanStrokes(strokes, W, H);
+      const top = cands.slice(0, 4).map(clean);
+      if (top.includes(target)) {
+        fb.className = 'feedback-bar ok';
+        fb.innerText = `🔥 Идеально! Распознано: «${item.kr}» ${item.tr || ''}`;
+        playAudio(item.file, item.kr);
+        if (onSuccess) onSuccess();
+      } else {
+        const readAs = cands[0] || '?';
+        fb.className = 'feedback-bar err';
+        fb.innerText = blindMode
+          ? `❌ Система прочитала это как «${readAs}». Проверь буквы и попробуй ещё раз!`
+          : `❌ Система прочитала это как «${readAs}», а нужно «${item.kr}». Сотри и напиши точнее!`;
+        if (onFail) onFail();
+      }
+    } catch (err) {
+      const ok = fallbackSectorCheck(inkC, item.kr, FONT, W, H);
+      if (ok) {
+        fb.className = 'feedback-bar ok';
+        fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr || ''}`;
+        playAudio(item.file, item.kr);
+        if (onSuccess) onSuccess();
+      } else {
+        fb.className = 'feedback-bar err';
+        fb.innerText = '❌ Не совсем похоже. Сотри и попробуй написать аккуратнее!';
+        if (onFail) onFail();
+      }
+    } finally {
+      checkBtn.disabled = false;
+      checkBtn.innerText = '✅ Проверить';
     }
-
-    const N = 64;
-    const uBin = normalizeToGrid(inkC, uBox, N, 6);
-    const tBin = normalizeToGrid(tCanvas, tBox, N, 6);
-    const uDil = dilateGrid(uBin, N, 4);
-    const tDil = dilateGrid(tBin, N, 4);
-
-    let tTotal = 0, tHit = 0, uTotal = 0, uHit = 0;
-    for (let i = 0; i < N * N; i++) {
-      if (tBin[i]) { tTotal++; if (uDil[i]) tHit++; }
-      if (uBin[i]) { uTotal++; if (tDil[i]) uHit++; }
-    }
-
-    const coverage = tTotal ? tHit / tTotal : 0;
-    const precision = uTotal ? uHit / uTotal : 0;
-
-    if (coverage < 0.52 || precision < 0.50) {
-      fb.className = 'feedback-bar err';
-      fb.innerText = '❌ Пока не похоже на «' + (blindMode ? item.ru : item.kr) + '». Нажми «Стереть» и попробуй снова!';
-      return;
-    }
-
-    const score = Math.min(99, Math.round((coverage * 0.55 + precision * 0.45) * 100));
-    fb.className = 'feedback-bar ok';
-    fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr} • Точность: ${score}%`;
-    playAudio(item.file, item.kr);
-    if (onSuccess) onSuccess(score);
   };
 }
 
 /* ====== ЭКРАН ПРОПИСЕЙ ====== */
 let drawCat = 'letters', drawBlind = true, curDrawIdx = 0;
 
-function openDrawTrainer() {
-  switchTab('draw');
-  renderDrawTrainer();
-}
+function openDrawTrainer() { switchTab('draw'); renderDrawTrainer(); }
 function setDrawCat(cat) {
   drawCat = cat; curDrawIdx = 0;
   document.getElementById('cat-letters').classList.toggle('active', cat === 'letters');
@@ -592,10 +596,7 @@ function renderDrawTrainer() {
 
   mountDrawWidget(widgetWrap, item, drawBlind, () => {
     if (!st.drawn.includes(item.kr)) {
-      st.drawn.push(item.kr);
-      st.coins += 5;
-      st.xp += 10;
-      save();
+      st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save();
       sel.children[curDrawIdx].classList.add('done');
       sel.children[curDrawIdx].innerText = '✅ ' + item.kr;
     }
@@ -652,15 +653,19 @@ function renderStep() {
   const s = queue[qIdx];
   if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
 
+  // 1. ПРОПИСИ ВНУТРИ УРОКА
   if (s.type === 'draw') {
     const wrap = document.createElement('div');
     const nextBtn = document.createElement('button');
     nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
     nextBtn.onclick = nextStep;
     body.append(wrap, nextBtn);
-    mountDrawWidget(wrap, s, !!s.blind, () => { nextBtn.style.display = 'block'; });
+    mountDrawWidget(wrap, s, s.blind !== false, () => { nextBtn.style.display = 'block'; }, () => {
+      if (!stepFailed) { stepFailed = true; mistakes++; }
+    });
   }
 
+  // 2. ТЕОРИЯ
   if (s.type === 'theory') {
     const wrap = document.createElement('div');
     wrap.className = 'card-box';
@@ -682,25 +687,28 @@ function renderStep() {
     body.appendChild(btn);
   }
 
+  // 3. ВЫБОР И АУДИРОВАНИЕ
   if (s.type === 'choice' || s.type === 'listen') {
     const prompt = document.createElement('div');
     prompt.className = 'prompt-word';
     if (s.type === 'listen') {
-      prompt.innerHTML = `<div style="font-size:13px;color:var(--muted);margin-bottom:6px">Аудирование • Нажми и слушай</div>`;
-      const lb = document.createElement('button');
-      lb.className = 'big-listen-btn'; lb.innerText = '🔊';
-      lb.onclick = () => playAudio(s.file, s.kr);
-      prompt.appendChild(lb);
+      prompt.innerHTML = `<div style="font-size:13px;color:var(--muted);margin-bottom:4px">Аудирование • Нажми и слушай</div>`;
+      const row = document.createElement('div'); row.className = 'listen-row';
+      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊';
+      lb.onclick = () => playAudio(s.file, s.kr, 1.0);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢';
+      sb.onclick = () => playAudio(s.file, s.kr, 0.72);
+      row.append(lb, sb);
+      prompt.appendChild(row);
       const rev = document.createElement('div');
       rev.id = 'listen-reveal'; rev.className = 'big-tr'; rev.style.visibility = 'hidden';
       rev.innerText = s.kr + ' ' + (s.tr || '');
       prompt.appendChild(rev);
-      setTimeout(() => playAudio(s.file, s.kr), 250);
+      setTimeout(() => playAudio(s.file, s.kr, 1.0), 250);
     } else {
       prompt.innerHTML = `<div class="big-kr">${s.kr}</div><div class="big-tr">${s.tr || ''}</div>`;
-      const ab = document.createElement('button');
-      ab.className = 'audio-pill'; ab.innerText = '🔊 Послушать';
-      ab.onclick = () => playAudio(s.file, s.kr);
+      const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Послушать';
+      ab.onclick = () => playAudio(s.file, s.kr, 1.0);
       prompt.appendChild(ab);
     }
     body.appendChild(prompt);
@@ -741,6 +749,7 @@ function renderStep() {
     body.append(optsWrap, fb, nextBtn);
   }
 
+  // 4. ПАРЫ
   if (s.type === 'match') {
     const h = document.createElement('h3');
     h.style.cssText = 'margin:0 0 14px;font-size:16px'; h.innerText = s.q || 'Соедини пары (корейский → значение)';
@@ -808,15 +817,29 @@ function renderStep() {
     body.append(grid, fb, nextBtn);
   }
 
-  if (s.type === 'build') {
+  // 5. СБОРКА СЛОВ/ПРЕДЛОЖЕНИЙ (ОБЫЧНАЯ И НА СЛУХ КАК В DUOLINGO)
+  if (s.type === 'build' || s.type === 'listen_build') {
     buildAns = [];
+    const isListen = s.type === 'listen_build';
     const prompt = document.createElement('div');
     prompt.className = 'prompt-word'; prompt.style.padding = '16px';
-    prompt.innerHTML = `<div style="font-size:16px;font-weight:700">${s.q}</div>`;
-    const ab = document.createElement('button');
-    ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом';
-    ab.onclick = () => playAudio(s.file, s.audioText);
-    prompt.appendChild(ab);
+
+    if (isListen) {
+      prompt.innerHTML = `<div style="font-size:15px;font-weight:700;margin-bottom:4px">🎧 ${s.q || 'Послушай и собери фразу'}</div>`;
+      const row = document.createElement('div'); row.className = 'listen-row';
+      const lb = document.createElement('button'); lb.className = 'big-listen-btn'; lb.innerText = '🔊';
+      lb.onclick = () => playAudio(s.file, s.audioText, 1.0);
+      const sb = document.createElement('button'); sb.className = 'slow-listen-btn'; sb.innerText = '🐢';
+      sb.onclick = () => playAudio(s.file, s.audioText, 0.72);
+      row.append(lb, sb);
+      prompt.appendChild(row);
+      setTimeout(() => playAudio(s.file, s.audioText, 1.0), 250);
+    } else {
+      prompt.innerHTML = `<div style="font-size:16px;font-weight:700">${s.q}</div>`;
+      const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом';
+      ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
+      prompt.appendChild(ab);
+    }
 
     const slots = document.createElement('div'); slots.className = 'build-slots';
     const pool = document.createElement('div'); pool.className = 'build-pool';
@@ -826,7 +849,7 @@ function renderStep() {
     nextBtn.onclick = nextStep;
 
     const renderBuild = () => {
-      slots.innerHTML = buildAns.length ? '' : '<span style="color:var(--muted);font-size:13px">Нажимай на слоги ниже</span>';
+      slots.innerHTML = buildAns.length ? '' : '<span style="color:var(--muted);font-size:13px">Нажимай на блоки ниже</span>';
       buildAns.forEach((item, pos) => {
         const c = document.createElement('button'); c.className = 'chip in-slot'; c.innerText = item.val;
         c.onclick = () => { buildAns.splice(pos, 1); renderBuild(); };
@@ -845,9 +868,9 @@ function renderStep() {
       if (buildAns.map(a => a.val).join('') === s.answer.join('')) {
         fb.className = 'feedback-bar ok'; fb.innerText = '✅ ' + s.explain;
         checkBtn.style.display = 'none'; nextBtn.style.display = 'block';
-        playAudio(s.file, s.audioText);
+        playAudio(s.file, s.audioText, 1.0);
       } else {
-        fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем так! Попробуй переставить слоги.';
+        fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем так! Послушай ещё раз и переставь блоки.';
         if (!stepFailed) { stepFailed = true; mistakes++; queue.push({ ...s, isRetry: true }); }
       }
     };
