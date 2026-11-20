@@ -26,12 +26,14 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.module-banner { background: linear-gradient(135deg, #2d144d, #4d1344); border: 1px solid rgba(255,46,147,0.4); border-radius: 20px; padding: 18px; margin-bottom: 18px; }
+.module-banner { background: linear-gradient(135deg, #2d144d, #4d1344); border: 1px solid rgba(255,46,147,0.4); border-radius: 20px; padding: 18px; margin-bottom: 14px; }
 .module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.14); padding: 4px 10px; border-radius: 10px; margin-bottom: 8px; color: #ff99d6; }
 .module-banner h2 { margin: 0 0 6px; font-size: 20px; }
 .module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
 .bar-bg { background: rgba(0,0,0,0.35); height: 8px; border-radius: 8px; overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.35s ease; }
+
+.trainer-banner { background: linear-gradient(135deg, #162447, #2b174a); border: 1px solid rgba(0,229,255,0.4); border-radius: 18px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
 .lesson-card { background: var(--surface); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; }
 .lesson-card.done { border-color: rgba(0,230,118,0.45); }
@@ -43,6 +45,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .btn:active { transform: scale(0.96); }
 .btn.full { width: 100%; padding: 15px; font-size: 15px; }
 .btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); }
+.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); }
 .btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; }
 
 .study-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -89,6 +92,19 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .chip.used { opacity: 0.25; pointer-events: none; }
 .chip.in-slot { background: rgba(138,43,226,0.35); border-color: var(--purple); }
 
+/* Drawing / Propisi */
+.draw-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.draw-meta-title { font-size: 18px; font-weight: 800; color: #ff85cb; }
+.draw-hint { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.draw-stage { position: relative; width: 270px; height: 270px; margin: 0 auto 14px; border-radius: 22px; background: #141022; border: 2px solid rgba(138,43,226,0.55); box-shadow: inset 0 0 28px rgba(0,0,0,0.55), 0 0 20px rgba(138,43,226,0.18); overflow: hidden; touch-action: none; }
+.draw-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
+.draw-controls { display: flex; gap: 10px; margin-bottom: 12px; }
+.draw-controls .btn { flex: 1; padding: 13px; }
+.draw-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+.char-pill { min-width: 48px; height: 48px; border-radius: 14px; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+.char-pill.active { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
+.char-pill.done { border-color: var(--success); color: var(--success); }
+
 .feedback-bar { padding: 13px 15px; border-radius: 14px; margin-bottom: 14px; font-size: 13px; font-weight: 600; display: none; line-height: 1.4; }
 .feedback-bar.ok { display: block; background: rgba(0,230,118,0.15); border: 1px solid var(--success); color: #9effc7; }
 .feedback-bar.err { display: block; background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: #ffb3ba; }
@@ -128,6 +144,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   </div>
 </div>
 
+<!-- LESSONS -->
 <div id="screen-lessons" class="screen active">
   <div class="module-banner">
     <div class="module-tag">Блок 1 • Полный Хангыль (TOPIK 0→1)</div>
@@ -135,9 +152,29 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
     <p>Длинные глубокие уроки: произношение, аудирование, пары, сборка слов и работа над ошибками.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
+
+  <div class="trainer-banner">
+    <div>
+      <div class="l-title">✍️ Прописи Хангыля</div>
+      <div class="l-meta">Рисуй буквы пальцем и получай +5 🎤</div>
+    </div>
+    <button class="btn cyan" onclick="openDrawTrainer()">Писать</button>
+  </div>
+
   <div id="lessons-list"></div>
 </div>
 
+<!-- DRAW TRAINER -->
+<div id="screen-draw" class="screen">
+  <div class="study-top">
+    <button class="close-btn" onclick="switchTab('lessons')">←</button>
+    <div style="font-weight:800;font-size:17px">✍️ Прописи Хангыля</div>
+  </div>
+  <div class="draw-selector" id="draw-selector"></div>
+  <div id="draw-trainer-body"></div>
+</div>
+
+<!-- STUDY -->
 <div id="screen-study" class="screen">
   <div class="study-top">
     <button class="close-btn" onclick="switchTab('lessons')">✕</button>
@@ -147,6 +184,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div id="study-body"></div>
 </div>
 
+<!-- BINDER -->
 <div id="screen-binder" class="screen">
   <h3 style="margin:0 0 12px">🃏 Витрина и Альбомы</h3>
   <div class="tabs-row">
@@ -158,6 +196,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="binder-grid" id="binder-grid"></div>
 </div>
 
+<!-- SHOP -->
 <div id="screen-shop" class="screen">
   <h3 style="margin:0 0 14px">🛍 Магазин агентства</h3>
   <div class="shop-item vip">
@@ -170,6 +209,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   </div>
 </div>
 
+<!-- RANK -->
 <div id="screen-rank" class="screen">
   <div class="league-card">
     <div class="module-tag">Недельный зачёт • Лига Трейни</div>
@@ -186,9 +226,14 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
 </div>
 
-<script src="lessons.js"></script>
+<script src="lessons.js?v=3"></script>
 <script>
-if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
+if (window.Telegram && window.Telegram.WebApp) {
+  window.Telegram.WebApp.expand();
+  if (window.Telegram.WebApp.disableVerticalSwipes) {
+    window.Telegram.WebApp.disableVerticalSwipes();
+  }
+}
 
 const CARDS = [
   { id: 1, album: "trainee", name: "Чиби-Стажёр Мина", role: "Вокал • Зал практики", r: "R", art: "🎧" },
@@ -199,8 +244,29 @@ const CARDS = [
   { id: 6, album: "debut", name: "Золотой Лайтстик", role: "Секретная карта", r: "SSR", art: "👑" }
 ];
 
-let st = { coins: 50, xp: 0, done: [], cards: [] };
-try { const s = localStorage.getItem('kp_lingua_v4'); if (s) st = JSON.parse(s); } catch (e) {}
+const DRAW_ITEMS = [
+  { kr: "아", tr: "[а]", hint: "1) Круг ㅇ против часовой • 2) Палочка сверху вниз • 3) Короткая вправо", file: "audio/a.mp3" },
+  { kr: "어", tr: "[о] открытое", hint: "1) Круг ㅇ • 2) Короткая влево-вправо • 3) Вертикальная сверху вниз", file: "audio/eo.mp3" },
+  { kr: "오", tr: "[о] трубочкой", hint: "1) Круг ㅇ сверху • 2) Короткая сверху вниз • 3) Горизонталь слева направо", file: "audio/o.mp3" },
+  { kr: "우", tr: "[у]", hint: "1) Круг ㅇ сверху • 2) Горизонталь слева направо • 3) Короткая вниз", file: "audio/u.mp3" },
+  { kr: "으", tr: "[ы]", hint: "1) Круг ㅇ сверху • 2) Ровная линия слева направо", file: "audio/eu.mp3" },
+  { kr: "이", tr: "[и]", hint: "1) Круг ㅇ слева • 2) Ровная вертикальная сверху вниз", file: "audio/i.mp3" },
+  { kr: "가", tr: "[ка / га]", hint: "ㄱ пишется одним движением: вправо и сразу вниз, затем ㅏ", file: "audio/ga.mp3" },
+  { kr: "나", tr: "[на]", hint: "ㄴ одним движением: вниз и сразу вправо, затем ㅏ", file: "audio/na.mp3" },
+  { kr: "다", tr: "[та / да]", hint: "ㄷ: верхняя черта слева направо, потом углом вниз-вправо", file: "audio/da.mp3" },
+  { kr: "라", tr: "[ра / ла]", hint: "ㄹ: три шага — верхний угол, середина вправо, нижний угол", file: "audio/ra.mp3" },
+  { kr: "마", tr: "[ма]", hint: "ㅁ: левая стенка вниз → верх+право → закрыть снизу", file: "audio/ma.mp3" },
+  { kr: "바", tr: "[па / ба]", hint: "ㅂ: две вертикали вниз → середина → низ", file: "audio/ba.mp3" },
+  { kr: "사", tr: "[са]", hint: "ㅅ: наклонная влево вниз, затем опора вправо вниз", file: "audio/sa.mp3" },
+  { kr: "자", tr: "[ча / джа]", hint: "ㅈ: горизонтальная крыша, потом как ㅅ вниз", file: "audio/ja.mp3" },
+  { kr: "하", tr: "[ха]", hint: "ㅎ: маленькая точка/черта → длинная черта → круг ㅇ снизу", file: "audio/ha.mp3" }
+];
+
+let st = { coins: 50, xp: 0, done: [], cards: [], drawn: [] };
+try {
+  const s = localStorage.getItem('kp_lingua_v4');
+  if (s) { st = JSON.parse(s); if (!st.drawn) st.drawn = []; }
+} catch (e) {}
 
 function save() {
   try { localStorage.setItem('kp_lingua_v4', JSON.stringify(st)); } catch (e) {}
@@ -237,9 +303,222 @@ function switchTab(t) {
   if (t === 'rank') renderRank();
 }
 
+/* ====== ВИДЖЕТ ПРОПИСЕЙ (CANVAS + ПРОВЕРКА КОНТУРА) ====== */
+function mountDrawWidget(container, item, onSuccess) {
+  const SIZE = 270;
+  const FONT = 'bold 175px -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+
+  container.innerHTML = `
+    <div class="card-box" style="padding:16px">
+      <div class="draw-header">
+        <div>
+          <div class="draw-meta-title">Напиши: ${item.kr} <span style="color:var(--cyan)">${item.tr || ''}</span></div>
+          <div class="draw-hint">${item.hint || 'Пиши слева направо и сверху вниз'}</div>
+        </div>
+        <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0" id="dw-audio">🔊</button>
+      </div>
+      <div class="draw-stage">
+        <canvas id="dw-guide" width="${SIZE}" height="${SIZE}"></canvas>
+        <canvas id="dw-ink" width="${SIZE}" height="${SIZE}"></canvas>
+      </div>
+      <div class="draw-controls">
+        <button class="btn ghost" id="dw-clear">🧹 Стереть</button>
+        <button class="btn" id="dw-check">✅ Проверить</button>
+      </div>
+      <div id="dw-fb" class="feedback-bar" style="margin-bottom:0"></div>
+    </div>
+  `;
+
+  document.getElementById('dw-audio').onclick = () => playAudio(item.file, item.kr);
+
+  const guideC = document.getElementById('dw-guide');
+  const gCtx = guideC.getContext('2d');
+  const inkC = document.getElementById('dw-ink');
+  const iCtx = inkC.getContext('2d');
+
+  // Сетка и полупрозрачный трафарет
+  gCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+  gCtx.setLineDash([6, 6]);
+  gCtx.lineWidth = 1.5;
+  gCtx.beginPath();
+  gCtx.moveTo(SIZE / 2, 0); gCtx.lineTo(SIZE / 2, SIZE);
+  gCtx.moveTo(0, SIZE / 2); gCtx.lineTo(SIZE, SIZE / 2);
+  gCtx.stroke();
+
+  gCtx.setLineDash([]);
+  gCtx.font = FONT;
+  gCtx.textAlign = 'center';
+  gCtx.textBaseline = 'middle';
+  gCtx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+  gCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+
+  // Рисование пальцем / мышью
+  let drawing = false, lastX = 0, lastY = 0;
+  iCtx.strokeStyle = '#ff2e93';
+  iCtx.lineWidth = 22;
+  iCtx.lineCap = 'round';
+  iCtx.lineJoin = 'round';
+  iCtx.shadowColor = 'rgba(255, 46, 147, 0.7)';
+  iCtx.shadowBlur = 8;
+
+  const getPos = (e) => {
+    const r = inkC.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * (SIZE / r.width),
+      y: (e.clientY - r.top) * (SIZE / r.height)
+    };
+  };
+
+  inkC.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    inkC.setPointerCapture(e.pointerId);
+    drawing = true;
+    const p = getPos(e);
+    lastX = p.x; lastY = p.y;
+    iCtx.beginPath();
+    iCtx.moveTo(p.x, p.y);
+    iCtx.lineTo(p.x + 0.1, p.y + 0.1);
+    iCtx.stroke();
+  });
+
+  inkC.addEventListener('pointermove', (e) => {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    iCtx.beginPath();
+    iCtx.moveTo(lastX, lastY);
+    iCtx.lineTo(p.x, p.y);
+    iCtx.stroke();
+    lastX = p.x; lastY = p.y;
+  });
+
+  const endDraw = () => { drawing = false; };
+  inkC.addEventListener('pointerup', endDraw);
+  inkC.addEventListener('pointercancel', endDraw);
+
+  const fb = document.getElementById('dw-fb');
+  document.getElementById('dw-clear').onclick = () => {
+    iCtx.clearRect(0, 0, SIZE, SIZE);
+    fb.className = 'feedback-bar';
+  };
+
+  // Умная проверка контура
+  document.getElementById('dw-check').onclick = () => {
+    const maskC = document.createElement('canvas');
+    maskC.width = SIZE; maskC.height = SIZE;
+    const mCtx = maskC.getContext('2d');
+    mCtx.font = FONT; mCtx.textAlign = 'center'; mCtx.textBaseline = 'middle';
+    mCtx.fillStyle = '#fff';
+    mCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+
+    const tolC = document.createElement('canvas');
+    tolC.width = SIZE; tolC.height = SIZE;
+    const tCtx = tolC.getContext('2d');
+    tCtx.font = FONT; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
+    tCtx.lineWidth = 34; tCtx.lineJoin = 'round';
+    tCtx.strokeStyle = '#fff'; tCtx.fillStyle = '#fff';
+    tCtx.strokeText(item.kr, SIZE / 2, SIZE / 2 + 8);
+    tCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+
+    const mData = mCtx.getImageData(0, 0, SIZE, SIZE).data;
+    const tData = tCtx.getImageData(0, 0, SIZE, SIZE).data;
+    const uData = iCtx.getImageData(0, 0, SIZE, SIZE).data;
+
+    let targetPx = 0, coveredPx = 0, userPx = 0, insideTolPx = 0;
+    for (let i = 3; i < mData.length; i += 4) {
+      const isTarget = mData[i] > 60;
+      const isTol = tData[i] > 60;
+      const isUser = uData[i] > 60;
+      if (isTarget) {
+        targetPx++;
+        if (isUser) coveredPx++;
+      }
+      if (isUser) {
+        userPx++;
+        if (isTol) insideTolPx++;
+      }
+    }
+
+    if (userPx < 200) {
+      fb.className = 'feedback-bar err';
+      fb.innerText = '✍️ Сначала обведи букву пальцем по трафарету!';
+      return;
+    }
+
+    const coverage = targetPx ? coveredPx / targetPx : 0;
+    const precision = userPx ? insideTolPx / userPx : 0;
+
+    if (precision < 0.45) {
+      fb.className = 'feedback-bar err';
+      fb.innerText = '❌ Много линий мимо контура. Нажми «Стереть» и обведи аккуратнее!';
+      return;
+    }
+
+    if (coverage < 0.48) {
+      fb.className = 'feedback-bar err';
+      fb.innerText = '✍️ Почти готово! Ты пропустил часть черты — допиши её.';
+      return;
+    }
+
+    const score = Math.min(99, Math.round((coverage * 0.6 + precision * 0.4) * 100));
+    fb.className = 'feedback-bar ok';
+    fb.innerText = '🔥 Отлично написано! Аккуратность: ' + score + '%';
+    playAudio(item.file, item.kr);
+    if (onSuccess) onSuccess(score);
+  };
+}
+
+/* ====== ЭКРАН ТРЕНАЖЁРА ПРОПИСЕЙ ====== */
+let curDrawIdx = 0;
+function openDrawTrainer() {
+  switchTab('draw');
+  renderDrawTrainer();
+}
+
+function renderDrawTrainer() {
+  const sel = document.getElementById('draw-selector');
+  sel.innerHTML = '';
+  DRAW_ITEMS.forEach((it, idx) => {
+    const b = document.createElement('button');
+    const isDone = st.drawn.includes(it.kr);
+    b.className = 'char-pill' + (idx === curDrawIdx ? ' active' : '') + (isDone ? ' done' : '');
+    b.innerText = it.kr;
+    b.onclick = () => { curDrawIdx = idx; renderDrawTrainer(); };
+    sel.appendChild(b);
+  });
+
+  const body = document.getElementById('draw-trainer-body');
+  const item = DRAW_ITEMS[curDrawIdx];
+  const widgetWrap = document.createElement('div');
+  body.innerHTML = '';
+  body.appendChild(widgetWrap);
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn full cyan';
+  nextBtn.style.display = 'none';
+  nextBtn.innerText = curDrawIdx < DRAW_ITEMS.length - 1 ? 'Следующая буква →' : '🎉 Все буквы пройдены! В меню';
+  nextBtn.onclick = () => {
+    if (curDrawIdx < DRAW_ITEMS.length - 1) { curDrawIdx++; renderDrawTrainer(); }
+    else switchTab('lessons');
+  };
+  body.appendChild(nextBtn);
+
+  mountDrawWidget(widgetWrap, item, () => {
+    if (!st.drawn.includes(item.kr)) {
+      st.drawn.push(item.kr);
+      st.coins += 5;
+      st.xp += 10;
+      save();
+      sel.children[curDrawIdx].classList.add('done');
+    }
+    nextBtn.style.display = 'block';
+  });
+}
+
+/* ====== ЭКРАН УРОКОВ ====== */
 function renderLessons() {
   if (typeof LESSONS === 'undefined') {
-    document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>. Положи его рядом с index.html на GitHub!</div>';
+    document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>.</div>';
     return;
   }
   const pct = Math.round((st.done.length / LESSONS.length) * 100);
@@ -260,6 +539,7 @@ function renderLessons() {
   });
 }
 
+/* ====== ДВИЖОК УРОКОВ ====== */
 let curL = null, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
 
 function startLesson(id) {
@@ -283,6 +563,15 @@ function renderStep() {
   if (qIdx >= total) return finishLesson();
   const s = queue[qIdx];
   if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
+
+  if (s.type === 'draw') {
+    const wrap = document.createElement('div');
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
+    nextBtn.onclick = nextStep;
+    body.append(wrap, nextBtn);
+    mountDrawWidget(wrap, s, () => { nextBtn.style.display = 'block'; });
+  }
 
   if (s.type === 'theory') {
     const wrap = document.createElement('div');
