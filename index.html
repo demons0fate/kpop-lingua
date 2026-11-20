@@ -44,7 +44,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 18px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; }
 .btn:active { transform: scale(0.96); }
 .btn.full { width: 100%; padding: 15px; font-size: 15px; }
-.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); }
+.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); }
 .btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); }
 .btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; }
 
@@ -92,16 +92,20 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .chip.used { opacity: 0.25; pointer-events: none; }
 .chip.in-slot { background: rgba(138,43,226,0.35); border-color: var(--purple); }
 
-/* Drawing / Propisi */
-.draw-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.draw-meta-title { font-size: 18px; font-weight: 800; color: #ff85cb; }
-.draw-hint { font-size: 13px; color: var(--muted); margin-top: 2px; }
-.draw-stage { position: relative; width: 270px; height: 270px; margin: 0 auto 14px; border-radius: 22px; background: #141022; border: 2px solid rgba(138,43,226,0.55); box-shadow: inset 0 0 28px rgba(0,0,0,0.55), 0 0 20px rgba(138,43,226,0.18); overflow: hidden; touch-action: none; }
+/* Drawing / Propisi (Free Slate Canvas) */
+.mode-switch { display: flex; background: var(--surface); border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); }
+.mode-btn { flex: 1; border: none; background: transparent; color: var(--muted); padding: 9px 6px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.mode-btn.active { background: var(--surface-2); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+
+.draw-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.draw-meta-title { font-size: 17px; font-weight: 800; color: #fff; }
+.draw-hint { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.draw-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; min-height: 250px; margin: 0 auto 14px; border-radius: 20px; background: #2c2d38; border: 2px solid rgba(255,255,255,0.14); box-shadow: inset 0 0 24px rgba(0,0,0,0.35); overflow: hidden; touch-action: none; }
 .draw-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
-.draw-controls { display: flex; gap: 10px; margin-bottom: 12px; }
-.draw-controls .btn { flex: 1; padding: 13px; }
-.draw-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
-.char-pill { min-width: 48px; height: 48px; border-radius: 14px; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+.draw-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+.draw-controls .btn { flex: 1; padding: 12px 10px; font-size: 13px; }
+.draw-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
+.char-pill { min-width: 46px; height: 42px; padding: 0 12px; border-radius: 12px; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
 .char-pill.active { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
 .char-pill.done { border-color: var(--success); color: var(--success); }
 
@@ -155,8 +159,8 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
   <div class="trainer-banner">
     <div>
-      <div class="l-title">✍️ Прописи Хангыля</div>
-      <div class="l-meta">Рисуй буквы пальцем и получай +5 🎤</div>
+      <div class="l-title">✍️ Прописи и Диктант</div>
+      <div class="l-meta">Пиши буквы и слова на слух • +5 🎤</div>
     </div>
     <button class="btn cyan" onclick="openDrawTrainer()">Писать</button>
   </div>
@@ -168,8 +172,19 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 <div id="screen-draw" class="screen">
   <div class="study-top">
     <button class="close-btn" onclick="switchTab('lessons')">←</button>
-    <div style="font-weight:800;font-size:17px">✍️ Прописи Хангыля</div>
+    <div style="font-weight:800;font-size:17px">✍️ Прописи и Диктант</div>
   </div>
+
+  <div class="mode-switch">
+    <button class="mode-btn active" id="cat-letters" onclick="setDrawCat('letters')">Буквы (12)</button>
+    <button class="mode-btn" id="cat-words" onclick="setDrawCat('words')">Слова K-Pop (8)</button>
+  </div>
+
+  <div class="mode-switch">
+    <button class="mode-btn active" id="mode-blind" onclick="setDrawBlind(true)">🎧 На слух (чистый экран)</button>
+    <button class="mode-btn" id="mode-guide" onclick="setDrawBlind(false)">📝 С трафаретом</button>
+  </div>
+
   <div class="draw-selector" id="draw-selector"></div>
   <div id="draw-trainer-body"></div>
 </div>
@@ -226,7 +241,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
 </div>
 
-<script src="lessons.js?v=3"></script>
+<script src="lessons.js?v=4"></script>
 <script>
 if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.expand();
@@ -244,23 +259,32 @@ const CARDS = [
   { id: 6, album: "debut", name: "Золотой Лайтстик", role: "Секретная карта", r: "SSR", art: "👑" }
 ];
 
-const DRAW_ITEMS = [
-  { kr: "아", tr: "[а]", hint: "1) Круг ㅇ против часовой • 2) Палочка сверху вниз • 3) Короткая вправо", file: "audio/a.mp3" },
-  { kr: "어", tr: "[о] открытое", hint: "1) Круг ㅇ • 2) Короткая влево-вправо • 3) Вертикальная сверху вниз", file: "audio/eo.mp3" },
-  { kr: "오", tr: "[о] трубочкой", hint: "1) Круг ㅇ сверху • 2) Короткая сверху вниз • 3) Горизонталь слева направо", file: "audio/o.mp3" },
-  { kr: "우", tr: "[у]", hint: "1) Круг ㅇ сверху • 2) Горизонталь слева направо • 3) Короткая вниз", file: "audio/u.mp3" },
-  { kr: "으", tr: "[ы]", hint: "1) Круг ㅇ сверху • 2) Ровная линия слева направо", file: "audio/eu.mp3" },
-  { kr: "이", tr: "[и]", hint: "1) Круг ㅇ слева • 2) Ровная вертикальная сверху вниз", file: "audio/i.mp3" },
-  { kr: "가", tr: "[ка / га]", hint: "ㄱ пишется одним движением: вправо и сразу вниз, затем ㅏ", file: "audio/ga.mp3" },
-  { kr: "나", tr: "[на]", hint: "ㄴ одним движением: вниз и сразу вправо, затем ㅏ", file: "audio/na.mp3" },
-  { kr: "다", tr: "[та / да]", hint: "ㄷ: верхняя черта слева направо, потом углом вниз-вправо", file: "audio/da.mp3" },
-  { kr: "라", tr: "[ра / ла]", hint: "ㄹ: три шага — верхний угол, середина вправо, нижний угол", file: "audio/ra.mp3" },
-  { kr: "마", tr: "[ма]", hint: "ㅁ: левая стенка вниз → верх+право → закрыть снизу", file: "audio/ma.mp3" },
-  { kr: "바", tr: "[па / ба]", hint: "ㅂ: две вертикали вниз → середина → низ", file: "audio/ba.mp3" },
-  { kr: "사", tr: "[са]", hint: "ㅅ: наклонная влево вниз, затем опора вправо вниз", file: "audio/sa.mp3" },
-  { kr: "자", tr: "[ча / джа]", hint: "ㅈ: горизонтальная крыша, потом как ㅅ вниз", file: "audio/ja.mp3" },
-  { kr: "하", tr: "[ха]", hint: "ㅎ: маленькая точка/черта → длинная черта → круг ㅇ снизу", file: "audio/ha.mp3" }
-];
+const DRAW_DATA = {
+  letters: [
+    { kr: "아", tr: "[а]", ru: "Звук [а]", file: "audio/a.mp3" },
+    { kr: "어", tr: "[о] открытое", ru: "Открытое [о]", file: "audio/eo.mp3" },
+    { kr: "오", tr: "[о] округлое", ru: "Округлое [о]", file: "audio/o.mp3" },
+    { kr: "우", tr: "[у]", ru: "Звук [у]", file: "audio/u.mp3" },
+    { kr: "으", tr: "[ы]", ru: "Звук [ы]", file: "audio/eu.mp3" },
+    { kr: "이", tr: "[и]", ru: "Звук [и]", file: "audio/i.mp3" },
+    { kr: "가", tr: "[ка / га]", ru: "Слог [ка]", file: "audio/ga.mp3" },
+    { kr: "나", tr: "[на]", ru: "Слог [на] («Я»)", file: "audio/na.mp3" },
+    { kr: "다", tr: "[та / да]", ru: "Слог [та]", file: "audio/da.mp3" },
+    { kr: "라", tr: "[ра / ла]", ru: "Слог [ра]", file: "audio/ra.mp3" },
+    { kr: "마", tr: "[ма]", ru: "Слог [ма]", file: "audio/ma.mp3" },
+    { kr: "사", tr: "[са]", ru: "Слог [са]", file: "audio/sa.mp3" }
+  ],
+  words: [
+    { kr: "리사", tr: "[Ли-са]", ru: "Имя: Лиса", file: "audio/lisa.mp3" },
+    { kr: "오빠", tr: "[оп-па]", ru: "Слово: Оппа", file: "audio/oppa.mp3" },
+    { kr: "사랑", tr: "[са-ран]", ru: "Слово: Любовь", file: "audio/sarang.mp3" },
+    { kr: "안녕", tr: "[ан-нён]", ru: "Слово: Привет", file: "audio/annyeong.mp3" },
+    { kr: "노래", tr: "[но-рэ]", ru: "Слово: Песня", file: "audio/norae.mp3" },
+    { kr: "가수", tr: "[ка-су]", ru: "Слово: Певец", file: "audio/gasu.mp3" },
+    { kr: "최고", tr: "[чхве-го]", ru: "Слово: Лучший!", file: "audio/choego.mp3" },
+    { kr: "고마워", tr: "[ко-ма-во]", ru: "Слово: Спасибо", file: "audio/gomawo.mp3" }
+  ]
+};
 
 let st = { coins: 50, xp: 0, done: [], cards: [], drawn: [] };
 try {
@@ -303,26 +327,82 @@ function switchTab(t) {
   if (t === 'rank') renderRank();
 }
 
-/* ====== ВИДЖЕТ ПРОПИСЕЙ (CANVAS + ПРОВЕРКА КОНТУРА) ====== */
-function mountDrawWidget(container, item, onSuccess) {
-  const SIZE = 270;
-  const FONT = 'bold 175px -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+/* ====== УМНЫЙ ДВИЖОК РАСПОЗНАВАНИЯ ПО ВСЕМУ ПОЛЮ ====== */
+function getBBox(imgData, w, h) {
+  const d = imgData.data;
+  let minX = w, minY = h, maxX = -1, maxY = -1, count = 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (d[(y * w + x) * 4 + 3] > 35) {
+        count++;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  return { minX, minY, maxX, maxY, w: maxX - minX + 1, h: maxY - minY + 1, count };
+}
+
+function normalizeToGrid(srcCanvas, bbox, N = 64, pad = 6) {
+  const c = document.createElement('canvas');
+  c.width = N; c.height = N;
+  const ctx = c.getContext('2d');
+  const inner = N - pad * 2;
+  const scale = Math.min(inner / bbox.w, inner / bbox.h);
+  const dw = bbox.w * scale;
+  const dh = bbox.h * scale;
+  const dx = (N - dw) / 2;
+  const dy = (N - dh) / 2;
+  ctx.drawImage(srcCanvas, bbox.minX, bbox.minY, bbox.w, bbox.h, dx, dy, dw, dh);
+  const data = ctx.getImageData(0, 0, N, N).data;
+  const bin = new Uint8Array(N * N);
+  for (let i = 0; i < N * N; i++) {
+    if (data[i * 4 + 3] > 30) bin[i] = 1;
+  }
+  return bin;
+}
+
+function dilateGrid(bin, N, r) {
+  const out = new Uint8Array(N * N);
+  for (let y = 0; y < N; y++) {
+    for (let x = 0; x < N; x++) {
+      if (!bin[y * N + x]) continue;
+      const y0 = Math.max(0, y - r), y1 = Math.min(N - 1, y + r);
+      const x0 = Math.max(0, x - r), x1 = Math.min(N - 1, x + r);
+      for (let yy = y0; yy <= y1; yy++) {
+        for (let xx = x0; xx <= x1; xx++) {
+          out[yy * N + xx] = 1;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function mountDrawWidget(container, item, blindMode, onSuccess) {
+  const W = 400, H = 300;
+  const len = item.kr.length;
+  const fontSize = len === 1 ? 155 : (len === 2 ? 115 : 88);
+  const FONT = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif`;
 
   container.innerHTML = `
-    <div class="card-box" style="padding:16px">
+    <div class="card-box" style="padding:15px">
       <div class="draw-header">
         <div>
-          <div class="draw-meta-title">Напиши: ${item.kr} <span style="color:var(--cyan)">${item.tr || ''}</span></div>
-          <div class="draw-hint">${item.hint || 'Пиши слева направо и сверху вниз'}</div>
+          <div class="draw-meta-title">${blindMode ? '🎧 Напиши на слух: ' + (item.ru || item.tr) : '✍️ Напиши: ' + item.kr + ' ' + (item.tr || '')}</div>
+          <div class="draw-hint">${blindMode ? 'Пиши в любом месте серого поля, любого размера' : 'Можно писать в любом месте поля или по трафарету'}</div>
         </div>
-        <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0" id="dw-audio">🔊</button>
+        <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0;width:42px;height:42px;font-size:18px" id="dw-audio">🔊</button>
       </div>
       <div class="draw-stage">
-        <canvas id="dw-guide" width="${SIZE}" height="${SIZE}"></canvas>
-        <canvas id="dw-ink" width="${SIZE}" height="${SIZE}"></canvas>
+        <canvas id="dw-guide" width="${W}" height="${H}"></canvas>
+        <canvas id="dw-ink" width="${W}" height="${H}"></canvas>
       </div>
       <div class="draw-controls">
         <button class="btn ghost" id="dw-clear">🧹 Стереть</button>
+        ${blindMode ? '<button class="btn ghost" id="dw-peek">👁 Подсказка</button>' : ''}
         <button class="btn" id="dw-check">✅ Проверить</button>
       </div>
       <div id="dw-fb" class="feedback-bar" style="margin-bottom:0"></div>
@@ -330,42 +410,45 @@ function mountDrawWidget(container, item, onSuccess) {
   `;
 
   document.getElementById('dw-audio').onclick = () => playAudio(item.file, item.kr);
+  if (blindMode) setTimeout(() => playAudio(item.file, item.kr), 200);
 
   const guideC = document.getElementById('dw-guide');
   const gCtx = guideC.getContext('2d');
   const inkC = document.getElementById('dw-ink');
   const iCtx = inkC.getContext('2d');
 
-  // Сетка и полупрозрачный трафарет
-  gCtx.strokeStyle = 'rgba(255,255,255,0.08)';
-  gCtx.setLineDash([6, 6]);
-  gCtx.lineWidth = 1.5;
-  gCtx.beginPath();
-  gCtx.moveTo(SIZE / 2, 0); gCtx.lineTo(SIZE / 2, SIZE);
-  gCtx.moveTo(0, SIZE / 2); gCtx.lineTo(SIZE, SIZE / 2);
-  gCtx.stroke();
+  const drawGuide = (showGhost) => {
+    gCtx.clearRect(0, 0, W, H);
+    if (showGhost) {
+      gCtx.font = FONT;
+      gCtx.textAlign = 'center';
+      gCtx.textBaseline = 'middle';
+      gCtx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+      gCtx.fillText(item.kr, W / 2, H / 2 + 6);
+    }
+  };
+  drawGuide(!blindMode);
 
-  gCtx.setLineDash([]);
-  gCtx.font = FONT;
-  gCtx.textAlign = 'center';
-  gCtx.textBaseline = 'middle';
-  gCtx.fillStyle = 'rgba(255, 255, 255, 0.16)';
-  gCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+  const peekBtn = document.getElementById('dw-peek');
+  if (peekBtn) {
+    peekBtn.onclick = () => {
+      drawGuide(true);
+      setTimeout(() => drawGuide(false), 1600);
+    };
+  }
 
-  // Рисование пальцем / мышью
+  // Тонкая чёткая линия
   let drawing = false, lastX = 0, lastY = 0;
-  iCtx.strokeStyle = '#ff2e93';
-  iCtx.lineWidth = 22;
+  iCtx.strokeStyle = '#ffffff';
+  iCtx.lineWidth = 7;
   iCtx.lineCap = 'round';
   iCtx.lineJoin = 'round';
-  iCtx.shadowColor = 'rgba(255, 46, 147, 0.7)';
-  iCtx.shadowBlur = 8;
 
   const getPos = (e) => {
     const r = inkC.getBoundingClientRect();
     return {
-      x: (e.clientX - r.left) * (SIZE / r.width),
-      y: (e.clientY - r.top) * (SIZE / r.height)
+      x: (e.clientX - r.left) * (W / r.width),
+      y: (e.clientY - r.top) * (H / r.height)
     };
   };
 
@@ -398,97 +481,101 @@ function mountDrawWidget(container, item, onSuccess) {
 
   const fb = document.getElementById('dw-fb');
   document.getElementById('dw-clear').onclick = () => {
-    iCtx.clearRect(0, 0, SIZE, SIZE);
+    iCtx.clearRect(0, 0, W, H);
     fb.className = 'feedback-bar';
   };
 
-  // Умная проверка контура
+  // Независимая от позиции и размера проверка
   document.getElementById('dw-check').onclick = () => {
-    const maskC = document.createElement('canvas');
-    maskC.width = SIZE; maskC.height = SIZE;
-    const mCtx = maskC.getContext('2d');
-    mCtx.font = FONT; mCtx.textAlign = 'center'; mCtx.textBaseline = 'middle';
-    mCtx.fillStyle = '#fff';
-    mCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+    const uBox = getBBox(iCtx.getImageData(0, 0, W, H), W, H);
+    if (uBox.count < 70 || (uBox.w < 14 && uBox.h < 14)) {
+      fb.className = 'feedback-bar err';
+      fb.innerText = '✍️ Сначала напиши букву или слово на сером поле!';
+      return;
+    }
 
-    const tolC = document.createElement('canvas');
-    tolC.width = SIZE; tolC.height = SIZE;
-    const tCtx = tolC.getContext('2d');
+    const tCanvas = document.createElement('canvas');
+    tCanvas.width = W; tCanvas.height = H;
+    const tCtx = tCanvas.getContext('2d');
     tCtx.font = FONT; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
-    tCtx.lineWidth = 34; tCtx.lineJoin = 'round';
-    tCtx.strokeStyle = '#fff'; tCtx.fillStyle = '#fff';
-    tCtx.strokeText(item.kr, SIZE / 2, SIZE / 2 + 8);
-    tCtx.fillText(item.kr, SIZE / 2, SIZE / 2 + 8);
+    tCtx.fillStyle = '#fff';
+    tCtx.fillText(item.kr, W / 2, H / 2 + 6);
+    const tBox = getBBox(tCtx.getImageData(0, 0, W, H), W, H);
 
-    const mData = mCtx.getImageData(0, 0, SIZE, SIZE).data;
-    const tData = tCtx.getImageData(0, 0, SIZE, SIZE).data;
-    const uData = iCtx.getImageData(0, 0, SIZE, SIZE).data;
+    const uRatio = uBox.w / Math.max(1, uBox.h);
+    const tRatio = tBox.w / Math.max(1, tBox.h);
+    const ratioDiff = Math.max(uRatio / tRatio, tRatio / uRatio);
 
-    let targetPx = 0, coveredPx = 0, userPx = 0, insideTolPx = 0;
-    for (let i = 3; i < mData.length; i += 4) {
-      const isTarget = mData[i] > 60;
-      const isTol = tData[i] > 60;
-      const isUser = uData[i] > 60;
-      if (isTarget) {
-        targetPx++;
-        if (isUser) coveredPx++;
-      }
-      if (isUser) {
-        userPx++;
-        if (isTol) insideTolPx++;
-      }
-    }
-
-    if (userPx < 200) {
+    if (ratioDiff > 2.15) {
       fb.className = 'feedback-bar err';
-      fb.innerText = '✍️ Сначала обведи букву пальцем по трафарету!';
+      fb.innerText = '❌ Не совпадают пропорции. Попробуй написать ещё раз' + (blindMode ? ' (или нажми 👁 Подсказка).' : '.');
       return;
     }
 
-    const coverage = targetPx ? coveredPx / targetPx : 0;
-    const precision = userPx ? insideTolPx / userPx : 0;
+    const N = 64;
+    const uBin = normalizeToGrid(inkC, uBox, N, 6);
+    const tBin = normalizeToGrid(tCanvas, tBox, N, 6);
+    const uDil = dilateGrid(uBin, N, 4);
+    const tDil = dilateGrid(tBin, N, 4);
 
-    if (precision < 0.45) {
+    let tTotal = 0, tHit = 0, uTotal = 0, uHit = 0;
+    for (let i = 0; i < N * N; i++) {
+      if (tBin[i]) { tTotal++; if (uDil[i]) tHit++; }
+      if (uBin[i]) { uTotal++; if (tDil[i]) uHit++; }
+    }
+
+    const coverage = tTotal ? tHit / tTotal : 0;
+    const precision = uTotal ? uHit / uTotal : 0;
+
+    if (coverage < 0.52 || precision < 0.50) {
       fb.className = 'feedback-bar err';
-      fb.innerText = '❌ Много линий мимо контура. Нажми «Стереть» и обведи аккуратнее!';
+      fb.innerText = '❌ Пока не похоже на «' + (blindMode ? item.ru : item.kr) + '». Нажми «Стереть» и попробуй снова!';
       return;
     }
 
-    if (coverage < 0.48) {
-      fb.className = 'feedback-bar err';
-      fb.innerText = '✍️ Почти готово! Ты пропустил часть черты — допиши её.';
-      return;
-    }
-
-    const score = Math.min(99, Math.round((coverage * 0.6 + precision * 0.4) * 100));
+    const score = Math.min(99, Math.round((coverage * 0.55 + precision * 0.45) * 100));
     fb.className = 'feedback-bar ok';
-    fb.innerText = '🔥 Отлично написано! Аккуратность: ' + score + '%';
+    fb.innerText = `🔥 Отлично! Это «${item.kr}» ${item.tr} • Точность: ${score}%`;
     playAudio(item.file, item.kr);
     if (onSuccess) onSuccess(score);
   };
 }
 
-/* ====== ЭКРАН ТРЕНАЖЁРА ПРОПИСЕЙ ====== */
-let curDrawIdx = 0;
+/* ====== ЭКРАН ПРОПИСЕЙ ====== */
+let drawCat = 'letters', drawBlind = true, curDrawIdx = 0;
+
 function openDrawTrainer() {
   switchTab('draw');
   renderDrawTrainer();
 }
+function setDrawCat(cat) {
+  drawCat = cat; curDrawIdx = 0;
+  document.getElementById('cat-letters').classList.toggle('active', cat === 'letters');
+  document.getElementById('cat-words').classList.toggle('active', cat === 'words');
+  renderDrawTrainer();
+}
+function setDrawBlind(val) {
+  drawBlind = val;
+  document.getElementById('mode-blind').classList.toggle('active', val);
+  document.getElementById('mode-guide').classList.toggle('active', !val);
+  renderDrawTrainer();
+}
 
 function renderDrawTrainer() {
+  const list = DRAW_DATA[drawCat];
   const sel = document.getElementById('draw-selector');
   sel.innerHTML = '';
-  DRAW_ITEMS.forEach((it, idx) => {
+  list.forEach((it, idx) => {
     const b = document.createElement('button');
     const isDone = st.drawn.includes(it.kr);
     b.className = 'char-pill' + (idx === curDrawIdx ? ' active' : '') + (isDone ? ' done' : '');
-    b.innerText = it.kr;
+    b.innerText = drawBlind ? (isDone ? '✅ ' + it.kr : '#' + (idx + 1)) : it.kr;
     b.onclick = () => { curDrawIdx = idx; renderDrawTrainer(); };
     sel.appendChild(b);
   });
 
   const body = document.getElementById('draw-trainer-body');
-  const item = DRAW_ITEMS[curDrawIdx];
+  const item = list[curDrawIdx];
   const widgetWrap = document.createElement('div');
   body.innerHTML = '';
   body.appendChild(widgetWrap);
@@ -496,20 +583,21 @@ function renderDrawTrainer() {
   const nextBtn = document.createElement('button');
   nextBtn.className = 'btn full cyan';
   nextBtn.style.display = 'none';
-  nextBtn.innerText = curDrawIdx < DRAW_ITEMS.length - 1 ? 'Следующая буква →' : '🎉 Все буквы пройдены! В меню';
+  nextBtn.innerText = curDrawIdx < list.length - 1 ? 'Следующее задание →' : '🎉 Раздел пройден! В меню';
   nextBtn.onclick = () => {
-    if (curDrawIdx < DRAW_ITEMS.length - 1) { curDrawIdx++; renderDrawTrainer(); }
+    if (curDrawIdx < list.length - 1) { curDrawIdx++; renderDrawTrainer(); }
     else switchTab('lessons');
   };
   body.appendChild(nextBtn);
 
-  mountDrawWidget(widgetWrap, item, () => {
+  mountDrawWidget(widgetWrap, item, drawBlind, () => {
     if (!st.drawn.includes(item.kr)) {
       st.drawn.push(item.kr);
       st.coins += 5;
       st.xp += 10;
       save();
       sel.children[curDrawIdx].classList.add('done');
+      sel.children[curDrawIdx].innerText = '✅ ' + item.kr;
     }
     nextBtn.style.display = 'block';
   });
@@ -570,7 +658,7 @@ function renderStep() {
     nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
     nextBtn.onclick = nextStep;
     body.append(wrap, nextBtn);
-    mountDrawWidget(wrap, s, () => { nextBtn.style.display = 'block'; });
+    mountDrawWidget(wrap, s, !!s.blind, () => { nextBtn.style.display = 'block'; });
   }
 
   if (s.type === 'theory') {
