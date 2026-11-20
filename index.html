@@ -33,15 +33,13 @@ svg { display: block; flex-shrink: 0; }
 .screen.active { display: block; }
 @keyframes screenIn { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-.module-banner { background: linear-gradient(135deg, #2a124a, #4d1143); border: 1px solid rgba(255,46,147,0.4); border-radius: 22px; padding: 18px; margin-bottom: 14px; box-shadow: 0 10px 28px rgba(77,17,67,0.28); }
+.module-banner { background: linear-gradient(135deg, #2a124a, #4d1143); border: 1px solid rgba(255,46,147,0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; box-shadow: 0 10px 28px rgba(77,17,67,0.28); }
 .module-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
 .module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 10px; color: #ff99d6; }
 .module-banner h2 { margin: 0 0 6px; font-size: 20px; }
 .module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
 .bar-bg { background: rgba(0,0,0,0.4); height: 8px; border-radius: 8px; overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.45s var(--spring); }
-
-.trainer-banner { background: linear-gradient(135deg, #132245, #291547); border: 1px solid rgba(0,229,255,0.35); border-radius: 18px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
 .lesson-card { background: var(--surface); border-radius: 18px; padding: 15px 16px; margin-bottom: 11px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; transition: transform 0.2s var(--spring), opacity 0.2s; }
 .lesson-card:active { transform: scale(0.985); }
@@ -124,10 +122,6 @@ svg { display: block; flex-shrink: 0; }
 .draw-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
 .draw-controls { display: flex; gap: 8px; margin-bottom: 12px; }
 .draw-controls .btn { flex: 1; padding: 12px 10px; font-size: 13px; }
-.draw-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
-.char-pill { min-width: 46px; height: 42px; padding: 0 12px; border-radius: 12px; background: var(--surface); border: 1.5px solid rgba(255,255,255,0.1); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
-.char-pill.active { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
-.char-pill.done { border-color: var(--success); color: var(--success); }
 
 /* Vocab & True 3D Flashcards */
 .vocab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -242,14 +236,6 @@ svg { display: block; flex-shrink: 0; }
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
-  <div class="trainer-banner">
-    <div>
-      <div class="l-title">Прописи и Диктант</div>
-      <div class="l-meta">Умное распознавание почерка • +5 микрофонов</div>
-    </div>
-    <button class="btn cyan" onclick="openDrawTrainer()">Писать</button>
-  </div>
-
   <div id="lessons-list"></div>
 </div>
 
@@ -260,28 +246,11 @@ svg { display: block; flex-shrink: 0; }
     <div class="pill energy" id="vocab-count">0 / 0</div>
   </div>
   <div class="mode-switch">
-    <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">Список слов</button>
+    <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">Список</button>
     <button class="mode-btn" id="vmode-cards" onclick="setVocabMode('cards')">3D-Карточки</button>
+    <button class="mode-btn" id="vmode-dict" onclick="setVocabMode('dict')">Диктант</button>
   </div>
   <div id="vocab-body"></div>
-</div>
-
-<!-- DRAW TRAINER -->
-<div id="screen-draw" class="screen">
-  <div class="study-top">
-    <button class="close-btn" onclick="switchTab('lessons')">←</button>
-    <div style="font-weight:800;font-size:17px">Прописи и Диктант</div>
-  </div>
-  <div class="mode-switch">
-    <button class="mode-btn active" id="cat-letters" onclick="setDrawCat('letters')">Буквы (12)</button>
-    <button class="mode-btn" id="cat-words" onclick="setDrawCat('words')">Слова K-Pop (8)</button>
-  </div>
-  <div class="mode-switch">
-    <button class="mode-btn active" id="mode-blind" onclick="setDrawBlind(true)">На слух (чистый экран)</button>
-    <button class="mode-btn" id="mode-guide" onclick="setDrawBlind(false)">С трафаретом</button>
-  </div>
-  <div class="draw-selector" id="draw-selector"></div>
-  <div id="draw-trainer-body"></div>
 </div>
 
 <!-- STUDY -->
@@ -519,33 +488,6 @@ const VOCAB = [
   { l: 8, kr: "보고 싶어", tr: "[по-го щи-по]", ru: "Я скучаю по тебе", file: "audio/bogoshipo.mp3" }
 ];
 
-const DRAW_DATA = {
-  letters: [
-    { kr: "아", tr: "[а]", ru: "Звук [а]", file: "audio/a.mp3" },
-    { kr: "어", tr: "[о] открытое", ru: "Открытое [о]", file: "audio/eo.mp3" },
-    { kr: "오", tr: "[о] округлое", ru: "Округлое [о]", file: "audio/o.mp3" },
-    { kr: "우", tr: "[у]", ru: "Звук [у]", file: "audio/u.mp3" },
-    { kr: "으", tr: "[ы]", ru: "Звук [ы]", file: "audio/eu.mp3" },
-    { kr: "이", tr: "[и]", ru: "Звук [и]", file: "audio/i.mp3" },
-    { kr: "가", tr: "[ка / га]", ru: "Слог [ка]", file: "audio/ga.mp3" },
-    { kr: "나", tr: "[на]", ru: "Слог [на] («Я»)", file: "audio/na.mp3" },
-    { kr: "다", tr: "[та / да]", ru: "Слог [та]", file: "audio/da.mp3" },
-    { kr: "라", tr: "[ра / ла]", ru: "Слог [ра]", file: "audio/ra.mp3" },
-    { kr: "마", tr: "[ма]", ru: "Слог [ма]", file: "audio/ma.mp3" },
-    { kr: "사", tr: "[са]", ru: "Слог [са]", file: "audio/sa.mp3" }
-  ],
-  words: [
-    { kr: "리사", tr: "[Ли-са]", ru: "Имя: Лиса", file: "audio/lisa.mp3" },
-    { kr: "오빠", tr: "[оп-па]", ru: "Слово: Оппа", file: "audio/oppa.mp3" },
-    { kr: "사랑", tr: "[са-ран]", ru: "Слово: Любовь", file: "audio/sarang.mp3" },
-    { kr: "안녕", tr: "[ан-нён]", ru: "Слово: Привет", file: "audio/annyeong.mp3" },
-    { kr: "노래", tr: "[но-рэ]", ru: "Слово: Песня", file: "audio/norae.mp3" },
-    { kr: "가수", tr: "[ка-су]", ru: "Слово: Певец", file: "audio/gasu.mp3" },
-    { kr: "최고", tr: "[чхве-го]", ru: "Слово: Лучший!", file: "audio/choego.mp3" },
-    { kr: "고마워", tr: "[ко-ма-во]", ru: "Слово: Спасибо", file: "audio/gomawo.mp3" }
-  ]
-};
-
 let st = {
   coins: 50, xp: 0, done: [], cards: [], drawn: [], biasId: null,
   energy: MAX_ENERGY, lastEnergyTs: Date.now(),
@@ -678,15 +620,18 @@ function switchTab(t) {
   if (t === 'rank') renderRank();
 }
 
-/* ====== СЛОВАРЬ И 3D-КАРТОЧКИ ====== */
+/* ====== СЛОВАРЬ, 3D-КАРТОЧКИ И ДИКТАНТ ====== */
 let vocabMode = 'list', vocabDeck = [], fcIdx = 0, fcFlipped = false;
+let dictDeck = [], dictIdx = 0;
 
 function getUnlockedVocab() { return VOCAB.filter(w => st.done.includes(w.l)); }
 function setVocabMode(m) {
   haptic('light'); vocabMode = m;
   document.getElementById('vmode-list').classList.toggle('active', m === 'list');
   document.getElementById('vmode-cards').classList.toggle('active', m === 'cards');
+  document.getElementById('vmode-dict').classList.toggle('active', m === 'dict');
   fcIdx = 0; fcFlipped = false; vocabDeck = getUnlockedVocab();
+  dictIdx = 0; dictDeck = shuffle(getUnlockedVocab());
   renderVocab();
 }
 
@@ -696,7 +641,7 @@ function renderVocab() {
   const body = document.getElementById('vocab-body'); body.innerHTML = '';
 
   if (!unlocked.length) {
-    body.innerHTML = `<div class="card-box" style="text-align:center;padding:28px 18px"><h3>Словарь пока пуст</h3><p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь!</p><button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">К урокам</button></div>`;
+    body.innerHTML = `<div class="card-box" style="text-align:center;padding:28px 18px"><h3>Словарь пока пуст</h3><p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь для повторения и диктанта!</p><button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">К урокам</button></div>`;
     return;
   }
 
@@ -713,7 +658,7 @@ function renderVocab() {
       row.onclick = () => { haptic('light'); playAudio(w.file, w.kr); };
       body.appendChild(row);
     });
-  } else {
+  } else if (vocabMode === 'cards') {
     if (!vocabDeck.length || vocabDeck.length !== unlocked.length) vocabDeck = [...unlocked];
     if (fcIdx >= vocabDeck.length) fcIdx = 0;
     const w = vocabDeck[fcIdx];
@@ -754,6 +699,33 @@ function renderVocab() {
     document.getElementById('fc-prev').onclick = () => { haptic('light'); fcIdx = (fcIdx - 1 + vocabDeck.length) % vocabDeck.length; fcFlipped = false; renderVocab(); };
     document.getElementById('fc-next').onclick = () => { haptic('light'); fcIdx = (fcIdx + 1) % vocabDeck.length; fcFlipped = false; renderVocab(); };
     document.getElementById('fc-shuf').onclick = () => { haptic('light'); vocabDeck = shuffle(unlocked); fcIdx = 0; fcFlipped = false; renderVocab(); };
+  } else {
+    if (!dictDeck.length || dictDeck.length !== unlocked.length) dictDeck = shuffle(unlocked);
+    if (dictIdx >= dictDeck.length) { dictDeck = shuffle(unlocked); dictIdx = 0; }
+    const w = dictDeck[dictIdx];
+    const isNew = !st.drawn.includes(w.kr);
+
+    const topInfo = document.createElement('div');
+    topInfo.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--muted);font-weight:700';
+    topInfo.innerHTML = `<span>Слово ${dictIdx + 1} из ${dictDeck.length}</span><span style="color:${isNew ? 'var(--cyan)' : 'var(--success)'}">${isNew ? '+5 микрофонов за 1-й раз' : '✓ Уже записано'}</span>`;
+
+    const widgetWrap = document.createElement('div');
+    const navRow = document.createElement('div');
+    navRow.className = 'fc-nav';
+    navRow.innerHTML = `<button class="btn ghost" id="dict-skip">Другое слово</button><button class="btn cyan" id="dict-next" style="display:none">Следующее →</button>`;
+
+    body.append(topInfo, widgetWrap, navRow);
+
+    const nextBtn = document.getElementById('dict-next');
+    document.getElementById('dict-skip').onclick = () => { haptic('light'); dictIdx = (dictIdx + 1) % dictDeck.length; renderVocab(); };
+    nextBtn.onclick = () => { haptic('light'); dictIdx = (dictIdx + 1) % dictDeck.length; renderVocab(); };
+
+    mountDrawWidget(widgetWrap, w, true, () => {
+      if (!st.drawn.includes(w.kr)) {
+        st.drawn.push(w.kr); st.coins += 5; st.xp += 10; save();
+      }
+      nextBtn.style.display = 'block';
+    });
   }
 }
 
@@ -1005,32 +977,6 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek =
       }
     } finally { checkBtn.disabled = false; checkBtn.innerText = 'Проверить'; }
   };
-}
-
-let drawCat = 'letters', drawBlind = true, curDrawIdx = 0;
-function openDrawTrainer() { switchTab('draw'); renderDrawTrainer(); }
-function setDrawCat(cat) { drawCat = cat; curDrawIdx = 0; document.getElementById('cat-letters').classList.toggle('active', cat === 'letters'); document.getElementById('cat-words').classList.toggle('active', cat === 'words'); renderDrawTrainer(); }
-function setDrawBlind(val) { drawBlind = val; document.getElementById('mode-blind').classList.toggle('active', val); document.getElementById('mode-guide').classList.toggle('active', !val); renderDrawTrainer(); }
-
-function renderDrawTrainer() {
-  const list = DRAW_DATA[drawCat], sel = document.getElementById('draw-selector'); sel.innerHTML = '';
-  list.forEach((it, idx) => {
-    const b = document.createElement('button'), isDone = st.drawn.includes(it.kr);
-    b.className = 'char-pill' + (idx === curDrawIdx ? ' active' : '') + (isDone ? ' done' : '');
-    b.innerText = drawBlind ? (isDone ? it.kr : '#' + (idx + 1)) : it.kr;
-    b.onclick = () => { curDrawIdx = idx; renderDrawTrainer(); };
-    sel.appendChild(b);
-  });
-  const body = document.getElementById('draw-trainer-body'), item = list[curDrawIdx];
-  const widgetWrap = document.createElement('div'); body.innerHTML = ''; body.appendChild(widgetWrap);
-  const nextBtn = document.createElement('button'); nextBtn.className = 'btn full cyan'; nextBtn.style.display = 'none';
-  nextBtn.innerText = curDrawIdx < list.length - 1 ? 'Следующее задание →' : 'Раздел пройден! В меню';
-  nextBtn.onclick = () => { if (curDrawIdx < list.length - 1) { curDrawIdx++; renderDrawTrainer(); } else switchTab('lessons'); };
-  body.appendChild(nextBtn);
-  mountDrawWidget(widgetWrap, item, drawBlind, () => {
-    if (!st.drawn.includes(item.kr)) { st.drawn.push(item.kr); st.coins += 5; st.xp += 10; save(); sel.children[curDrawIdx].classList.add('done'); sel.children[curDrawIdx].innerText = item.kr; }
-    nextBtn.style.display = 'block';
-  });
 }
 
 /* ====== УРОКИ И ДВИЖОК ====== */
