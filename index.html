@@ -35,9 +35,10 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
 .trainer-banner { background: linear-gradient(135deg, #162447, #2b174a); border: 1px solid rgba(0,229,255,0.4); border-radius: 18px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
-.lesson-card { background: var(--surface); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; }
+.lesson-card { background: var(--surface); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; transition: opacity 0.2s; }
 .lesson-card.done { border-color: rgba(0,230,118,0.45); }
 .lesson-card.exam { background: linear-gradient(135deg, #23193b, #361c3d); border: 1px solid rgba(255,215,0,0.45); }
+.lesson-card.locked { opacity: 0.5; filter: grayscale(0.4); }
 .l-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
 .l-title { font-weight: 700; font-size: 15px; }
 
@@ -55,6 +56,10 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .step-count { font-size: 12px; color: var(--muted); font-weight: 700; }
 .retry-badge { display: inline-block; background: rgba(255,71,87,0.2); border: 1px solid var(--danger); color: #ff9aa3; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 10px; margin-bottom: 12px; }
 
+.jump-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px; margin-bottom: 10px; }
+.jump-btn { min-width: 34px; height: 32px; padding: 0 8px; border-radius: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.12); color: var(--muted); font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
+.jump-btn.active { background: rgba(0,229,255,0.18); border-color: var(--cyan); color: #fff; }
+
 .card-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; margin-bottom: 16px; line-height: 1.55; }
 .card-box h3 { margin: 0 0 10px; color: #ff85cb; font-size: 18px; }
 .card-box p { margin: 0 0 10px; font-size: 14px; color: #e6e1f2; }
@@ -66,7 +71,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .ex-info { flex: 1; padding: 0 10px; }
 .ex-tr { font-size: 13px; color: var(--cyan); font-weight: 700; }
 .ex-ru { font-size: 12px; color: var(--muted); }
-.ex-play { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,46,147,0.2); color: #ff7ac6; display: flex; align-items: center; justify-content: center; }
+.ex-play { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,46,147,0.2); color: #ff7ac6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 .prompt-word { text-align: center; background: linear-gradient(180deg, rgba(138,43,226,0.2), rgba(255,46,147,0.1)); border: 1px solid rgba(138,43,226,0.4); border-radius: 20px; padding: 20px 16px; margin-bottom: 16px; }
 .big-kr { font-size: 44px; font-weight: 800; letter-spacing: 2px; }
@@ -112,6 +117,22 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .char-pill.active { border-color: var(--cyan); background: rgba(0,229,255,0.16); }
 .char-pill.done { border-color: var(--success); color: var(--success); }
 
+/* Vocab / Flashcards */
+.vocab-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.vocab-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 12px 14px; margin-bottom: 9px; cursor: pointer; }
+.vocab-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.flashcard-wrap { perspective: 900px; margin: 14px 0 16px; }
+.flashcard { background: linear-gradient(155deg, #241b3d, #161126); border: 1.5px solid rgba(0,229,255,0.35); border-radius: 24px; min-height: 270px; padding: 26px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,0.35); transition: transform 0.18s ease, border-color 0.2s; }
+.flashcard.flipped { border-color: var(--accent); background: linear-gradient(155deg, #32163b, #191229); }
+.flashcard:active { transform: scale(0.98); }
+.fc-emoji { font-size: 58px; margin-bottom: 12px; }
+.fc-kr { font-size: 40px; font-weight: 800; letter-spacing: 1px; }
+.fc-tr { font-size: 18px; color: var(--cyan); font-weight: 700; margin-top: 8px; }
+.fc-ru { font-size: 22px; font-weight: 800; color: #fff; margin-top: 6px; }
+.fc-hint { font-size: 12px; color: var(--muted); margin-top: 18px; }
+.fc-nav { display: flex; gap: 10px; }
+.fc-nav .btn { flex: 1; }
+
 .feedback-bar { padding: 13px 15px; border-radius: 14px; margin-bottom: 14px; font-size: 13px; font-weight: 600; display: none; line-height: 1.4; }
 .feedback-bar.ok { display: block; background: rgba(0,230,118,0.15); border: 1px solid var(--success); color: #9effc7; }
 .feedback-bar.err { display: block; background: rgba(255,71,87,0.15); border: 1px solid var(--danger); color: #ffb3ba; }
@@ -135,13 +156,10 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 .rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 14px; margin-bottom: 8px; }
 .rank-row.me { border: 1px solid var(--accent); background: rgba(255,46,147,0.12); }
 
-.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20,16,32,0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 10px 0 14px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
-.nav-item { color: var(--muted); font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.nav-item span { font-size: 20px; }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20,16,32,0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 9px 4px 13px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
+.nav-item { color: var(--muted); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+.nav-item span { font-size: 19px; }
 .nav-item.active { color: var(--accent); }
-.jump-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px; margin-bottom: 10px; }
-.jump-btn { min-width: 34px; height: 32px; padding: 0 8px; border-radius: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.12); color: var(--muted); font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
-.jump-btn.active { background: rgba(0,229,255,0.18); border-color: var(--cyan); color: #fff; }
 </style>
 </head>
 <body>
@@ -159,7 +177,7 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   <div class="module-banner">
     <div class="module-tag">Блок 1 • Полный Хангыль (TOPIK 0→1)</div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Длинные глубокие уроки: произношение, аудирование, пары, сборка слов, прописи и работа над ошибками.</p>
+    <p>Проходи уроки по порядку, пополняй словарь и сдай Большой экзамен без подсказок.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
@@ -172,6 +190,19 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
   </div>
 
   <div id="lessons-list"></div>
+</div>
+
+<!-- VOCAB / DICTIONARY -->
+<div id="screen-vocab" class="screen">
+  <div class="vocab-head">
+    <h3 style="margin:0">📖 Мой словарь</h3>
+    <div class="pill xp" id="vocab-count">0 / 0</div>
+  </div>
+  <div class="mode-switch">
+    <button class="mode-btn active" id="vmode-list" onclick="setVocabMode('list')">📖 Список слов</button>
+    <button class="mode-btn" id="vmode-cards" onclick="setVocabMode('cards')">🃏 Карточки</button>
+  </div>
+  <div id="vocab-body"></div>
 </div>
 
 <!-- DRAW TRAINER -->
@@ -242,12 +273,13 @@ body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90p
 
 <div class="nav">
   <div class="nav-item active" id="nav-lessons" onclick="switchTab('lessons')"><span>📚</span>Уроки</div>
+  <div class="nav-item" id="nav-vocab" onclick="switchTab('vocab')"><span>📖</span>Словарь</div>
   <div class="nav-item" id="nav-binder" onclick="switchTab('binder')"><span>🃏</span>Альбомы</div>
   <div class="nav-item" id="nav-shop" onclick="switchTab('shop')"><span>🛍</span>Магазин</div>
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')"><span>🏆</span>Топ</div>
 </div>
 
-<script src="lessons.js?v=5"></script>
+<script src="lessons.js?v=6"></script>
 <script>
 if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.expand();
@@ -263,6 +295,80 @@ const CARDS = [
   { id: 4, album: "debut", name: "Чиби-Рэпер Джин", role: "Студия звукозаписи", r: "SR", art: "🎙️" },
   { id: 5, album: "debut", name: "Сцена Дебюта", role: "Лимитка за Экзамен", r: "SSR", art: "🌟" },
   { id: 6, album: "debut", name: "Золотой Лайтстик", role: "Секретная карта", r: "SSR", art: "👑" }
+];
+
+const VOCAB = [
+  // Урок 1
+  { l: 1, kr: "아이", tr: "[а-и]", ru: "Ребёнок", icon: "👶", file: "audio/ai.mp3" },
+  { l: 1, kr: "우유", tr: "[у-ю]", ru: "Молоко", icon: "🥛", file: "audio/uyu.mp3" },
+  { l: 1, kr: "여우", tr: "[ё-у]", ru: "Лиса", icon: "🦊", file: "audio/yeou.mp3" },
+  { l: 1, kr: "오이", tr: "[о-и]", ru: "Огурец", icon: "🥒", file: "audio/oi.mp3" },
+  { l: 1, kr: "이유", tr: "[и-ю]", ru: "Причина", icon: "💡", file: "audio/iyu.mp3" },
+  { l: 1, kr: "아이유", tr: "[А-и-ю]", ru: "Певица IU", icon: "🎤", file: "audio/iu.mp3" },
+  // Урок 2
+  { l: 2, kr: "가수", tr: "[ка-су]", ru: "Певец / Артист", icon: "🎙️", file: "audio/gasu.mp3" },
+  { l: 2, kr: "드라마", tr: "[ты-ра-ма]", ru: "Дорама", icon: "🎬", file: "audio/drama.mp3" },
+  { l: 2, kr: "바다", tr: "[па-да]", ru: "Море", icon: "🌊", file: "audio/bada.mp3" },
+  { l: 2, kr: "미소", tr: "[ми-со]", ru: "Улыбка", icon: "😊", file: "audio/miso.mp3" },
+  { l: 2, kr: "바보", tr: "[па-бо]", ru: "Дурачок", icon: "🤪", file: "audio/babo.mp3" },
+  { l: 2, kr: "나비", tr: "[на-би]", ru: "Бабочка", icon: "🦋", file: "audio/nabi.mp3" },
+  { l: 2, kr: "고기", tr: "[ко-ги]", ru: "Мясо", icon: "🥩", file: "audio/gogi.mp3" },
+  // Урок 3
+  { l: 3, kr: "하나", tr: "[ха-на]", ru: "Один", icon: "1️⃣", file: "audio/hana.mp3" },
+  { l: 3, kr: "모자", tr: "[мо-джа]", ru: "Шапка / Кепка", icon: "🧢", file: "audio/moja.mp3" },
+  { l: 3, kr: "차", tr: "[чха]", ru: "Чай / Машина", icon: "🍵", file: "audio/cha.mp3" },
+  { l: 3, kr: "커피", tr: "[кхо-пхи]", ru: "Кофе", icon: "☕", file: "audio/keopi.mp3" },
+  { l: 3, kr: "카메라", tr: "[кха-ме-ра]", ru: "Камера", icon: "📷", file: "audio/kamera.mp3" },
+  { l: 3, kr: "피아노", tr: "[пхи-а-но]", ru: "Пианино", icon: "🎹", file: "audio/piano.mp3" },
+  { l: 3, kr: "포도", tr: "[пхо-до]", ru: "Виноград", icon: "🍇", file: "audio/podo.mp3" },
+  { l: 3, kr: "치마", tr: "[чхи-ма]", ru: "Юбка", icon: "👗", file: "audio/chima.mp3" },
+  // Урок 4
+  { l: 4, kr: "오빠", tr: "[оп-па]", ru: "Оппа (старший брат)", icon: "🫰", file: "audio/oppa.mp3" },
+  { l: 4, kr: "아빠", tr: "[ап-па]", ru: "Папа", icon: "👨", file: "audio/appa.mp3" },
+  { l: 4, kr: "뽀뽀", tr: "[ппо-ппо]", ru: "Чмок / Поцелуй", icon: "💋", file: "audio/ppoppo.mp3" },
+  { l: 4, kr: "쓰다", tr: "[ссы-да]", ru: "Писать / Горький", icon: "✍️", file: "audio/sseuda.mp3" },
+  { l: 4, kr: "싸다", tr: "[сса-да]", ru: "Дешёвый", icon: "🏷️", file: "audio/ssada.mp3" },
+  { l: 4, kr: "꼬리", tr: "[кко-ри]", ru: "Хвост", icon: "🐾", file: "audio/kkori.mp3" },
+  // Урок 5
+  { l: 5, kr: "노래", tr: "[но-рэ]", ru: "Песня", icon: "🎵", file: "audio/norae.mp3" },
+  { l: 5, kr: "카페", tr: "[кха-пхе]", ru: "Кафе", icon: "🏪", file: "audio/kape.mp3" },
+  { l: 5, kr: "세계", tr: "[се-ге]", ru: "Мир / Вселенная", icon: "🌍", file: "audio/segye.mp3" },
+  { l: 5, kr: "뭐", tr: "[мво]", ru: "Что?", icon: "❓", file: "audio/mwo.mp3" },
+  { l: 5, kr: "최고", tr: "[чхве-го]", ru: "Лучший / Супер!", icon: "👍", file: "audio/choego.mp3" },
+  { l: 5, kr: "사과", tr: "[са-гва]", ru: "Яблоко / Извинение", icon: "🍎", file: "audio/sagwa.mp3" },
+  { l: 5, kr: "과자", tr: "[ква-джа]", ru: "Снеки / Печенье", icon: "🍪", file: "audio/gwaja.mp3" },
+  { l: 5, kr: "의자", tr: "[ый-джа]", ru: "Стул", icon: "🪑", file: "audio/uija.mp3" },
+  { l: 5, kr: "가위", tr: "[ка-ви]", ru: "Ножницы", icon: "✂️", file: "audio/gawi.mp3" },
+  // Урок 6
+  { l: 6, kr: "별", tr: "[пёль]", ru: "Звезда", icon: "⭐", file: "audio/byeol.mp3" },
+  { l: 6, kr: "팬", tr: "[пхэн]", ru: "Фанат", icon: "🎉", file: "audio/paen.mp3" },
+  { l: 6, kr: "봄", tr: "[пом]", ru: "Весна", icon: "🌸", file: "audio/bom.mp3" },
+  { l: 6, kr: "밤", tr: "[пам]", ru: "Ночь", icon: "🌙", file: "audio/bam.mp3" },
+  { l: 6, kr: "달", tr: "[таль]", ru: "Луна", icon: "🌕", file: "audio/dal.mp3" },
+  { l: 6, kr: "물", tr: "[муль]", ru: "Вода", icon: "💧", file: "audio/mul.mp3" },
+  { l: 6, kr: "사랑", tr: "[са-ран]", ru: "Любовь", icon: "❤️", file: "audio/sarang.mp3" },
+  { l: 6, kr: "안녕", tr: "[ан-нён]", ru: "Привет / Пока", icon: "👋", file: "audio/annyeong.mp3" },
+  { l: 6, kr: "마음", tr: "[ма-ым]", ru: "Сердце / Душа", icon: "💖", file: "audio/maeum.mp3" },
+  { l: 6, kr: "사람", tr: "[са-рам]", ru: "Человек", icon: "🧑", file: "audio/saram.mp3" },
+  { l: 6, kr: "바람", tr: "[па-рам]", ru: "Ветер", icon: "💨", file: "audio/baram.mp3" },
+  // Урок 7
+  { l: 7, kr: "책", tr: "[чхэк]", ru: "Книга", icon: "📕", file: "audio/chaek.mp3" },
+  { l: 7, kr: "밥", tr: "[пап]", ru: "Рис / Еда", icon: "🍚", file: "audio/bap.mp3" },
+  { l: 7, kr: "집", tr: "[чип]", ru: "Дом", icon: "🏠", file: "audio/jip.mp3" },
+  { l: 7, kr: "옷", tr: "[от]", ru: "Одежда", icon: "👕", file: "audio/ot.mp3" },
+  { l: 7, kr: "꽃", tr: "[ккот]", ru: "Цветок", icon: "💐", file: "audio/kkot.mp3" },
+  { l: 7, kr: "음악", tr: "[ы-мак]", ru: "Музыка", icon: "🎶", file: "audio/eumak.mp3" },
+  { l: 7, kr: "한국어", tr: "[хан-гу-го]", ru: "Корейский язык", icon: "🇰🇷", file: "audio/hangugeo.mp3" },
+  { l: 7, kr: "서울", tr: "[со-уль]", ru: "Сеул", icon: "🏙️", file: "audio/seoul.mp3" },
+  { l: 7, kr: "한국", tr: "[хан-гук]", ru: "Корея", icon: "🗺️", file: "audio/hanguk.mp3" },
+  // Урок 8
+  { l: 8, kr: "사랑해", tr: "[са-ран-хэ]", ru: "Я тебя люблю", icon: "💘", file: "audio/saranghae.mp3" },
+  { l: 8, kr: "고마워", tr: "[ко-ма-во]", ru: "Спасибо", icon: "🙏", file: "audio/gomawo.mp3" },
+  { l: 8, kr: "미안해", tr: "[ми-ан-хэ]", ru: "Извини / Прости", icon: "🥺", file: "audio/mianhae.mp3" },
+  { l: 8, kr: "대박", tr: "[тэ-бак]", ru: "Супер / Вау!", icon: "🤯", file: "audio/daebak.mp3" },
+  { l: 8, kr: "화이팅", tr: "[файтин]", ru: "Удачи / Вперёд!", icon: "🔥", file: "audio/fighting.mp3" },
+  { l: 8, kr: "진짜", tr: "[чин-чча]", ru: "Правда? / Реально?", icon: "😲", file: "audio/jinjja.mp3" },
+  { l: 8, kr: "보고 싶어", tr: "[по-го щи-по]", ru: "Я скучаю по тебе", icon: "💭", file: "audio/bogoshipo.mp3" }
 ];
 
 const DRAW_DATA = {
@@ -330,8 +436,99 @@ function switchTab(t) {
   const nav = document.getElementById('nav-' + t);
   if (nav) nav.classList.add('active');
   if (t === 'lessons') renderLessons();
+  if (t === 'vocab') renderVocab();
   if (t === 'binder') renderBinder();
   if (t === 'rank') renderRank();
+}
+
+/* ====== СЛОВАРЬ И КАРТОЧКИ ====== */
+let vocabMode = 'list', vocabDeck = [], fcIdx = 0, fcFlipped = false;
+
+function getUnlockedVocab() {
+  return VOCAB.filter(w => st.done.includes(w.l));
+}
+
+function setVocabMode(m) {
+  vocabMode = m;
+  document.getElementById('vmode-list').classList.toggle('active', m === 'list');
+  document.getElementById('vmode-cards').classList.toggle('active', m === 'cards');
+  fcIdx = 0; fcFlipped = false;
+  vocabDeck = getUnlockedVocab();
+  renderVocab();
+}
+
+function renderVocab() {
+  const unlocked = getUnlockedVocab();
+  document.getElementById('vocab-count').innerText = `${unlocked.length} / ${VOCAB.length}`;
+  const body = document.getElementById('vocab-body');
+  body.innerHTML = '';
+
+  if (!unlocked.length) {
+    body.innerHTML = `
+      <div class="card-box" style="text-align:center;padding:28px 18px">
+        <div style="font-size:44px;margin-bottom:8px">📖</div>
+        <h3 style="margin:0 0 8px">Словарь пока пуст</h3>
+        <p style="color:var(--muted)">Пройди <b>Урок 1</b>, и все изученные слова автоматически появятся здесь в виде списка и карточек!</p>
+        <button class="btn" style="margin-top:8px" onclick="switchTab('lessons')">Перейти к урокам</button>
+      </div>`;
+    return;
+  }
+
+  if (vocabMode === 'list') {
+    unlocked.forEach(w => {
+      const row = document.createElement('div');
+      row.className = 'vocab-row';
+      row.innerHTML = `
+        <div class="vocab-icon">${w.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:20px;font-weight:800">${w.kr} <span style="font-size:13px;color:var(--cyan);font-weight:700">${w.tr}</span></div>
+          <div style="font-size:13px;color:var(--muted)">${w.ru}</div>
+        </div>
+        <div class="ex-play">🔊</div>`;
+      row.onclick = () => playAudio(w.file, w.kr);
+      body.appendChild(row);
+    });
+  } else {
+    if (!vocabDeck.length || vocabDeck.length !== unlocked.length) vocabDeck = [...unlocked];
+    if (fcIdx >= vocabDeck.length) fcIdx = 0;
+    const w = vocabDeck[fcIdx];
+
+    body.innerHTML = `
+      <div style="text-align:center;font-size:12px;color:var(--muted);font-weight:700">Карточка ${fcIdx + 1} из ${vocabDeck.length}</div>
+      <div class="flashcard-wrap">
+        <div class="flashcard ${fcFlipped ? 'flipped' : ''}" id="fc-card">
+          ${!fcFlipped ? `
+            <div class="fc-emoji">${w.icon}</div>
+            <div class="fc-kr">${w.kr}</div>
+            <button class="audio-pill" id="fc-audio">🔊 Послушать</button>
+            <div class="fc-hint">Нажми на карточку, чтобы увидеть перевод</div>
+          ` : `
+            <div class="fc-emoji">${w.icon}</div>
+            <div class="fc-kr">${w.kr}</div>
+            <div class="fc-tr">${w.tr}</div>
+            <div class="fc-ru">${w.ru}</div>
+            <div class="fc-hint">Нажми ещё раз, чтобы перевернуть обратно</div>
+          `}
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button class="btn ghost" id="fc-prev">← Назад</button>
+        <button class="btn ghost" id="fc-shuf">🔀</button>
+        <button class="btn cyan" id="fc-next">Дальше →</button>
+      </div>
+    `;
+
+    document.getElementById('fc-card').onclick = (e) => {
+      if (e.target.id === 'fc-audio') return;
+      fcFlipped = !fcFlipped;
+      renderVocab();
+    };
+    const ab = document.getElementById('fc-audio');
+    if (ab) ab.onclick = (e) => { e.stopPropagation(); playAudio(w.file, w.kr); };
+    document.getElementById('fc-prev').onclick = () => { fcIdx = (fcIdx - 1 + vocabDeck.length) % vocabDeck.length; fcFlipped = false; renderVocab(); };
+    document.getElementById('fc-next').onclick = () => { fcIdx = (fcIdx + 1) % vocabDeck.length; fcFlipped = false; renderVocab(); };
+    document.getElementById('fc-shuf').onclick = () => { vocabDeck = shuffle(unlocked); fcIdx = 0; fcFlipped = false; renderVocab(); };
+  }
 }
 
 /* ====== РАСПОЗНАВАНИЕ РУКОПИСНОГО КОРЕЙСКОГО ПО ШТРИХАМ ====== */
@@ -355,7 +552,6 @@ async function recognizeKoreanStrokes(strokes, w, h) {
   throw new Error('IME empty');
 }
 
-/* Запасная строгая проверка (если нет доступа к Google IME) */
 function fallbackSectorCheck(inkC, targetText, FONT, W, H) {
   const getBox = (ctx) => {
     const d = ctx.getImageData(0, 0, W, H).data;
@@ -402,7 +598,7 @@ function fallbackSectorCheck(inkC, targetText, FONT, W, H) {
   return ut > 0 && (uh / ut) >= 0.55;
 }
 
-function mountDrawWidget(container, item, blindMode, onSuccess, onFail) {
+function mountDrawWidget(container, item, blindMode, onSuccess, onFail, noPeek = false) {
   const W = 400, H = 300;
   const len = item.kr.length;
   const fontSize = len === 1 ? 155 : (len === 2 ? 115 : 88);
@@ -413,7 +609,7 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail) {
       <div class="draw-header">
         <div>
           <div class="draw-meta-title">${blindMode ? '🎧 Напиши на слух: ' + (item.ru || item.tr) : '✍️ Напиши: ' + item.kr + ' ' + (item.tr || '')}</div>
-          <div class="draw-hint">Пиши в любом месте поля — система прочитает твой почерк</div>
+          <div class="draw-hint">${noPeek ? 'Режим экзамена — без подсказок!' : 'Пиши в любом месте поля — система прочитает твой почерк'}</div>
         </div>
         <button class="ex-play" style="border:none;cursor:pointer;flex-shrink:0;width:42px;height:42px;font-size:18px" id="dw-audio">🔊</button>
       </div>
@@ -423,7 +619,7 @@ function mountDrawWidget(container, item, blindMode, onSuccess, onFail) {
       </div>
       <div class="draw-controls">
         <button class="btn ghost" id="dw-clear">🧹 Стереть</button>
-        ${blindMode ? '<button class="btn ghost" id="dw-peek">👁 Подсказка</button>' : ''}
+        ${(blindMode && !noPeek) ? '<button class="btn ghost" id="dw-peek">👁 Подсказка</button>' : ''}
         <button class="btn" id="dw-check">✅ Проверить</button>
       </div>
       <div id="dw-fb" class="feedback-bar" style="margin-bottom:0"></div>
@@ -607,7 +803,17 @@ function renderDrawTrainer() {
   });
 }
 
-/* ====== ЭКРАН УРОКОВ ====== */
+/* ====== ЭКРАН УРОКОВ (С ПОСЛЕДОВАТЕЛЬНЫМ ОТКРЫТИЕМ) ====== */
+function isLessonUnlocked(l, idx) {
+  if (st.done.includes(l.id)) return true;
+  if (l.isExam) {
+    const regular = LESSONS.filter(x => !x.isExam);
+    return regular.every(x => st.done.includes(x.id));
+  }
+  if (idx === 0) return true;
+  return st.done.includes(LESSONS[idx - 1].id);
+}
+
 function renderLessons() {
   if (typeof LESSONS === 'undefined') {
     document.getElementById('lessons-list').innerHTML = '<div class="card-box">⚠️ Не найден файл <b>lessons.js</b>.</div>';
@@ -617,24 +823,29 @@ function renderLessons() {
   document.getElementById('module-progress').style.width = pct + '%';
   const list = document.getElementById('lessons-list');
   list.innerHTML = '';
-  LESSONS.forEach(l => {
+  LESSONS.forEach((l, idx) => {
     const done = st.done.includes(l.id);
+    const unlocked = isLessonUnlocked(l, idx);
     const el = document.createElement('div');
-    el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '');
-    el.innerHTML = `<div><div class="l-title">${done ? '✅ ' : ''}${l.title}</div><div class="l-meta">${l.desc} • ${l.steps.length} шагов • +${l.xp} XP</div></div>`;
+    el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (!unlocked ? ' locked' : '');
+    el.innerHTML = `<div><div class="l-title">${done ? '✅ ' : (!unlocked ? '🔒 ' : '')}${l.title}</div><div class="l-meta">${l.desc} • ${l.steps.length} шагов • +${l.xp} XP</div></div>`;
     const btn = document.createElement('button');
-    btn.className = 'btn' + (l.isExam ? ' gold' : '');
-    btn.innerText = done ? 'Повтор' : 'Учить';
-    btn.onclick = () => startLesson(l.id);
+    if (!unlocked) {
+      btn.className = 'btn ghost';
+      btn.innerText = '🔒';
+      btn.onclick = () => alert(l.isExam ? 'Сначала пройди все 8 уроков Блока 1!' : 'Сначала пройди предыдущий урок!');
+    } else {
+      btn.className = 'btn' + (l.isExam ? ' gold' : '');
+      btn.innerText = done ? 'Повтор' : (l.isExam ? 'Сдать' : 'Учить');
+      btn.onclick = () => startLesson(l.id);
+    }
     el.appendChild(btn);
     list.appendChild(el);
   });
 }
 
 /* ====== ДВИЖОК УРОКОВ ====== */
-let curL = null, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
-
-let isReplay = false;
+let curL = null, isReplay = false, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
 
 function startLesson(id) {
   curL = LESSONS.find(x => x.id === id);
@@ -656,10 +867,7 @@ function renderJumpBar() {
     const icon = step.type === 'draw' ? '✍️' : (step.type === 'theory' ? '📖' : (step.type.includes('build') ? '🧩' : '•'));
     b.innerText = `${idx + 1}${icon}`;
     b.onclick = () => {
-      if (idx < queue.length) {
-        qIdx = idx;
-        renderStep();
-      }
+      if (idx < queue.length) { qIdx = idx; renderStep(); }
     };
     bar.appendChild(b);
   });
@@ -677,12 +885,15 @@ function renderStep() {
   stepFailed = false;
 
   if (qIdx >= total) return finishLesson();
+
   const jumpBar = renderJumpBar();
   if (jumpBar) body.appendChild(jumpBar);
+
   const s = queue[qIdx];
+  const isExam = !!(curL && curL.isExam);
   if (s.isRetry) body.innerHTML += '<div class="retry-badge">🔁 Работа над ошибками</div>';
 
-    // 1. ПРОПИСИ ВНУТРИ УРОКА (ПОДДЕРЖКА ОДНОЙ БУКВЫ ИЛИ СПИСКА БУКВ)
+  // 1. ПРОПИСИ ВНУТРИ УРОКА (ПАЧКИ БУКВ)
   if (s.type === 'draw') {
     const drawList = Array.isArray(s.items) && s.items.length ? s.items : [s];
     let idx = 0;
@@ -690,9 +901,7 @@ function renderStep() {
     prog.style.cssText = 'font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:8px;text-align:center';
     const box = document.createElement('div');
     const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn full';
-    nextBtn.style.display = 'none';
-    nextBtn.innerText = 'Дальше →';
+    nextBtn.className = 'btn full'; nextBtn.style.display = 'none'; nextBtn.innerText = 'Дальше →';
     nextBtn.onclick = nextStep;
     body.append(prog, box, nextBtn);
 
@@ -702,19 +911,20 @@ function renderStep() {
       mountDrawWidget(
         box,
         curItem,
-        s.blind !== false,
+        isExam ? true : (s.blind !== false),
         () => {
           if (idx < drawList.length - 1) {
             idx++;
             setTimeout(runOne, 900);
           } else {
-            prog.innerText = `✅ Все буквы написаны (${drawList.length}/${drawList.length})`;
+            prog.innerText = `✅ Все слова написаны (${drawList.length}/${drawList.length})`;
             nextBtn.style.display = 'block';
           }
         },
         () => {
           if (!stepFailed) { stepFailed = true; mistakes++; }
-        }
+        },
+        isExam
       );
     };
     runOne();
@@ -761,7 +971,7 @@ function renderStep() {
       prompt.appendChild(rev);
       setTimeout(() => playAudio(s.file, s.kr, 1.0), 250);
     } else {
-      prompt.innerHTML = `<div class="big-kr">${s.kr}</div><div class="big-tr">${s.tr || ''}</div>`;
+      prompt.innerHTML = `<div class="big-kr">${s.kr}</div>${!isExam ? `<div class="big-tr">${s.tr || ''}</div>` : ''}`;
       const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Послушать';
       ab.onclick = () => playAudio(s.file, s.kr, 1.0);
       prompt.appendChild(ab);
@@ -793,9 +1003,9 @@ function renderStep() {
           b.classList.add('wrong');
           optsWrap.children[s.correct].classList.add('correct');
           fb.className = 'feedback-bar err';
-          fb.innerText = '❌ Ошибка (вернёмся к этому в конце урока). ' + s.explain;
+          fb.innerText = (isExam ? '❌ Ошибка. ' : '❌ Ошибка (вернёмся к этому в конце урока). ') + s.explain;
           mistakes++;
-          queue.push({ ...s, isRetry: true });
+          if (!isExam) queue.push({ ...s, isRetry: true });
         }
         nextBtn.style.display = 'block';
       };
@@ -872,7 +1082,7 @@ function renderStep() {
     body.append(grid, fb, nextBtn);
   }
 
-  // 5. СБОРКА СЛОВ/ПРЕДЛОЖЕНИЙ (ОБЫЧНАЯ И НА СЛУХ КАК В DUOLINGO)
+  // 5. СБОРКА СЛОВ/ПРЕДЛОЖЕНИЙ
   if (s.type === 'build' || s.type === 'listen_build') {
     buildAns = [];
     const isListen = s.type === 'listen_build';
@@ -891,9 +1101,11 @@ function renderStep() {
       setTimeout(() => playAudio(s.file, s.audioText, 1.0), 250);
     } else {
       prompt.innerHTML = `<div style="font-size:16px;font-weight:700">${s.q}</div>`;
-      const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом';
-      ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
-      prompt.appendChild(ab);
+      if (!isExam) {
+        const ab = document.createElement('button'); ab.className = 'audio-pill'; ab.innerText = '🔊 Подсказка голосом';
+        ab.onclick = () => playAudio(s.file, s.audioText, 1.0);
+        prompt.appendChild(ab);
+      }
     }
 
     const slots = document.createElement('div'); slots.className = 'build-slots';
@@ -925,8 +1137,8 @@ function renderStep() {
         checkBtn.style.display = 'none'; nextBtn.style.display = 'block';
         playAudio(s.file, s.audioText, 1.0);
       } else {
-        fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем так! Послушай ещё раз и переставь блоки.';
-        if (!stepFailed) { stepFailed = true; mistakes++; queue.push({ ...s, isRetry: true }); }
+        fb.className = 'feedback-bar err'; fb.innerText = '❌ Не совсем так! Попробуй переставить блоки.';
+        if (!stepFailed) { stepFailed = true; mistakes++; if (!isExam) queue.push({ ...s, isRetry: true }); }
       }
     };
 
@@ -939,9 +1151,25 @@ function nextStep() { qIdx++; renderStep(); }
 
 function finishLesson() {
   document.getElementById('study-bar').style.width = '100%';
-  let cardHtml = '';
+  if (curL.isExam && mistakes > 4) {
+    document.getElementById('study-body').innerHTML = `
+      <div class="card-box" style="text-align:center;padding:26px 18px">
+        <div style="font-size:44px;margin-bottom:6px">😅</div>
+        <h2 style="margin:0 0 6px;color:var(--danger)">Экзамен не сдан</h2>
+        <p>Допущено ошибок: <b>${mistakes}</b> (для сдачи нужно не больше 4).</p>
+        <p style="color:var(--muted)">Повтори слова в Словаре и попробуй ещё раз — SSR-карта ждёт!</p>
+      </div>
+      <button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>
+      <button class="btn ghost full" onclick="switchTab('vocab')">Открыть словарь 📖</button>
+    `;
+    return;
+  }
+
+  let cardHtml = '', vocabHtml = '';
   if (!st.done.includes(curL.id)) {
     st.done.push(curL.id); st.coins += curL.coins; st.xp += curL.xp;
+    const newWords = VOCAB.filter(w => w.l === curL.id).length;
+    if (newWords > 0) vocabHtml = `<p style="color:var(--cyan);font-weight:700">📖 В словарь добавлено новых слов: +${newWords}</p>`;
     if (curL.cardId && !st.cards.includes(curL.cardId)) {
       st.cards.push(curL.cardId);
       const c = CARDS.find(x => x.id === curL.cardId);
@@ -953,12 +1181,12 @@ function finishLesson() {
   document.getElementById('study-body').innerHTML = `
     <div class="card-box" style="text-align:center;padding:26px 18px">
       <div style="font-size:44px;margin-bottom:6px">🔥</div>
-      <h2 style="margin:0 0 6px">Урок пройден!</h2>
+      <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
       <div style="color:var(--cyan);font-weight:700;margin-bottom:10px">${stars}</div>
-      <p>Награда: <b>+${curL.coins} 🎤</b> и <b>+${curL.xp} XP</b></p>${cardHtml}
+      <p>Награда: <b>+${curL.coins} 🎤</b> и <b>+${curL.xp} XP</b></p>${vocabHtml}${cardHtml}
     </div>
     <button class="btn full" style="margin-bottom:10px" onclick="switchTab('lessons')">К урокам</button>
-    <button class="btn ghost full" onclick="switchTab('binder')">В Альбомы 🃏</button>
+    <button class="btn ghost full" onclick="switchTab('vocab')">В Словарь 📖</button>
   `;
 }
 
