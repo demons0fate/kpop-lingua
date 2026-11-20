@@ -1,4 +1,4 @@
-/* ====== СТУДИЯ (ЛИГИ, КАРТЫ 3-КОЛОНКИ, КВЕСТЫ И БЕЙДЖИ) + МАГАЗИН БОКСОВ + ТОП ====== */
+/* ====== СТУДИЯ (ЛИГИ, КАРТЫ 3-КОЛОНКИ, КВЕСТЫ 50 БАЛЛОВ И БЕЙДЖИ) + МАГАЗИН БОКСОВ + ТОП ====== */
 (function () {
   const ROLES = [
     { key: "vocal", title: "Вокал", desc: "Бонус XP" },
@@ -36,6 +36,8 @@
     { m: 10, name: "Ноя", icon: "💿", col: "#00e5ff" },
     { m: 11, name: "Дек", icon: "👑", col: "#ffd700" }
   ];
+
+  const MONTHLY_GOAL = 50;
 
   const TROPHIES = [
     { id: "hangul_master", name: "Код Хангыля", desc: "За сдачу Экзамена 1", buff: "+5% XP", icon: "★" },
@@ -122,18 +124,20 @@
     .album-stage.opening .album-sleeve { animation: none; transform: translateX(-34px) rotate(-5deg); }
     .album-stage.opening .album-vinyl { transform: translateX(72px) rotate(540deg); }
 
-    /* Задания, Ежемесячные бейджи и Трофеи */
+    /* Задания, Ежемесячные бейджи (50 баллов) и Трофеи */
     .quest-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 14px 0 8px; display: flex; justify-content: space-between; }
     .contract-row { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .contract-row.done { border-color: rgba(0,230,118,0.45); background: rgba(0,230,118,0.08); }
     .c-title { font-size: 13px; font-weight: 700; }
+    .c-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
     .c-prog { font-size: 12px; color: var(--cyan); font-weight: 800; }
     .daily-prize { background: linear-gradient(135deg, rgba(255,184,0,0.14), rgba(255,46,147,0.14)); border: 1px solid rgba(255,215,0,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
 
     .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
     .m-badge { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 8px 4px; text-align: center; opacity: 0.35; filter: grayscale(1); }
-    .m-badge.cur { opacity: 0.9; filter: none; border-style: dashed; border-color: var(--cyan); }
-    .m-badge.got { opacity: 1; filter: none; border-width: 1.5px; background: linear-gradient(155deg, #271b42, #150f26); }
+    .m-badge.missed { opacity: 0.48; filter: grayscale(1); border-color: rgba(255,255,255,0.08); }
+    .m-badge.cur { opacity: 0.95; filter: none; border-style: dashed; border-color: var(--cyan); }
+    .m-badge.got { opacity: 1; filter: none; border-width: 1.5px; background: linear-gradient(155deg, #271b42, #150f26); box-shadow: 0 0 12px rgba(255,46,147,0.22); }
     .m-badge-ico { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: rgba(255,255,255,0.08); }
     .m-badge-name { font-size: 10px; font-weight: 800; }
 
@@ -190,7 +194,15 @@
     if (!st.cards.includes(cardId)) st.cards.push(cardId);
   }
 
-  // Настройка нижней навигации (Студия + точки уведомлений на Студии и Магазине)
+  // Начисление баллов месяца строго за выполненные дневные задания (макс. 3 в день)
+  function checkDailyMonthlyPts() {
+    const d = st.daily;
+    if (d.lessons >= 1 && !d.p1) { d.p1 = true; st.monthly.pts++; }
+    if (d.dict >= 2 && !d.p2) { d.p2 = true; st.monthly.pts++; }
+    if (d.cards >= 3 && !d.p3) { d.p3 = true; st.monthly.pts++; }
+  }
+
+  // Настройка нижней навигации
   const navBinder = document.getElementById('nav-binder');
   if (navBinder) {
     if (navBinder.lastChild) navBinder.lastChild.textContent = 'Студия';
@@ -209,7 +221,7 @@
     if (sDot && st.daily && st.weekly && st.monthly) {
       const dailyReady = st.daily.lessons >= 1 && st.daily.dict >= 2 && st.daily.cards >= 3 && !st.daily.claimed;
       const weeklyReady = st.weekly.days.length >= 5 && !st.weekly.claimed;
-      const monthlyReady = st.monthly.pts >= 10 && !st.monthly.claimed;
+      const monthlyReady = st.monthly.pts >= MONTHLY_GOAL && !st.monthly.claimed;
       sDot.classList.toggle('show', dailyReady || weeklyReady || monthlyReady);
     }
     if (shDot && st.cases) {
@@ -244,7 +256,9 @@
       st.streak.lastDate = today;
     }
 
-    if (!st.daily || st.daily.date !== today) st.daily = { date: today, lessons: 0, dict: 0, cards: 0, claimed: false };
+    if (!st.daily || st.daily.date !== today) {
+      st.daily = { date: today, lessons: 0, dict: 0, cards: 0, p1: false, p2: false, p3: false, claimed: false };
+    }
     if (!st.weekly || st.weekly.week !== wk) st.weekly = { week: wk, days: [today], claimed: false };
     else if (!st.weekly.days.includes(today)) st.weekly.days.push(today);
     if (!st.monthly || st.monthly.key !== mk) st.monthly = { key: mk, pts: 0, claimed: false };
@@ -383,7 +397,7 @@
       sub.appendChild(grid);
     }
 
-    // ЗАДАНИЯ (Ежедневные + Еженедельные + Ежемесячные бейджи + Трофеи)
+    // ЗАДАНИЯ (Ежедневные + Еженедельные + Ежемесячный квест 50 баллов + Архив бейджей)
     if (studioSubTab === 'quests') {
       const d = st.daily, w = st.weekly, m = st.monthly;
       const dCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
@@ -391,13 +405,34 @@
       const curYear = new Date().getFullYear();
 
       sub.innerHTML = `
-        <div class="quest-sec"><span>Ежедневные задания</span><span style="color:var(--cyan)">${dCnt}/3</span></div>
-        <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}"><div><div class="c-title">Пройти 1 урок или повтор</div></div><div class="c-prog">${Math.min(d.lessons, 1)}/1</div></div>
-        <div class="contract-row ${d.dict >= 2 ? 'done' : ''}"><div><div class="c-title">Написать 2 слова в Диктанте</div></div><div class="c-prog">${Math.min(d.dict, 2)}/2</div></div>
-        <div class="contract-row ${d.cards >= 3 ? 'done' : ''}"><div><div class="c-title">Перевернуть 3 карточки</div></div><div class="c-prog">${Math.min(d.cards, 3)}/3</div></div>
+        <div class="quest-sec"><span>Ежемесячный квест • ${MONTHS[curMonthIdx].name} ${curYear}</span><span style="color:var(--accent)">${Math.min(m.pts, MONTHLY_GOAL)}/${MONTHLY_GOAL}</span></div>
+        <div class="card-box" style="padding:13px 14px;margin-bottom:12px;border-color:rgba(255,46,147,0.35)">
+          <div style="font-size:13px;font-weight:800;margin-bottom:3px">Набери ${MONTHLY_GOAL} баллов за месяц</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Каждое дневное задание = +1 балл (до 3 в день) • Награда: Рарный бейдж + Золотой бокс</div>
+          ${m.pts >= MONTHLY_GOAL && !m.claimed
+            ? `<button class="btn full" id="claim-monthly">Получить бейдж «${MONTHS[curMonthIdx].name} ${curYear}»!</button>`
+            : (m.claimed
+                ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Бейдж этого месяца в твоей коллекции!</div>`
+                : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((m.pts / MONTHLY_GOAL) * 100))}%"></div></div>`)
+          }
+        </div>
+
+        <div class="quest-sec"><span>Ежедневные задания (до 3 баллов в день)</span><span style="color:var(--cyan)">${dCnt}/3</span></div>
+        <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}">
+          <div><div class="c-title">Пройти 1 урок или повтор</div><div class="c-sub">+1 балл в квест месяца</div></div>
+          <div class="c-prog">${Math.min(d.lessons, 1)}/1</div>
+        </div>
+        <div class="contract-row ${d.dict >= 2 ? 'done' : ''}">
+          <div><div class="c-title">Написать 2 слова в Диктанте</div><div class="c-sub">+1 балл в квест месяца</div></div>
+          <div class="c-prog">${Math.min(d.dict, 2)}/2</div>
+        </div>
+        <div class="contract-row ${d.cards >= 3 ? 'done' : ''}">
+          <div><div class="c-title">Перевернуть 3 карточки</div><div class="c-sub">+1 балл в квест месяца</div></div>
+          <div class="c-prog">${Math.min(d.cards, 3)}/3</div>
+        </div>
         <div class="daily-prize">
-          <div style="font-size:12px;font-weight:800;margin-bottom:6px">Награда дня: Серебряный бокс + 25 🎤</div>
-          ${dCnt === 3 && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать награду дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / 3) * 100)}%"></div></div>`)}
+          <div style="font-size:12px;font-weight:800;margin-bottom:6px">Бонус дня (за все 3): Серебряный бокс + 25 🎤</div>
+          ${dCnt === 3 && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / 3) * 100)}%"></div></div>`)}
         </div>
 
         <div class="quest-sec"><span>Еженедельный челлендж</span><span style="color:var(--gold)">${w.days.length}/5 дн.</span></div>
@@ -407,21 +442,17 @@
           ${w.days.length >= 5 && !w.claimed ? `<button class="btn gold full" id="claim-weekly">Забрать Золотой бокс!</button>` : (w.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Награда недели получена!</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((w.days.length / 5) * 100))}%"></div></div>`)}
         </div>
 
-        <div class="quest-sec"><span>Ежемесячный квест • ${MONTHS[curMonthIdx].name} ${curYear}</span><span style="color:var(--accent)">${Math.min(m.pts, 10)}/10</span></div>
-        <div class="card-box" style="padding:12px 14px;margin-bottom:12px">
-          <div style="font-size:13px;font-weight:800;margin-bottom:4px">Выполни 10 активностей (уроки / диктант / карточки)</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Награда: Рарный бейдж «${MONTHS[curMonthIdx].name} ${curYear}» + Золотой бокс</div>
-          ${m.pts >= 10 && !m.claimed ? `<button class="btn full" id="claim-monthly">Получить бейдж месяца!</button>` : (m.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Бейдж этого месяца в коллекции!</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((m.pts / 10) * 100))}%"></div></div>`)}
-        </div>
-
-        <div class="quest-sec"><span>Бейджи ${curYear}</span><span>${st.monthlyBadges.length}/12</span></div>
+        <div class="quest-sec"><span>Бейджи ${curYear} (Архив)</span><span>${st.monthlyBadges.length}/12</span></div>
         <div class="badges-grid">
           ${MONTHS.map(mo => {
             const key = `${curYear}-${mo.m}`;
             const got = st.monthlyBadges.includes(key);
             const isCur = mo.m === curMonthIdx;
-            return `<div class="m-badge ${got ? 'got' : (isCur ? 'cur' : '')}" style="${got ? `border-color:${mo.col}` : ''}">
-              <div class="m-badge-ico" style="${got ? `background:${mo.col}28` : ''}">${got || isCur ? mo.icon : '🔒'}</div>
+            const isPast = mo.m < curMonthIdx;
+            const cls = got ? 'got' : (isCur ? 'cur' : (isPast ? 'missed' : ''));
+            const ico = (got || isCur || isPast) ? mo.icon : '🔒';
+            return `<div class="m-badge ${cls}" style="${got ? `border-color:${mo.col}` : ''}">
+              <div class="m-badge-ico" style="${got ? `background:${mo.col}28` : ''}">${ico}</div>
               <div class="m-badge-name">${mo.name}</div>
             </div>`;
           }).join('')}
@@ -691,14 +722,14 @@
     };
   };
 
-  // Перехваты для квестов (дневных + месячных) и наград
+  // Перехваты для квестов (дневных -> 1 балл в месяц за каждое задание)
   const origFinishLesson = window.finishLesson;
   window.finishLesson = function () {
     const passed = !(curL && curL.isExam && mistakes > 4);
     if (passed) {
       initStudioState();
       st.daily.lessons++;
-      st.monthly.pts++;
+      checkDailyMonthlyPts();
       if (curL && !st.done.includes(curL.id)) {
         const b = getTeamBonuses();
         st.xp += Math.round(curL.xp * (b.xp / 100));
@@ -719,7 +750,7 @@
   window.mountDrawWidget = function (container, item, blindMode, onSuccess, onFail, noPeek) {
     origMountDraw(container, item, blindMode, () => {
       if (document.getElementById('screen-vocab').classList.contains('active')) {
-        initStudioState(); st.daily.dict++; st.monthly.pts++; save(); updateNavDots();
+        initStudioState(); st.daily.dict++; checkDailyMonthlyPts(); save(); updateNavDots();
       }
       if (onSuccess) onSuccess();
     }, onFail, noPeek);
@@ -727,7 +758,7 @@
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('#fc-card') && e.target.id !== 'fc-audio') {
-      initStudioState(); st.daily.cards++; st.monthly.pts++; save(); updateNavDots();
+      initStudioState(); st.daily.cards++; checkDailyMonthlyPts(); save(); updateNavDots();
     }
   });
 
