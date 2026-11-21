@@ -14,7 +14,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px;
+      padding: 14px;
     }
     .preview-wrap {
       position: relative;
@@ -24,83 +24,66 @@
       background: #1e1e2c;
       border: 3px solid #2e2e44;
       overflow: hidden;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       flex-shrink: 0;
     }
     .preview-wrap img {
       position: absolute;
-      left: 50%;
       transform: translateX(-50%);
       object-fit: contain;
+      object-position: center top;
       pointer-events: none;
     }
     #layer-bg {
-      top: 0;
-      left: 0;
-      transform: none;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; transform: none;
+      width: 100%; height: 100%;
       object-fit: cover;
-    }
-    #layer-face {
-      top: 17%;
-      left: 50%;
-      width: 46%;
-      height: 48%;
-      object-position: center top;
-    }
-    #layer-outfit {
-      top: 56%;
-      left: 50%;
-      width: 78%;
-      height: 46%;
-      object-position: center top;
-    }
-    #layer-eyes {
-      top: 31%;
-      left: 53%;
-      width: 17%;
-      height: 8%;
-    }
-    #layer-mouth {
-      top: 40%;
-      left: 53%;
-      width: 11%;
-      height: 7%;
-    }
-    #layer-hair {
-      top: 10%;
-      left: 49%;
-      width: 56%;
-      height: 48%;
-      object-position: center top;
-    }
-    #layer-acc {
-      top: 30%;
-      left: 53%;
-      width: 30%;
-      height: 18%;
     }
 
     .actions {
       display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 12px;
       width: 100%;
       max-width: 440px;
     }
     .btn {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       border: none;
-      border-radius: 14px;
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       background: #6c5ce7;
       color: #fff;
     }
+    .btn.secondary { background: #26263a; border: 1px solid #3a3a54; }
     .btn:active { transform: scale(0.97); }
+
+    .tuner {
+      width: 100%;
+      max-width: 440px;
+      background: #1b1b28;
+      border: 1px solid #2e2e44;
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tuner-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #b8b8d4;
+    }
+    .tuner-row span { width: 78px; flex-shrink: 0; }
+    .tuner-row input { flex: 1; accent-color: #6c5ce7; }
+    .tuner-row b { width: 34px; text-align: right; color: #fff; }
+
     .tabs {
       display: flex;
       gap: 8px;
@@ -122,11 +105,8 @@
       border: 1px solid #2e2e44;
       cursor: pointer;
     }
-    .tab.active {
-      background: #fff;
-      color: #12121a;
-      border-color: #fff;
-    }
+    .tab.active { background: #fff; color: #12121a; border-color: #fff; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -147,20 +127,9 @@
       cursor: pointer;
       overflow: hidden;
     }
-    .item.active {
-      border-color: #6c5ce7;
-      background: #272540;
-    }
-    .item img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .item.none {
-      font-size: 13px;
-      color: #8888a8;
-      font-weight: 600;
-    }
+    .item.active { border-color: #6c5ce7; background: #272540; }
+    .item img { width: 100%; height: 100%; object-fit: contain; }
+    .item.none { font-size: 13px; color: #8888a8; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -177,6 +146,25 @@
 
   <div class="actions">
     <button class="btn" id="randomBtn">🎲 Случайный</button>
+    <button class="btn secondary" id="copyBtn">📋 Скопировать</button>
+  </div>
+
+  <div class="tuner" id="tuner">
+    <div class="tuner-row">
+      <span>Вверх/Вниз</span>
+      <input type="range" id="sl-top" min="0" max="80" step="1">
+      <b id="val-top">0%</b>
+    </div>
+    <div class="tuner-row">
+      <span>Влево/Вправо</span>
+      <input type="range" id="sl-left" min="20" max="80" step="1">
+      <b id="val-left">50%</b>
+    </div>
+    <div class="tuner-row">
+      <span>Размер</span>
+      <input type="range" id="sl-width" min="5" max="110" step="1">
+      <b id="val-width">50%</b>
+    </div>
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -187,96 +175,60 @@
 
     const ASSETS = {
       bg: {
-        label: 'Фон',
-        optional: true,
-        files: [
-          'Background=Background1.svg',
-          'Background=Background2.svg',
-          'Background=Background3.svg',
-          'Background=Background4.svg'
-        ]
+        label: 'Фон', optional: true,
+        files: ['Background=Background1.svg','Background=Background2.svg','Background=Background3.svg','Background=Background4.svg']
       },
       face: {
-        label: 'Кожа',
-        optional: false,
-        files: [
-          'Face=Skin 1 - Fair.svg',
-          'Face=Skin 2 - Light.svg',
-          'Face=Skin 3 - Tanned.svg',
-          'Face=Skin 4 - Darker.svg'
-        ]
+        label: 'Кожа', optional: false,
+        files: ['Face=Skin 1 - Fair.svg','Face=Skin 2 - Light.svg','Face=Skin 3 - Tanned.svg','Face=Skin 4 - Darker.svg']
       },
       hair: {
-        label: 'Волосы',
-        optional: true,
+        label: 'Волосы', optional: true,
         files: [
-          'Hair=Style 01.svg', 'Hair=Style 02.svg', 'Hair=Style 03.svg',
-          'Hair=Style 04.svg', 'Hair=Style 05.svg', 'Hair=Style 06.svg',
-          'Hair=Style 07.svg', 'Hair=Style 08.svg', 'Hair=Style 10.svg',
-          'Hair=Style 11.svg', 'Hair=Style 12.svg', 'Hair=Style 13.svg',
-          'Hair=Style 14.svg', 'Hair=Style 15.svg', 'Hair=Style 16.svg',
-          'Hair=Style 17.svg', 'Hair=Style 19.svg', 'Hair=Style 20.svg',
-          'Hair=Style 21.svg', 'Hair=Style 22.svg', 'Hair=Style 23.svg'
+          'Hair=Style 01.svg','Hair=Style 02.svg','Hair=Style 03.svg','Hair=Style 04.svg','Hair=Style 05.svg',
+          'Hair=Style 06.svg','Hair=Style 07.svg','Hair=Style 08.svg','Hair=Style 10.svg','Hair=Style 11.svg',
+          'Hair=Style 12.svg','Hair=Style 13.svg','Hair=Style 14.svg','Hair=Style 15.svg','Hair=Style 16.svg',
+          'Hair=Style 17.svg','Hair=Style 19.svg','Hair=Style 20.svg','Hair=Style 21.svg','Hair=Style 22.svg','Hair=Style 23.svg'
         ]
       },
       eyes: {
-        label: 'Глаза',
-        optional: false,
-        files: [
-          'Eyes=Normal.svg', 'Eyes=Angry.svg', 'Eyes=Closed.svg',
-          'Eyes=Cynic.svg', 'Eyes=Sad.svg', 'Eyes=Thin.svg'
-        ]
+        label: 'Глаза', optional: false,
+        files: ['Eyes=Normal.svg','Eyes=Angry.svg','Eyes=Closed.svg','Eyes=Cynic.svg','Eyes=Sad.svg','Eyes=Thin.svg']
       },
       mouth: {
-        label: 'Рот',
-        optional: false,
+        label: 'Рот', optional: false,
         files: [
-          'Mouth=Normal Smile.svg', 'Mouth=Normal Thin.svg', 'Mouth=Cute.svg',
-          'Mouth=Smiliey.svg', 'Mouth=Open Mouth.svg', 'Mouth=Open Tooth.svg',
-          'Mouth=Eat.svg', 'Mouth=Sad.svg', 'Mouth=Angry.svg', 'Mouth=Hate.svg'
+          'Mouth=Normal Smile.svg','Mouth=Normal Thin.svg','Mouth=Cute.svg','Mouth=Smiliey.svg',
+          'Mouth=Open Mouth.svg','Mouth=Open Tooth.svg','Mouth=Eat.svg','Mouth=Sad.svg','Mouth=Angry.svg','Mouth=Hate.svg'
         ]
       },
       outfit: {
-        label: 'Одежда',
-        optional: false,
+        label: 'Одежда', optional: false,
         files: [
-          'Outfit=Outfit 01.svg', 'Outfit=Outfit 02.svg', 'Outfit=Outfit 03.svg',
-          'Outfit=Outfit 04.svg', 'Outfit=Outfit 05.svg', 'Outfit=Outfit 06.svg',
-          'Outfit=Outfit 07.svg', 'Outfit=Outfit 08.svg', 'Outfit=Outfit 09.svg',
-          'Outfit=Outfit 10.svg', 'Outfit=Outfit 11.svg', 'Outfit=Outfit 12.svg',
-          'Outfit=Outfit 13.svg', 'Outfit=Outfit 14.svg', 'Outfit=Outfit 16.svg',
-          'Outfit=Outfit 17.svg', 'Outfit=Outfit 18.svg', 'Outfit=Outfit 19.svg',
-          'Outfit=Outfit 20.svg', 'Outfit=Outfit 21.svg', 'Outfit=Outfit 22.svg',
-          'Outfit=Outfit 23.svg'
+          'Outfit=Outfit 01.svg','Outfit=Outfit 02.svg','Outfit=Outfit 03.svg','Outfit=Outfit 04.svg','Outfit=Outfit 05.svg',
+          'Outfit=Outfit 06.svg','Outfit=Outfit 07.svg','Outfit=Outfit 08.svg','Outfit=Outfit 09.svg','Outfit=Outfit 10.svg',
+          'Outfit=Outfit 11.svg','Outfit=Outfit 12.svg','Outfit=Outfit 13.svg','Outfit=Outfit 14.svg','Outfit=Outfit 16.svg',
+          'Outfit=Outfit 17.svg','Outfit=Outfit 18.svg','Outfit=Outfit 19.svg','Outfit=Outfit 20.svg','Outfit=Outfit 21.svg',
+          'Outfit=Outfit 22.svg','Outfit=Outfit 23.svg'
         ]
       },
       acc: {
-        label: 'Аксессуары',
-        optional: true,
+        label: 'Аксессуары', optional: true,
         files: [
-          'Accessories=Cap.svg', 'Accessories=Circle Earring.svg',
-          'Accessories=Earphone.svg', 'Accessories=Earring.svg',
-          'Accessories=Futuristic Glasses.svg', 'Accessories=Glasses.svg',
-          'Accessories=Mask Google.svg', 'Accessories=Mask.svg',
-          'Accessories=Moustache.svg', 'Accessories=Rounded Glasses.svg',
-          'Accessories=Simple Earring.svg', 'Accessories=Stylish Glasses.svg'
+          'Accessories=Cap.svg','Accessories=Circle Earring.svg','Accessories=Earphone.svg','Accessories=Earring.svg',
+          'Accessories=Futuristic Glasses.svg','Accessories=Glasses.svg','Accessories=Mask Google.svg','Accessories=Mask.svg',
+          'Accessories=Moustache.svg','Accessories=Rounded Glasses.svg','Accessories=Simple Earring.svg','Accessories=Stylish Glasses.svg'
         ]
       }
     };
 
-    const ACC_POS = {
-      'Accessories=Cap.svg':                { top: '8%',  left: '49%', width: '48%', height: '24%' },
-      'Accessories=Earphone.svg':           { top: '13%', left: '48%', width: '52%', height: '32%' },
-      'Accessories=Circle Earring.svg':     { top: '38%', left: '34%', width: '9%',  height: '10%' },
-      'Accessories=Earring.svg':            { top: '38%', left: '34%', width: '8%',  height: '10%' },
-      'Accessories=Simple Earring.svg':     { top: '38%', left: '34%', width: '7%',  height: '10%' },
-      'Accessories=Glasses.svg':            { top: '30%', left: '53%', width: '28%', height: '14%' },
-      'Accessories=Rounded Glasses.svg':    { top: '30%', left: '53%', width: '28%', height: '14%' },
-      'Accessories=Stylish Glasses.svg':    { top: '29%', left: '53%', width: '30%', height: '14%' },
-      'Accessories=Futuristic Glasses.svg': { top: '29%', left: '53%', width: '30%', height: '14%' },
-      'Accessories=Mask.svg':               { top: '37%', left: '53%', width: '30%', height: '20%' },
-      'Accessories=Mask Google.svg':        { top: '36%', left: '53%', width: '30%', height: '20%' },
-      'Accessories=Moustache.svg':          { top: '39%', left: '53%', width: '13%', height: '6%'  }
+    const LAYOUT = {
+      face:   { top: 17, left: 50, width: 46 },
+      outfit: { top: 51, left: 51, width: 82 },
+      eyes:   { top: 31, left: 53, width: 17 },
+      mouth:  { top: 41, left: 53, width: 11 },
+      hair:   { top: 10, left: 49, width: 56 },
+      acc:    { top: 30, left: 53, width: 30 }
     };
 
     const state = {
@@ -289,11 +241,38 @@
       acc: null
     };
 
-    let activeTab = 'hair';
+    let activeTab = 'outfit';
 
-    function fileUrl(name) {
-      return BASE + encodeURIComponent(name);
+    function fileUrl(name) { return BASE + encodeURIComponent(name); }
+
+    function applyLayout() {
+      Object.entries(LAYOUT).forEach(([key, pos]) => {
+        const img = document.getElementById('layer-' + key);
+        img.style.top = pos.top + '%';
+        img.style.left = pos.left + '%';
+        img.style.width = pos.width + '%';
+      });
     }
+
+    function syncSliders() {
+      const tuner = document.getElementById('tuner');
+      if (!LAYOUT[activeTab]) { tuner.style.display = 'none'; return; }
+      tuner.style.display = 'flex';
+      const pos = LAYOUT[activeTab];
+      ['top', 'left', 'width'].forEach(prop => {
+        document.getElementById('sl-' + prop).value = pos[prop];
+        document.getElementById('val-' + prop).textContent = pos[prop] + '%';
+      });
+    }
+
+    ['top', 'left', 'width'].forEach(prop => {
+      document.getElementById('sl-' + prop).oninput = (e) => {
+        if (!LAYOUT[activeTab]) return;
+        LAYOUT[activeTab][prop] = Number(e.target.value);
+        document.getElementById('val-' + prop).textContent = e.target.value + '%';
+        applyLayout();
+      };
+    });
 
     function renderPreview() {
       Object.keys(state).forEach(key => {
@@ -301,14 +280,12 @@
         if (state[key]) {
           img.src = fileUrl(state[key]);
           img.style.display = 'block';
-          if (key === 'acc' && ACC_POS[state[key]]) {
-            Object.assign(img.style, ACC_POS[state[key]]);
-          }
         } else {
           img.removeAttribute('src');
           img.style.display = 'none';
         }
       });
+      applyLayout();
     }
 
     function renderTabs() {
@@ -322,6 +299,7 @@
           activeTab = key;
           renderTabs();
           renderGrid();
+          syncSliders();
         };
         wrap.appendChild(btn);
       });
@@ -331,19 +309,13 @@
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
       const cfg = ASSETS[activeTab];
-
       if (cfg.optional) {
         const none = document.createElement('div');
         none.className = 'item none' + (state[activeTab] === null ? ' active' : '');
         none.textContent = 'Нет';
-        none.onclick = () => {
-          state[activeTab] = null;
-          renderPreview();
-          renderGrid();
-        };
+        none.onclick = () => { state[activeTab] = null; renderPreview(); renderGrid(); };
         grid.appendChild(none);
       }
-
       cfg.files.forEach(file => {
         const card = document.createElement('div');
         card.className = 'item' + (state[activeTab] === file ? ' active' : '');
@@ -351,11 +323,7 @@
         img.src = fileUrl(file);
         img.loading = 'lazy';
         card.appendChild(img);
-        card.onclick = () => {
-          state[activeTab] = file;
-          renderPreview();
-          renderGrid();
-        };
+        card.onclick = () => { state[activeTab] = file; renderPreview(); renderGrid(); };
         grid.appendChild(card);
       });
     }
@@ -369,9 +337,17 @@
       renderGrid();
     };
 
+    document.getElementById('copyBtn').onclick = () => {
+      navigator.clipboard.writeText(JSON.stringify(LAYOUT));
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Скопировано!';
+      setTimeout(() => btn.textContent = '📋 Скопировать', 1500);
+    };
+
     renderTabs();
     renderGrid();
     renderPreview();
+    syncSliders();
   </script>
 </body>
 </html>
