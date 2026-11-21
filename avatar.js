@@ -1,11 +1,65 @@
-/* ====== РЕДАКТОР ГЕРОЯ (СТИЛЬ DUOLINGO) + ОТДЕЛЬНАЯ ВКЛАДКА «МОЗАИКА» ====== */
+/* ====== РЕДАКТОР ГЕРОЯ (DICEBEAR TOON HEAD + СТИЛЬ DUOLINGO) + ВКЛАДКА «МОЗАИКА» ====== */
 (function () {
-  const SKINS = ["#ffdfc4", "#f0c8a0", "#d9a077", "#a56c43", "#6b3e26"];
-  const HAIRS = ["Короткая", "Каре", "Ёжик", "Хвостики"];
-  const HAIR_COLS = ["#1a1625", "#ff2e93", "#00e5ff", "#ffd700", "#b46eff", "#ff6b6b"];
-  const EYES = ["Обычные", "Улыбка", "Звёзды", "Дерзкий"];
-  const MOUTHS = ["Улыбка", "Смех", "Спокойный", "Кот :3"];
-  const SHIRTS = ["#2a2244", "#ff2e93", "#00b4d8", "#ffd700", "#111118"];
+  const SKINS = ["f1c3a5", "c68e7a", "b98e6a", "a36b4f", "5c3829"];
+  const HAIR_COLS = ["2c1b18", "ff2e93", "00e5ff", "d6b370", "b46eff", "a55728"];
+  const CLOTHES_COLS = ["151613", "ec4899", "0b3286", "731ac3", "eab308", "e8e9e6"];
+
+  const HAIRS = [
+    { v: "undercut",  n: "Андеркат" },
+    { v: "spiky",     n: "Ёжик" },
+    { v: "sideComed", n: "Набок" },
+    { v: "bun",       n: "Пучок" },
+    { v: "none",      n: "Без волос" }
+  ];
+
+  const REAR_HAIRS = [
+    { v: "none",         n: "Короткие" },
+    { v: "neckHigh",     n: "До шеи" },
+    { v: "shoulderHigh", n: "До плеч" },
+    { v: "longStraight", n: "Длинные" },
+    { v: "longWavy",     n: "Волнистые" }
+  ];
+
+  const EYES = [
+    { v: "wide",   n: "Широкие" },
+    { v: "happy",  n: "Радость" },
+    { v: "wink",   n: "Подмиг" },
+    { v: "bow",    n: "Мягкие" },
+    { v: "humble", n: "Скромные" }
+  ];
+
+  const BROWS = [
+    { v: "happy",   n: "Добрые" },
+    { v: "neutral", n: "Обычные" },
+    { v: "raised",  n: "Удивление" },
+    { v: "angry",   n: "Дерзкие" },
+    { v: "sad",     n: "Грустные" }
+  ];
+
+  const MOUTHS = [
+    { v: "smile", n: "Улыбка" },
+    { v: "laugh", n: "Смех" },
+    { v: "agape", n: "Вау" },
+    { v: "angry", n: "Хмурый" },
+    { v: "sad",   n: "Грусть" }
+  ];
+
+  const BEARDS = [
+    { v: "none",          n: "Нет" },
+    { v: "chin",          n: "Бородка" },
+    { v: "chinMoustache", n: "С усами" },
+    { v: "fullBeard",     n: "Борода" },
+    { v: "moustacheTwirl",n: "Усы" }
+  ];
+
+  const CLOTHES = [
+    { v: "openJacket", n: "Куртка" },
+    { v: "tShirt",     n: "Футболка" },
+    { v: "turtleNeck", n: "Водолазка" },
+    { v: "shirt",      n: "Рубашка" },
+    { v: "dress",      n: "Платье" }
+  ];
+
   const BGS = [
     "linear-gradient(135deg,#ff2e93,#7b2cbf)",
     "linear-gradient(135deg,#00e5ff,#3a0ca3)",
@@ -15,7 +69,7 @@
   ];
 
   const ACCS = [
-    { id: "none", name: "Без скина", locked: false },
+    { id: "none",  name: "Без скина", locked: false },
     { id: "visor", name: "Кибер-визор", locked: true, req: "Мозаика #1" }
   ];
 
@@ -27,15 +81,31 @@
     { id: "acc",   ico: "🕶️", label: "Скины" }
   ];
 
+  const DEFAULT_AV = {
+    v: 2,
+    skin: "f1c3a5",
+    hair: "undercut",
+    rearHair: "none",
+    hairCol: "ff2e93",
+    eyes: "happy",
+    brows: "happy",
+    mouth: "smile",
+    beard: "none",
+    clothes: "openJacket",
+    clothesCol: "151613",
+    bg: 0,
+    acc: "none"
+  };
+
   let editorTab = 'base';
   let inMosaicTab = false;
 
   const css = document.createElement('style');
   css.textContent = `
-    .av-svg-wrap { width: 100%; height: 100%; border-radius: inherit; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    .av-svg-wrap svg { width: 100%; height: 100%; display: block; }
+    .av-svg-wrap { position: relative; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .av-svg-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .av-visor-ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-    /* Компактные 4 вкладки в Студии */
     #screen-binder .mode-btn { font-size: 11px; padding: 8px 4px; }
 
     /* Редактор персонажа в стиле Duolingo */
@@ -44,7 +114,7 @@
     .duo-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #130e24; border-bottom: 1px solid rgba(255,255,255,0.07); }
     .duo-done { background: none; border: none; color: var(--cyan); font-size: 13px; font-weight: 900; letter-spacing: 0.6px; cursor: pointer; padding: 6px 4px; }
     .duo-stage { height: 215px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-    .duo-stage-av { width: 195px; height: 195px; }
+    .duo-stage-av { width: 200px; height: 200px; }
 
     .duo-tabs { display: grid; grid-template-columns: repeat(5, 1fr); background: #151026; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
     .duo-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 4px; font-size: 20px; cursor: pointer; opacity: 0.45; transition: 0.18s; }
@@ -53,21 +123,19 @@
     .duo-body { flex: 1; overflow-y: auto; padding: 14px 16px 32px; -webkit-overflow-scrolling: touch; }
     .duo-sec { font-size: 12px; font-weight: 800; color: #d8cce8; margin: 4px 0 10px; }
 
-    /* Скруглённые квадраты цветов (как Skin tone) */
     .duo-swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 18px; }
     .duo-sw { aspect-ratio: 1; border-radius: 14px; border: 2.5px solid rgba(255,255,255,0.12); padding: 4px; cursor: pointer; transition: 0.15s; background: #19132b; }
     .duo-sw.on { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,229,255,0.35); transform: scale(1.04); }
     .duo-sw-in { width: 100%; height: 100%; border-radius: 9px; }
 
-    /* Визуальные превью-карточки деталей */
-    .duo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
-    .duo-card { background: #18122b; border: 2px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 8px; text-align: center; cursor: pointer; position: relative; transition: 0.15s; }
+    .duo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+    .duo-card { background: #18122b; border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 6px; text-align: center; cursor: pointer; position: relative; transition: 0.15s; }
     .duo-card.on { border-color: var(--cyan); background: rgba(0,229,255,0.1); box-shadow: 0 0 14px rgba(0,229,255,0.22); }
     .duo-card.locked { opacity: 0.5; }
-    .duo-card-prev { width: 86px; height: 86px; margin: 0 auto 4px; border-radius: 12px; overflow: hidden; }
-    .duo-card-lbl { font-size: 11px; font-weight: 800; color: #e2d9f3; }
+    .duo-card-prev { width: 76px; height: 76px; margin: 0 auto 4px; border-radius: 10px; overflow: hidden; }
+    .duo-card-lbl { font-size: 10px; font-weight: 800; color: #e2d9f3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Отдельная вкладка Мозаика 3×3 */
+    /* Вкладка Мозаика 3×3 */
     .mosaic-box { background: linear-gradient(145deg, #211638, #130d24); border: 1.5px solid rgba(0,229,255,0.32); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
     .mosaic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; max-width: 240px; margin: 14px auto 16px; }
     .m-tile { aspect-ratio: 1; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: rgba(255,255,255,0.25); transition: 0.25s; }
@@ -78,62 +146,81 @@
   document.head.appendChild(css);
 
   function initAvState() {
-    if (!st.avatar) st.avatar = { skin: 0, hair: 0, hairCol: 1, eyes: 0, mouth: 0, shirt: 0, bg: 0, acc: 'none' };
+    if (!st.avatar || st.avatar.v !== 2) {
+      const prevAcc = (st.avatar && st.avatar.acc) ? st.avatar.acc : "none";
+      st.avatar = { ...DEFAULT_AV, acc: prevAcc };
+    }
     if (!st.mosaic) st.mosaic = { pieces: [], dust: 0, claimed: false };
     if (!st.unlockedAcc) st.unlockedAcc = [];
   }
 
-  /* Рендер векторного персонажа (SVG) */
-  window.renderAvatarSvg = function (cfg, transparentBg) {
-    const a = cfg || st.avatar || { skin: 0, hair: 0, hairCol: 1, eyes: 0, mouth: 0, shirt: 0, bg: 0, acc: 'none' };
-    const skin = SKINS[a.skin] || SKINS[0];
-    const hc = HAIR_COLS[a.hairCol] || HAIR_COLS[0];
-    const sh = SHIRTS[a.shirt] || SHIRTS[0];
+  /* Сборка URL для DiceBear Toon Head */
+  function buildToonUrl(a) {
+    const p = new URLSearchParams();
+    p.set("seed", "kpop");
+    p.set("skinColor", a.skin || DEFAULT_AV.skin);
+    p.set("hairColor", a.hairCol || DEFAULT_AV.hairCol);
+    p.set("clothesColor", a.clothesCol || DEFAULT_AV.clothesCol);
+    p.set("eyesVariant", a.eyes || DEFAULT_AV.eyes);
+    p.set("eyebrowsVariant", a.brows || DEFAULT_AV.brows);
+    p.set("mouthVariant", a.mouth || DEFAULT_AV.mouth);
+    p.set("clothesVariant", a.clothes || DEFAULT_AV.clothes);
 
-    let hairBack = '';
-    if (a.hair === 1) hairBack = `<rect x="22" y="28" width="56" height="44" rx="18" fill="${hc}"/>`;
-    if (a.hair === 3) hairBack = `<circle cx="18" cy="48" r="13" fill="${hc}"/><circle cx="82" cy="48" r="13" fill="${hc}"/>`;
-
-    let hairFront = `<path d="M26 42 Q30 16 50 16 Q70 16 74 42 Q64 28 50 30 Q36 28 26 42 Z" fill="${hc}"/>`;
-    if (a.hair === 2) hairFront = `<path d="M26 42 L34 14 L44 26 L52 10 L60 26 L70 16 L74 42 Q50 28 26 42 Z" fill="${hc}"/>`;
-
-    let eyesSvg = `<circle cx="40" cy="48" r="3.8" fill="#161224"/><circle cx="60" cy="48" r="3.8" fill="#161224"/><circle cx="41.2" cy="46.8" r="1.3" fill="#fff"/><circle cx="61.2" cy="46.8" r="1.3" fill="#fff"/>`;
-    if (a.eyes === 1) eyesSvg = `<path d="M35 49 Q40 43 45 49" stroke="#161224" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M55 49 Q60 43 65 49" stroke="#161224" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    if (a.eyes === 2) eyesSvg = `<text x="34" y="53" font-size="12" fill="#ff2e93">★</text><text x="54" y="53" font-size="12" fill="#00e5ff">★</text>`;
-    if (a.eyes === 3) eyesSvg = `<rect x="35" y="46" width="10" height="4" rx="2" fill="#161224"/><rect x="55" y="46" width="10" height="4" rx="2" fill="#161224"/>`;
-
-    let mouthSvg = `<path d="M44 60 Q50 66 56 60" stroke="#161224" stroke-width="2.8" fill="none" stroke-linecap="round"/>`;
-    if (a.mouth === 1) mouthSvg = `<path d="M43 59 Q50 69 57 59 Z" fill="#ff4757" stroke="#161224" stroke-width="2"/>`;
-    if (a.mouth === 2) mouthSvg = `<line x1="45" y1="62" x2="55" y2="62" stroke="#161224" stroke-width="2.8" stroke-linecap="round"/>`;
-    if (a.mouth === 3) mouthSvg = `<path d="M43 61 Q46.5 65 50 61 Q53.5 65 57 61" stroke="#161224" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-
-    let accSvg = '';
-    if (a.acc === 'visor') {
-      accSvg = `<rect x="28" y="41" width="44" height="14" rx="7" fill="rgba(0,229,255,0.68)" stroke="#00e5ff" stroke-width="2.5"/><line x1="33" y1="45" x2="46" y2="45" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>`;
+    if (a.hair === "none") {
+      p.set("hairProbability", "0");
+    } else {
+      p.set("hairProbability", "100");
+      p.set("hairVariant", a.hair || DEFAULT_AV.hair);
     }
 
+    if (!a.rearHair || a.rearHair === "none") {
+      p.set("rearHairProbability", "0");
+    } else {
+      p.set("rearHairProbability", "100");
+      p.set("rearHairVariant", a.rearHair);
+    }
+
+    if (!a.beard || a.beard === "none") {
+      p.set("beardProbability", "0");
+    } else {
+      p.set("beardProbability", "100");
+      p.set("beardVariant", a.beard);
+    }
+
+    return `https://api.dicebear.com/10.x/toon-head/svg?${p.toString()}`;
+  }
+
+  /* Рендер персонажа Toon Head + слой скина */
+  window.renderAvatarSvg = function (cfg, transparentBg) {
+    const a = (cfg && cfg.v === 2) ? cfg : (st.avatar && st.avatar.v === 2 ? st.avatar : DEFAULT_AV);
     const bgStyle = transparentBg ? 'transparent' : (BGS[a.bg] || BGS[0]);
+    const url = buildToonUrl(a);
+    const visorSvg = a.acc === 'visor'
+      ? `<svg class="av-visor-ov" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+           <rect x="27" y="42" width="46" height="14" rx="7" fill="rgba(0,229,255,0.62)" stroke="#00e5ff" stroke-width="2.5"/>
+           <line x1="33" y1="46" x2="48" y2="46" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+         </svg>`
+      : '';
+
     return `<div class="av-svg-wrap" style="background:${bgStyle}">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        ${hairBack}
-        <path d="M22 100 C24 78 36 74 50 74 C64 74 76 78 78 100 Z" fill="${sh}"/>
-        <rect x="44" y="66" width="12" height="12" rx="4" fill="${skin}"/>
-        <circle cx="50" cy="48" r="23" fill="${skin}"/>
-        <circle cx="34" cy="54" r="3.5" fill="#ff7ac6" opacity="0.45"/>
-        <circle cx="66" cy="54" r="3.5" fill="#ff7ac6" opacity="0.45"/>
-        ${eyesSvg}
-        ${mouthSvg}
-        ${hairFront}
-        ${accSvg}
-      </svg>
+      <img src="${url}" alt="avatar" loading="lazy"/>
+      ${visorSvg}
     </div>`;
   };
 
-  /* Редактор персонажа в стиле Duolingo */
+  /* Редактор персонажа */
   const editorOv = document.createElement('div');
   editorOv.className = 'duo-editor';
   editorOv.id = 'av-editor-overlay';
   document.body.appendChild(editorOv);
+
+  function renderCards(list, key, a) {
+    return `<div class="duo-grid">${list.map(it => `
+      <div class="duo-card ${a[key] === it.v ? 'on' : ''}" data-set="${key}:${it.v}">
+        <div class="duo-card-prev">${renderAvatarSvg({ ...a, [key]: it.v }, true)}</div>
+        <div class="duo-card-lbl">${it.n}</div>
+      </div>`).join('')}</div>`;
+  }
 
   window.openAvatarCreator = function () {
     initAvState();
@@ -143,32 +230,40 @@
     if (editorTab === 'base') {
       bodyHtml = `
         <div class="duo-sec">Тон кожи</div>
-        <div class="duo-swatches">${SKINS.map((c, i) => `<div class="duo-sw ${a.skin === i ? 'on' : ''}" data-set="skin:${i}"><div class="duo-sw-in" style="background:${c}"></div></div>`).join('')}</div>
+        <div class="duo-swatches">${SKINS.map(c => `<div class="duo-sw ${a.skin === c ? 'on' : ''}" data-set="skin:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
         <div class="duo-sec">Фон карточки</div>
         <div class="duo-swatches">${BGS.map((c, i) => `<div class="duo-sw ${a.bg === i ? 'on' : ''}" data-set="bg:${i}"><div class="duo-sw-in" style="background:${c}"></div></div>`).join('')}</div>`;
     } else if (editorTab === 'hair') {
       bodyHtml = `
         <div class="duo-sec">Цвет волос</div>
-        <div class="duo-swatches" style="grid-template-columns:repeat(6,1fr)">${HAIR_COLS.map((c, i) => `<div class="duo-sw ${a.hairCol === i ? 'on' : ''}" data-set="hairCol:${i}"><div class="duo-sw-in" style="background:${c}"></div></div>`).join('')}</div>
-        <div class="duo-sec">Причёска</div>
-        <div class="duo-grid">${HAIRS.map((n, i) => `<div class="duo-card ${a.hair === i ? 'on' : ''}" data-set="hair:${i}"><div class="duo-card-prev">${renderAvatarSvg({ ...a, hair: i }, true)}</div><div class="duo-card-lbl">${n}</div></div>`).join('')}</div>`;
+        <div class="duo-swatches" style="grid-template-columns:repeat(6,1fr)">${HAIR_COLS.map(c => `<div class="duo-sw ${a.hairCol === c ? 'on' : ''}" data-set="hairCol:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
+        <div class="duo-sec">Причёска (верх)</div>
+        ${renderCards(HAIRS, 'hair', a)}
+        <div class="duo-sec">Длина волос (сзади)</div>
+        ${renderCards(REAR_HAIRS, 'rearHair', a)}`;
     } else if (editorTab === 'face') {
       bodyHtml = `
         <div class="duo-sec">Глаза</div>
-        <div class="duo-grid">${EYES.map((n, i) => `<div class="duo-card ${a.eyes === i ? 'on' : ''}" data-set="eyes:${i}"><div class="duo-card-prev">${renderAvatarSvg({ ...a, eyes: i }, true)}</div><div class="duo-card-lbl">${n}</div></div>`).join('')}</div>
-        <div class="duo-sec">Мордашка</div>
-        <div class="duo-grid">${MOUTHS.map((n, i) => `<div class="duo-card ${a.mouth === i ? 'on' : ''}" data-set="mouth:${i}"><div class="duo-card-prev">${renderAvatarSvg({ ...a, mouth: i }, true)}</div><div class="duo-card-lbl">${n}</div></div>`).join('')}</div>`;
+        ${renderCards(EYES, 'eyes', a)}
+        <div class="duo-sec">Брови</div>
+        ${renderCards(BROWS, 'brows', a)}
+        <div class="duo-sec">Эмоция</div>
+        ${renderCards(MOUTHS, 'mouth', a)}
+        <div class="duo-sec">Борода / Усы</div>
+        ${renderCards(BEARDS, 'beard', a)}`;
     } else if (editorTab === 'cloth') {
       bodyHtml = `
         <div class="duo-sec">Цвет одежды</div>
-        <div class="duo-swatches">${SHIRTS.map((c, i) => `<div class="duo-sw ${a.shirt === i ? 'on' : ''}" data-set="shirt:${i}"><div class="duo-sw-in" style="background:${c}"></div></div>`).join('')}</div>`;
+        <div class="duo-swatches" style="grid-template-columns:repeat(6,1fr)">${CLOTHES_COLS.map(c => `<div class="duo-sw ${a.clothesCol === c ? 'on' : ''}" data-set="clothesCol:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
+        <div class="duo-sec">Стиль одежды</div>
+        ${renderCards(CLOTHES, 'clothes', a)}`;
     } else if (editorTab === 'acc') {
       bodyHtml = `
         <div class="duo-sec">Скины (открываются в Мозаике)</div>
-        <div class="duo-grid">${ACCS.map(ac => {
+        <div class="duo-grid" style="grid-template-columns:repeat(2,1fr)">${ACCS.map(ac => {
           const isLocked = ac.locked && !st.unlockedAcc.includes(ac.id);
           return `<div class="duo-card ${a.acc === ac.id ? 'on' : ''} ${isLocked ? 'locked' : ''}" data-acc="${ac.id}">
-            <div class="duo-card-prev">${renderAvatarSvg({ ...a, acc: ac.id }, true)}</div>
+            <div class="duo-card-prev" style="width:90px;height:90px">${renderAvatarSvg({ ...a, acc: ac.id }, true)}</div>
             <div class="duo-card-lbl">${isLocked ? '🔒 ' : ''}${ac.name}</div>
           </div>`;
         }).join('')}</div>`;
@@ -188,7 +283,7 @@
       </div>
       <div class="duo-body">${bodyHtml}</div>`;
 
-      const closeEditor = () => {
+    const closeEditor = () => {
       editorOv.classList.remove('open');
       save();
       renderBinder();
@@ -204,7 +299,7 @@
     editorOv.querySelectorAll('[data-set]').forEach(el => {
       el.onclick = () => {
         const [k, v] = el.getAttribute('data-set').split(':');
-        st.avatar[k] = Number(v);
+        st.avatar[k] = k === 'bg' ? Number(v) : v;
         save(false); haptic('light'); openAvatarCreator();
       };
     });
@@ -236,7 +331,7 @@
     renderBinder();
   };
 
-  /* Перехватываем переключение подвкладок Студии для добавления 4-й вкладки «Мозаика» */
+  /* 4-я вкладка «Мозаика» в Студии */
   const origSetStudioSubTab = window.setStudioSubTab;
   window.setStudioSubTab = function (t) {
     inMosaicTab = false;
@@ -254,11 +349,9 @@
     initAvState();
     origRenderBinder();
 
-    // Подменяем аватар в шапке Студии
     const avBox = document.querySelector('#screen-binder .av-circle');
     if (avBox) { avBox.style.padding = '0'; avBox.innerHTML = renderAvatarSvg(); }
 
-    // Добавляем 4-ю вкладку «Мозаика» в панель переключения
     const modeSwitch = document.querySelector('#screen-binder .mode-switch');
     if (modeSwitch) {
       const m = st.mosaic;
@@ -271,7 +364,6 @@
       modeSwitch.appendChild(mBtn);
     }
 
-    // Если активна вкладка «Мозаика» — рисуем её контент
     if (inMosaicTab) {
       const sub = document.getElementById('studio-sub-body');
       if (!sub) return;
@@ -326,7 +418,7 @@
     }
   };
 
-  // Подменяем аватар в Профиле + кнопка редактора
+  /* Подмена аватара в Профиле + скрытие старых эмодзи */
   const origOpenProfile = window.openProfileModal;
   window.openProfileModal = function () {
     initAvState();
@@ -346,7 +438,7 @@
     }
   };
 
-  // Шанс дропа кусочка мозаики после завершения урока
+  /* Шанс дропа кусочка мозаики после завершения урока */
   const origFinishAv = window.finishLesson;
   window.finishLesson = function () {
     const passed = !(curL && curL.isExam && mistakes > 4);
