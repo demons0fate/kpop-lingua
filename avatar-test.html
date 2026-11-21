@@ -35,7 +35,8 @@
       pointer-events: none;
     }
     #layer-bg {
-      top: 0; left: 0; transform: none;
+      top: 0; left: 0;
+      transform: scale(1.16);
       width: 100%; height: 100%;
       object-fit: cover;
     }
@@ -263,25 +264,73 @@
       acc: {
         label: 'Аксессуары', optional: true,
         files: [
-          'Accessories=Cap.svg','Accessories=Circle Earring.svg','Accessories=Earphone.svg','Accessories=Earring.svg',
-          'Accessories=Futuristic Glasses.svg','Accessories=Glasses.svg','Accessories=Mask Google.svg','Accessories=Mask.svg',
-          'Accessories=Moustache.svg','Accessories=Rounded Glasses.svg','Accessories=Simple Earring.svg','Accessories=Stylish Glasses.svg'
+          'Accessories=Circle Earring.svg','Accessories=Earphone.svg','Accessories=Earring.svg',
+          'Accessories=Futuristic Glasses.svg','Accessories=Glasses.svg','Accessories=Mask Google.svg',
+          'Accessories=Mask.svg','Accessories=Rounded Glasses.svg','Accessories=Simple Earring.svg',
+          'Accessories=Stylish Glasses.svg'
         ]
       }
     };
 
     const DEFAULT_LAYOUT = {
-      face:   { top: 21, left: 49, width: 46 },
-      outfit: { top: 51, left: 54, width: 71 },
-      eyes:   { top: 34, left: 60, width: 17 },
-      mouth:  { top: 47, left: 58, width: 8  },
-      hair:   { top: 17, left: 52, width: 59 },
-      acc:    { top: 32, left: 58, width: 28 }
+      face:   { top: 25, left: 49, width: 54 },
+      outfit: { top: 61, left: 54, width: 82 },
+      eyes:   { top: 40, left: 61, width: 20 },
+      mouth:  { top: 55, left: 59, width: 10 },
+      hair:   { top: 20, left: 52, width: 70 },
+      acc:    { top: 38, left: 59, width: 34 }
+    };
+
+    const DEFAULT_OVERRIDES = {
+      'Hair=Style 02.svg':                  { top: 20, left: 52, width: 69 },
+      'Outfit=Outfit 01.svg':               { top: 60, left: 53, width: 81 },
+      'Outfit=Outfit 02.svg':               { top: 61, left: 54, width: 82 },
+      'Outfit=Outfit 08.svg':               { top: 61, left: 54, width: 80 },
+      'Outfit=Outfit 12.svg':               { top: 61, left: 53, width: 78 },
+      'Outfit=Outfit 20.svg':               { top: 61, left: 54, width: 83 },
+      'Outfit=Outfit 21.svg':               { top: 61, left: 53, width: 81 },
+      'Outfit=Outfit 23.svg':               { top: 61, left: 54, width: 89 },
+      'Outfit=Outfit 14.svg':               { top: 61, left: 53, width: 82 },
+      'Hair=Style 03.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 04.svg':                  { top: 16, left: 52, width: 70 },
+      'Hair=Style 05.svg':                  { top: 22, left: 52, width: 70 },
+      'Hair=Style 06.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 07.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 10.svg':                  { top: 18, left: 52, width: 70 },
+      'Hair=Style 11.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 12.svg':                  { top: 18, left: 52, width: 70 },
+      'Hair=Style 14.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 15.svg':                  { top: 19, left: 52, width: 70 },
+      'Hair=Style 16.svg':                  { top: 20, left: 52, width: 70 },
+      'Hair=Style 17.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 19.svg':                  { top: 21, left: 52, width: 70 },
+      'Hair=Style 20.svg':                  { top: 22, left: 52, width: 69 },
+      'Hair=Style 21.svg':                  { top: 21, left: 52, width: 69 },
+      'Hair=Style 22.svg':                  { top: 18, left: 52, width: 69 },
+      'Mouth=Normal Smile.svg':             { top: 56, left: 59, width: 10 },
+      'Mouth=Cute.svg':                     { top: 57, left: 59, width: 10 },
+      'Mouth=Smiliey.svg':                  { top: 56, left: 59, width: 10 },
+      'Mouth=Open Mouth.svg':               { top: 56, left: 58, width: 10 },
+      'Mouth=Open Tooth.svg':               { top: 56, left: 58, width: 10 },
+      'Mouth=Eat.svg':                      { top: 57, left: 59, width: 10 },
+      'Mouth=Angry.svg':                    { top: 56, left: 58, width: 10 },
+      'Mouth=Hate.svg':                     { top: 57, left: 59, width: 10 },
+      'Accessories=Circle Earring.svg':     { top: 47, left: 55, width: 40 },
+      'Accessories=Earphone.svg':           { top: 47, left: 55, width: 40 },
+      'Accessories=Earring.svg':            { top: 47, left: 55, width: 40 },
+      'Accessories=Futuristic Glasses.svg': { top: 37, left: 54, width: 43 },
+      'Hair=Style 23.svg':                  { top: 24, left: 51, width: 71 },
+      'Accessories=Glasses.svg':            { top: 41, left: 54, width: 43 },
+      'Accessories=Mask Google.svg':        { top: 47, left: 55, width: 40 },
+      'Accessories=Mask.svg':               { top: 47, left: 56, width: 40 },
+      'Accessories=Rounded Glasses.svg':    { top: 39, left: 56, width: 39 },
+      'Accessories=Simple Earring.svg':     { top: 47, left: 55, width: 40 },
+      'Accessories=Stylish Glasses.svg':    { top: 42, left: 55, width: 37 }
     };
 
     let layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-    let itemOverrides = {}; // { 'Hair=Style 04.svg': { top, left, width } }
-    let editMode = 'tab'; // 'tab' | 'item'
+    let itemOverrides = JSON.parse(JSON.stringify(DEFAULT_OVERRIDES));
+    let editMode = 'tab';
 
     const state = {
       bg: ASSETS.bg.files[0],
@@ -387,7 +436,7 @@
 
     document.getElementById('resetAllBtn').onclick = () => {
       layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-      itemOverrides = {};
+      itemOverrides = JSON.parse(JSON.stringify(DEFAULT_OVERRIDES));
       editMode = 'tab';
       applyLayout();
       syncSliders();
