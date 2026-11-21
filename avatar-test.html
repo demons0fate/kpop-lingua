@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Avatar Editor Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #12121a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    .preview-wrap {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      border-radius: 28px;
+      background: #1e1e2c;
+      border: 2px solid #2e2e44;
+      overflow: hidden;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+    .preview-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #6c5ce7;
+      color: #fff;
+    }
+    .btn:active { transform: scale(0.97); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      width: 100%;
+      max-width: 440px;
+      padding-bottom: 10px;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: #1e1e2c;
+      color: #a0a0be;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid #2e2e44;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #fff;
+      color: #12121a;
+      border-color: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 440px;
+      padding-bottom: 24px;
+    }
+    .item {
+      aspect-ratio: 1;
+      background: #1e1e2c;
+      border: 2px solid #2e2e44;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .item.active {
+      border-color: #6c5ce7;
+      background: #272540;
+    }
+    .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .item.none {
+      font-size: 13px;
+      color: #8888a8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="preview-wrap" id="preview">
+    <img id="layer-bg" alt="" />
+    <img id="layer-face" alt="" />
+    <img id="layer-outfit" alt="" />
+    <img id="layer-eyes" alt="" />
+    <img id="layer-mouth" alt="" />
+    <img id="layer-hair" alt="" />
+    <img id="layer-acc" alt="" />
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="randomBtn">🎲 Случайный</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const BASE = './img/avatar/';
+
+    const ASSETS = {
+      bg: {
+        label: 'Фон',
+        optional: true,
+        files: [
+          'Background=Background1.svg',
+          'Background=Background2.svg',
+          'Background=Background3.svg',
+          'Background=Background4.svg'
+        ]
+      },
+      face: {
+        label: 'Кожа',
+        optional: false,
+        files: [
+          'Face=Skin 1 - Fair.svg',
+          'Face=Skin 2 - Light.svg',
+          'Face=Skin 3 - Tanned.svg',
+          'Face=Skin 4 - Darker.svg'
+        ]
+      },
+      hair: {
+        label: 'Волосы',
+        optional: true,
+        files: [
+          'Hair=Style 01.svg', 'Hair=Style 02.svg', 'Hair=Style 03.svg',
+          'Hair=Style 04.svg', 'Hair=Style 05.svg', 'Hair=Style 06.svg',
+          'Hair=Style 07.svg', 'Hair=Style 08.svg', 'Hair=Style 10.svg',
+          'Hair=Style 11.svg', 'Hair=Style 12.svg', 'Hair=Style 13.svg',
+          'Hair=Style 14.svg', 'Hair=Style 15.svg', 'Hair=Style 16.svg',
+          'Hair=Style 17.svg', 'Hair=Style 19.svg', 'Hair=Style 20.svg',
+          'Hair=Style 21.svg', 'Hair=Style 22.svg', 'Hair=Style 23.svg'
+        ]
+      },
+      eyes: {
+        label: 'Глаза',
+        optional: false,
+        files: [
+          'Eyes=Normal.svg', 'Eyes=Angry.svg', 'Eyes=Closed.svg',
+          'Eyes=Cynic.svg', 'Eyes=Sad.svg', 'Eyes=Thin.svg'
+        ]
+      },
+      mouth: {
+        label: 'Рот',
+        optional: false,
+        files: [
+          'Mouth=Normal Smile.svg', 'Mouth=Normal Thin.svg', 'Mouth=Cute.svg',
+          'Mouth=Smiliey.svg', 'Mouth=Open Mouth.svg', 'Mouth=Open Tooth.svg',
+          'Mouth=Eat.svg', 'Mouth=Sad.svg', 'Mouth=Angry.svg', 'Mouth=Hate.svg'
+        ]
+      },
+      outfit: {
+        label: 'Одежда',
+        optional: false,
+        files: [
+          'Outfit=Outfit 01.svg', 'Outfit=Outfit 02.svg', 'Outfit=Outfit 03.svg',
+          'Outfit=Outfit 04.svg', 'Outfit=Outfit 05.svg', 'Outfit=Outfit 06.svg',
+          'Outfit=Outfit 07.svg', 'Outfit=Outfit 08.svg', 'Outfit=Outfit 09.svg',
+          'Outfit=Outfit 10.svg', 'Outfit=Outfit 11.svg', 'Outfit=Outfit 12.svg',
+          'Outfit=Outfit 13.svg', 'Outfit=Outfit 14.svg', 'Outfit=Outfit 16.svg',
+          'Outfit=Outfit 17.svg', 'Outfit=Outfit 18.svg', 'Outfit=Outfit 19.svg',
+          'Outfit=Outfit 20.svg', 'Outfit=Outfit 21.svg', 'Outfit=Outfit 22.svg',
+          'Outfit=Outfit 23.svg'
+        ]
+      },
+      acc: {
+        label: 'Аксессуары',
+        optional: true,
+        files: [
+          'Accessories=Cap.svg', 'Accessories=Circle Earring.svg',
+          'Accessories=Earphone.svg', 'Accessories=Earring.svg',
+          'Accessories=Futuristic Glasses.svg', 'Accessories=Glasses.svg',
+          'Accessories=Mask Google.svg', 'Accessories=Mask.svg',
+          'Accessories=Moustache.svg', 'Accessories=Rounded Glasses.svg',
+          'Accessories=Simple Earring.svg', 'Accessories=Stylish Glasses.svg'
+        ]
+      }
+    };
+
+    const state = {
+      bg: ASSETS.bg.files[0],
+      face: ASSETS.face.files[0],
+      hair: ASSETS.hair.files[0],
+      eyes: ASSETS.eyes.files[0],
+      mouth: ASSETS.mouth.files[0],
+      outfit: ASSETS.outfit.files[0],
+      acc: null
+    };
+
+    let activeTab = 'hair';
+
+    function fileUrl(name) {
+      return BASE + encodeURIComponent(name);
+    }
+
+    function renderPreview() {
+      Object.keys(state).forEach(key => {
+        const img = document.getElementById('layer-' + key);
+        if (state[key]) {
+          img.src = fileUrl(state[key]);
+          img.style.display = 'block';
+        } else {
+          img.removeAttribute('src');
+          img.style.display = 'none';
+        }
+      });
+    }
+
+    function renderTabs() {
+      const wrap = document.getElementById('tabs');
+      wrap.innerHTML = '';
+      Object.entries(ASSETS).forEach(([key, cfg]) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab' + (activeTab === key ? ' active' : '');
+        btn.textContent = cfg.label;
+        btn.onclick = () => {
+          activeTab = key;
+          renderTabs();
+          renderGrid();
+        };
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      const cfg = ASSETS[activeTab];
+
+      if (cfg.optional) {
+        const none = document.createElement('div');
+        none.className = 'item none' + (state[activeTab] === null ? ' active' : '');
+        none.textContent = 'Нет';
+        none.onclick = () => {
+          state[activeTab] = null;
+          renderPreview();
+          renderGrid();
+        };
+        grid.appendChild(none);
+      }
+
+      cfg.files.forEach(file => {
+        const card = document.createElement('div');
+        card.className = 'item' + (state[activeTab] === file ? ' active' : '');
+        const img = document.createElement('img');
+        img.src = fileUrl(file);
+        img.loading = 'lazy';
+        card.appendChild(img);
+        card.onclick = () => {
+          state[activeTab] = file;
+          renderPreview();
+          renderGrid();
+        };
+        grid.appendChild(card);
+      });
+    }
+
+    document.getElementById('randomBtn').onclick = () => {
+      Object.entries(ASSETS).forEach(([key, cfg]) => {
+        const pool = cfg.optional ? [null, ...cfg.files] : cfg.files;
+        state[key] = pool[Math.floor(Math.random() * pool.length)];
+      });
+      renderPreview();
+      renderGrid();
+    };
+
+    renderTabs();
+    renderGrid();
+    renderPreview();
+  </script>
+</body>
+</html>
