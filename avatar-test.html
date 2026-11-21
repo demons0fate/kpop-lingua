@@ -16,31 +16,31 @@
       align-items: center;
       padding: 16px;
     }
-    .preview-wrap {
+        .preview-wrap {
       position: relative;
       width: 240px;
       height: 240px;
-      border-radius: 28px;
+      border-radius: 50%;
       background: #1e1e2c;
-      border: 2px solid #2e2e44;
+      border: 3px solid #2e2e44;
       overflow: hidden;
       margin-bottom: 14px;
       flex-shrink: 0;
     }
-        .preview-wrap img {
+    .preview-wrap img {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       height: auto;
       pointer-events: none;
     }
-    #layer-bg     { top: 4%;   width: 92%; }
+    #layer-bg     { top: 0;    width: 100%; }
     #layer-face   { top: 18%;  width: 42%; }
     #layer-outfit { bottom: 0; width: 76%; }
-    #layer-eyes   { top: 39%;  width: 22%; }
-    #layer-mouth  { top: 51%;  width: 12%; }
-    #layer-hair   { top: 11%;  width: 54%; }
-    #layer-acc    { top: 34%;  width: 46%; }
+    #layer-eyes   { top: 33%;  left: 54%; width: 17%; }
+    #layer-mouth  { top: 43%;  left: 54%; width: 10%; }
+    #layer-hair   { top: 11%;  left: 49%; width: 53%; }
+    #layer-acc    { top: 31%;  left: 53%; width: 30%; }
     .actions {
       display: flex;
       gap: 10px;
