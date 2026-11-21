@@ -1,139 +1,169 @@
-/* ====== РЕДАКТОР ГЕРОЯ (DICEBEAR TOON HEAD + СТИЛЬ DUOLINGO) + ВКЛАДКА «МОЗАИКА» ====== */
+/* ====== РЕДАКТОР ГЕРОЯ (AVATAAARS + СТИЛЬ DUOLINGO) + МОЗАИКА + КАРТОЧКИ ====== */
+import { createAvatar } from 'https://cdn.jsdelivr.net/npm/@dicebear/core@9/+esm';
+import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+esm';
+
 (function () {
-  const SKINS = ["f1c3a5", "c68e7a", "b98e6a", "a36b4f", "5c3829"];
-  const HAIR_COLS = ["2c1b18", "ff2e93", "00e5ff", "d6b370", "b46eff", "a55728"];
-  const CLOTHES_COLS = ["151613", "ec4899", "0b3286", "731ac3", "eab308", "e8e9e6"];
+  const OPTIONS = {
+    top: {
+      label: 'Волосы',
+      type: 'part',
+      values: [
+        'shortFlat', 'shortRound', 'shortWaved', 'shortCurly', 'shaggy',
+        'shaggyMullet', 'bob', 'bun', 'curly', 'curvy',
+        'longButNotTooLong', 'miaWallace', 'straight01', 'straight02', 'straightAndStrand'
+      ]
+    },
+    hairColor: {
+      label: 'Цвет волос',
+      type: 'color',
+      values: ['2c1b18', '4a312c', '724133', 'a55728', 'b58143', 'd6b370', 'c93305', 'f59797']
+    },
+    skinColor: {
+      label: 'Кожа',
+      type: 'color',
+      values: ['ffdbb4', 'edb98a', 'd08b5b', '614335']
+    },
+    eyes: {
+      label: 'Глаза',
+      type: 'part',
+      values: ['default', 'happy', 'wink', 'side', 'squint', 'hearts', 'closed']
+    },
+    eyebrows: {
+      label: 'Брови',
+      type: 'part',
+      values: ['default', 'defaultNatural', 'raisedExcited', 'raisedExcitedNatural', 'flatNatural', 'sadConcerned', 'angryNatural', 'upDown']
+    },
+    mouth: {
+      label: 'Рот',
+      type: 'part',
+      values: ['smile', 'default', 'twinkle', 'tongue', 'serious', 'concerned', 'disbelief', 'eating', 'grimace', 'sad']
+    },
+    clothing: {
+      label: 'Одежда',
+      type: 'part',
+      values: ['hoodie', 'blazerAndShirt', 'blazerAndSweater', 'collarAndSweater', 'shirtCrewNeck', 'shirtScoopNeck', 'shirtVNeck']
+    },
+    clothesColor: {
+      label: 'Цвет одежды',
+      type: 'color',
+      values: ['262e33', '3c4f5c', '5199e4', '65c9ff', '929598', 'a7ffc4', 'b1e2ff', 'e6e6e6', 'ff488e', 'ff5c5c', 'ffafb9', 'ffffb1']
+    },
+    accessories: {
+      label: 'Очки',
+      type: 'part',
+      optional: true,
+      values: ['round', 'prescription01', 'prescription02', 'sunglasses', 'wayfarers', 'kurt']
+    },
+    backgroundColor: {
+      label: 'Фон',
+      type: 'color',
+      values: ['3b82f6', '8b5cf6', 'ec4899', '06b6d4', '10b981', 'f59e0b', 'b6e3f4', 'c0aede', 'ffd5dc', '2b2d42']
+    },
+    acc: {
+      label: 'Скины',
+      type: 'skin'
+    }
+  };
 
-  const HAIRS = [
-    { v: "undercut",  n: "Андеркат" },
-    { v: "spiky",     n: "Ёжик" },
-    { v: "sideComed", n: "Набок" },
-    { v: "bun",       n: "Пучок" },
-    { v: "none",      n: "Без волос" }
-  ];
-
-  const REAR_HAIRS = [
-    { v: "none",         n: "Короткие" },
-    { v: "neckHigh",     n: "До шеи" },
-    { v: "shoulderHigh", n: "До плеч" },
-    { v: "longStraight", n: "Длинные" },
-    { v: "longWavy",     n: "Волнистые" }
-  ];
-
-  const EYES = [
-    { v: "wide",   n: "Широкие" },
-    { v: "happy",  n: "Радость" },
-    { v: "wink",   n: "Подмиг" },
-    { v: "bow",    n: "Мягкие" },
-    { v: "humble", n: "Скромные" }
-  ];
-
-  const BROWS = [
-    { v: "happy",   n: "Добрые" },
-    { v: "neutral", n: "Обычные" },
-    { v: "raised",  n: "Удивление" },
-    { v: "angry",   n: "Дерзкие" },
-    { v: "sad",     n: "Грустные" }
-  ];
-
-  const MOUTHS = [
-    { v: "smile", n: "Улыбка" },
-    { v: "laugh", n: "Смех" },
-    { v: "agape", n: "Вау" },
-    { v: "angry", n: "Хмурый" },
-    { v: "sad",   n: "Грусть" }
-  ];
-
-  const BEARDS = [
-    { v: "none",          n: "Нет" },
-    { v: "chin",          n: "Бородка" },
-    { v: "chinMoustache", n: "С усами" },
-    { v: "fullBeard",     n: "Борода" },
-    { v: "moustacheTwirl",n: "Усы" }
-  ];
-
-  const CLOTHES = [
-    { v: "openJacket", n: "Куртка" },
-    { v: "tShirt",     n: "Футболка" },
-    { v: "turtleNeck", n: "Водолазка" },
-    { v: "shirt",      n: "Рубашка" },
-    { v: "dress",      n: "Платье" }
-  ];
-
-  const BGS = [
-    "linear-gradient(135deg,#ff2e93,#7b2cbf)",
-    "linear-gradient(135deg,#00e5ff,#3a0ca3)",
-    "linear-gradient(135deg,#ffd700,#ff6b00)",
-    "linear-gradient(135deg,#2563eb,#1e1b4b)",
-    "linear-gradient(135deg,#1f2330,#0e0a1a)"
-  ];
-
-  const ACCS = [
-    { id: "none",  name: "Без скина", locked: false },
-    { id: "visor", name: "Кибер-визор", locked: true, req: "Мозаика #1" }
-  ];
-
-  const EDITOR_TABS = [
-    { id: "base",  ico: "👤", label: "База" },
-    { id: "hair",  ico: "💇", label: "Волосы" },
-    { id: "face",  ico: "👀", label: "Лицо" },
-    { id: "cloth", ico: "👕", label: "Одежда" },
-    { id: "acc",   ico: "🕶️", label: "Скины" }
+  const SKINS_LIST = [
+    { id: 'none',  name: 'Без скина',   locked: false },
+    { id: 'visor', name: 'Кибер-визор', locked: true, req: 'Мозаика #1' }
   ];
 
   const DEFAULT_AV = {
-    v: 2,
-    skin: "f1c3a5",
-    hair: "undercut",
-    rearHair: "none",
-    hairCol: "ff2e93",
-    eyes: "happy",
-    brows: "happy",
-    mouth: "smile",
-    beard: "none",
-    clothes: "openJacket",
-    clothesCol: "151613",
-    bg: 0,
-    acc: "none"
+    v: 3,
+    top: 'shortFlat',
+    hairColor: '2c1b18',
+    skinColor: 'ffdbb4',
+    eyes: 'default',
+    eyebrows: 'defaultNatural',
+    mouth: 'smile',
+    clothing: 'hoodie',
+    clothesColor: '5199e4',
+    accessories: null,
+    backgroundColor: '3b82f6',
+    acc: 'none'
   };
 
-  let editorTab = 'base';
+  let activeTab = 'top';
   let inMosaicTab = false;
 
   const css = document.createElement('style');
   css.textContent = `
-    .av-svg-wrap { position: relative; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    .av-svg-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .av-svg-wrap { position: relative; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+    .av-svg-wrap > svg:first-child { width: 100%; height: 100%; display: block; pointer-events: none; }
     .av-visor-ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
     #screen-binder .mode-btn { font-size: 11px; padding: 8px 4px; }
 
+    /* Крупный баннер героя в Профиле (стиль Duolingo) */
+    .prof-hero-banner {
+      position: relative;
+      width: 100%;
+      height: 196px;
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 14px;
+      border: 2px solid rgba(255,255,255,0.14);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+      cursor: pointer;
+    }
+    .prof-hero-av {
+      height: 94%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .prof-hero-edit {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      background: rgba(19, 19, 31, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 7px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .prof-hero-edit:active { transform: scale(0.95); }
+
     /* Редактор персонажа в стиле Duolingo */
-    .duo-editor { position: fixed; inset: 0; background: #0e0a1a; z-index: 9700; display: none; flex-direction: column; }
+    .duo-editor { position: fixed; inset: 0; background: #13131f; z-index: 9700; display: none; flex-direction: column; }
     .duo-editor.open { display: flex; animation: fadeIn 0.2s ease; }
-    .duo-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #130e24; border-bottom: 1px solid rgba(255,255,255,0.07); }
-    .duo-done { background: none; border: none; color: var(--cyan); font-size: 13px; font-weight: 900; letter-spacing: 0.6px; cursor: pointer; padding: 6px 4px; }
-    .duo-stage { height: 215px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-    .duo-stage-av { width: 200px; height: 200px; }
+    .duo-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #13131f; border-bottom: 1px solid #24243a; flex-shrink: 0; }
+    .duo-done { background: none; border: none; color: #38bdf8; font-size: 15px; font-weight: 800; letter-spacing: 0.4px; cursor: pointer; padding: 4px 6px; }
+    .duo-stage { position: relative; width: 100%; height: 39dvh; min-height: 220px; max-height: 320px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; flex-shrink: 0; transition: background-color 0.25s ease; }
+    .duo-stage-av { height: 94%; aspect-ratio: 1; display: flex; align-items: flex-end; justify-content: center; }
+    .duo-rand-fab { position: absolute; right: 14px; bottom: 14px; width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.2); background: rgba(19,19,31,0.55); backdrop-filter: blur(8px); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .duo-rand-fab:active { transform: scale(0.93); }
 
-    .duo-tabs { display: grid; grid-template-columns: repeat(5, 1fr); background: #151026; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
-    .duo-tab { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 4px; font-size: 20px; cursor: pointer; opacity: 0.45; transition: 0.18s; }
-    .duo-tab.active { opacity: 1; border-bottom-color: var(--cyan); background: rgba(0,229,255,0.06); }
+    .duo-tabs { display: flex; overflow-x: auto; background: #171726; border-bottom: 1px solid #26263d; padding: 0 8px; scrollbar-width: none; flex-shrink: 0; }
+    .duo-tabs::-webkit-scrollbar { display: none; }
+    .duo-tab { position: relative; padding: 13px 14px; background: none; border: none; color: #8888a8; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+    .duo-tab.active { color: #38bdf8; }
+    .duo-tab.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: #38bdf8; }
 
-    .duo-body { flex: 1; overflow-y: auto; padding: 14px 16px 32px; -webkit-overflow-scrolling: touch; }
-    .duo-sec { font-size: 12px; font-weight: 800; color: #d8cce8; margin: 4px 0 10px; }
+    .duo-body { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
+    .duo-sec { font-size: 14px; font-weight: 700; color: #a4a4c4; margin-bottom: 12px; }
+    .duo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 24px; }
+    .duo-grid.colors { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .duo-grid.skins { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-    .duo-swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 18px; }
-    .duo-sw { aspect-ratio: 1; border-radius: 14px; border: 2.5px solid rgba(255,255,255,0.12); padding: 4px; cursor: pointer; transition: 0.15s; background: #19132b; }
-    .duo-sw.on { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,229,255,0.35); transform: scale(1.04); }
-    .duo-sw-in { width: 100%; height: 100%; border-radius: 9px; }
-
-    .duo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
-    .duo-card { background: #18122b; border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 6px; text-align: center; cursor: pointer; position: relative; transition: 0.15s; }
-    .duo-card.on { border-color: var(--cyan); background: rgba(0,229,255,0.1); box-shadow: 0 0 14px rgba(0,229,255,0.22); }
-    .duo-card.locked { opacity: 0.5; }
-    .duo-card-prev { width: 76px; height: 76px; margin: 0 auto 4px; border-radius: 10px; overflow: hidden; }
-    .duo-card-lbl { font-size: 10px; font-weight: 800; color: #e2d9f3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .duo-item { aspect-ratio: 1; background: #1d1d30; border: 2.5px solid #2b2b45; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; transition: border-color 0.15s, transform 0.1s; position: relative; }
+    .duo-item:active { transform: scale(0.96); }
+    .duo-item.active { border-color: #38bdf8; background: #232942; box-shadow: 0 0 0 2px rgba(56,189,248,0.25); }
+    .duo-item.locked { opacity: 0.55; }
+    .duo-item.none { font-size: 14px; color: #8f8fb0; font-weight: 700; }
+    .duo-item.color-card { padding: 5px; border-radius: 15px; background: #171726; }
+    .duo-swatch { width: 100%; height: 100%; border-radius: 10px; }
+    .duo-skin-lbl { position: absolute; bottom: 6px; left: 6px; right: 6px; text-align: center; font-size: 11px; font-weight: 800; background: rgba(19,19,31,0.78); padding: 3px 6px; border-radius: 8px; }
 
     /* Вкладка Мозаика 3×3 */
     .mosaic-box { background: linear-gradient(145deg, #211638, #130d24); border: 1.5px solid rgba(0,229,255,0.32); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
@@ -142,180 +172,207 @@
     .m-tile.open { border-style: solid; border-color: var(--cyan); background: linear-gradient(135deg, rgba(255,46,147,0.35), rgba(0,229,255,0.35)); color: #fff; box-shadow: inset 0 0 14px rgba(0,229,255,0.3); }
     .m-tile.craftable { cursor: pointer; border-color: var(--gold); animation: tilePulse 1.4s infinite alternate; }
     @keyframes tilePulse { from { box-shadow: 0 0 4px rgba(255,215,0,0.2); } to { box-shadow: 0 0 14px rgba(255,215,0,0.65); } }
+
+    /* Карточки артистов в едином стиле Avataaars */
+    .toon-card-art { position: relative; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+    .toon-card-art svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+    .toon-role-pill { position: absolute; bottom: 5px; right: 5px; background: rgba(14,10,26,0.72); border: 1px solid rgba(255,255,255,0.2); border-radius: 7px; padding: 2px 5px; font-size: 9px; font-weight: 900; color: #fff; backdrop-filter: blur(4px); }
   `;
   document.head.appendChild(css);
 
   function initAvState() {
-    if (!st.avatar || st.avatar.v !== 2) {
-      const prevAcc = (st.avatar && st.avatar.acc) ? st.avatar.acc : "none";
+    if (!st.avatar || st.avatar.v !== 3) {
+      const prevAcc = (st.avatar && st.avatar.acc) ? st.avatar.acc : 'none';
       st.avatar = { ...DEFAULT_AV, acc: prevAcc };
     }
     if (!st.mosaic) st.mosaic = { pieces: [], dust: 0, claimed: false };
     if (!st.unlockedAcc) st.unlockedAcc = [];
   }
 
-  /* Сборка URL для DiceBear Toon Head */
-  function buildToonUrl(a) {
-    const p = new URLSearchParams();
-    p.set("seed", "kpop");
-    p.set("skinColor", a.skin || DEFAULT_AV.skin);
-    p.set("hairColor", a.hairCol || DEFAULT_AV.hairCol);
-    p.set("clothesColor", a.clothesCol || DEFAULT_AV.clothesCol);
-    p.set("eyesVariant", a.eyes || DEFAULT_AV.eyes);
-    p.set("eyebrowsVariant", a.brows || DEFAULT_AV.brows);
-    p.set("mouthVariant", a.mouth || DEFAULT_AV.mouth);
-    p.set("clothesVariant", a.clothes || DEFAULT_AV.clothes);
-
-    if (a.hair === "none") {
-      p.set("hairProbability", "0");
-    } else {
-      p.set("hairProbability", "100");
-      p.set("hairVariant", a.hair || DEFAULT_AV.hair);
+  function buildConfig(a, withBg = false) {
+    const cfg = {
+      seed: 'base',
+      top: [a.top || DEFAULT_AV.top],
+      hairColor: [a.hairColor || DEFAULT_AV.hairColor],
+      skinColor: [a.skinColor || DEFAULT_AV.skinColor],
+      eyes: [a.eyes || DEFAULT_AV.eyes],
+      eyebrows: [a.eyebrows || DEFAULT_AV.eyebrows],
+      mouth: [a.mouth || DEFAULT_AV.mouth],
+      clothing: [a.clothing || DEFAULT_AV.clothing],
+      clothesColor: [a.clothesColor || DEFAULT_AV.clothesColor],
+      facialHairProbability: 0,
+      accessoriesProbability: a.accessories ? 100 : 0
+    };
+    if (withBg) {
+      cfg.backgroundColor = [a.backgroundColor || DEFAULT_AV.backgroundColor];
     }
-
-    if (!a.rearHair || a.rearHair === "none") {
-      p.set("rearHairProbability", "0");
-    } else {
-      p.set("rearHairProbability", "100");
-      p.set("rearHairVariant", a.rearHair);
+    if (a.accessories) {
+      cfg.accessories = [a.accessories];
     }
-
-    if (!a.beard || a.beard === "none") {
-      p.set("beardProbability", "0");
-    } else {
-      p.set("beardProbability", "100");
-      p.set("beardVariant", a.beard);
-    }
-
-    return `https://api.dicebear.com/10.x/toon-head/svg?${p.toString()}`;
+    return cfg;
   }
 
-  /* Рендер персонажа Toon Head + слой скина */
-  window.renderAvatarSvg = function (cfg, transparentBg) {
-    const a = (cfg && cfg.v === 2) ? cfg : (st.avatar && st.avatar.v === 2 ? st.avatar : DEFAULT_AV);
-    const bgStyle = transparentBg ? 'transparent' : (BGS[a.bg] || BGS[0]);
-    const url = buildToonUrl(a);
+  window.renderAvatarSvg = function (cfg, transparentBg = false) {
+    initAvState();
+    const a = (cfg && cfg.v === 3) ? cfg : st.avatar;
+    const svg = createAvatar(avataaars, buildConfig(a, false)).toString();
+    const bg = transparentBg ? 'transparent' : ('#' + (a.backgroundColor || DEFAULT_AV.backgroundColor));
     const visorSvg = a.acc === 'visor'
       ? `<svg class="av-visor-ov" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
            <rect x="27" y="42" width="46" height="14" rx="7" fill="rgba(0,229,255,0.62)" stroke="#00e5ff" stroke-width="2.5"/>
            <line x1="33" y1="46" x2="48" y2="46" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
          </svg>`
       : '';
-
-    return `<div class="av-svg-wrap" style="background:${bgStyle}">
-      <img src="${url}" alt="avatar" loading="lazy"/>
-      ${visorSvg}
-    </div>`;
+    return `<div class="av-svg-wrap" style="background:${bg}">${svg}${visorSvg}</div>`;
   };
 
-  /* Редактор персонажа */
+  /* ====== ПОЛНОЭКРАННЫЙ РЕДАКТОР (DUOLINGO) ====== */
   const editorOv = document.createElement('div');
   editorOv.className = 'duo-editor';
   editorOv.id = 'av-editor-overlay';
+  editorOv.innerHTML = `
+    <div class="duo-head">
+      <button class="close-btn" style="width:32px;height:32px;font-size:15px" id="duo-close">✕</button>
+      <div style="font-size:16px;font-weight:800">Редактор героя</div>
+      <button class="duo-done" id="duo-done">ГОТОВО</button>
+    </div>
+    <div class="duo-stage" id="duo-stage">
+      <div class="duo-stage-av" id="duo-stage-av"></div>
+      <button class="duo-rand-fab" id="duo-rand" title="Случайный образ">🎲</button>
+    </div>
+    <div class="duo-tabs" id="duo-tabs"></div>
+    <div class="duo-body">
+      <div class="duo-sec" id="duo-sec-title">Волосы</div>
+      <div class="duo-grid" id="duo-grid"></div>
+    </div>
+  `;
   document.body.appendChild(editorOv);
 
-  function renderCards(list, key, a) {
-    return `<div class="duo-grid">${list.map(it => `
-      <div class="duo-card ${a[key] === it.v ? 'on' : ''}" data-set="${key}:${it.v}">
-        <div class="duo-card-prev">${renderAvatarSvg({ ...a, [key]: it.v }, true)}</div>
-        <div class="duo-card-lbl">${it.n}</div>
-      </div>`).join('')}</div>`;
+  function updateStage() {
+    const a = st.avatar;
+    editorOv.querySelector('#duo-stage').style.backgroundColor = '#' + (a.backgroundColor || DEFAULT_AV.backgroundColor);
+    editorOv.querySelector('#duo-stage-av').innerHTML = renderAvatarSvg(a, true);
   }
+
+  function renderEditorTabs() {
+    const wrap = editorOv.querySelector('#duo-tabs');
+    wrap.innerHTML = '';
+    Object.entries(OPTIONS).forEach(([key, cfg]) => {
+      const btn = document.createElement('button');
+      btn.className = 'duo-tab' + (activeTab === key ? ' active' : '');
+      btn.textContent = cfg.label;
+      btn.onclick = () => {
+        activeTab = key;
+        haptic('light');
+        renderEditorTabs();
+        renderEditorGrid();
+      };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderEditorGrid() {
+    const grid = editorOv.querySelector('#duo-grid');
+    const cfg = OPTIONS[activeTab];
+    const a = st.avatar;
+    editorOv.querySelector('#duo-sec-title').textContent = cfg.label;
+    grid.className = 'duo-grid' + (cfg.type === 'color' ? ' colors' : (cfg.type === 'skin' ? ' skins' : ''));
+    grid.innerHTML = '';
+
+    if (cfg.type === 'skin') {
+      SKINS_LIST.forEach(sk => {
+        const isLocked = sk.locked && !st.unlockedAcc.includes(sk.id);
+        const card = document.createElement('div');
+        card.className = 'duo-item' + (a.acc === sk.id ? ' active' : '') + (isLocked ? ' locked' : '');
+        card.innerHTML = `${renderAvatarSvg({ ...a, acc: sk.id }, false)}<div class="duo-skin-lbl">${isLocked ? '🔒 ' : ''}${sk.name}</div>`;
+        card.onclick = () => {
+          if (isLocked) return alert(`Открой во вкладке «Мозаика»: собери ${sk.req}!`);
+          st.avatar.acc = sk.id;
+          save(false); haptic('ok');
+          updateStage();
+          renderEditorGrid();
+        };
+        grid.appendChild(card);
+      });
+      return;
+    }
+
+    if (cfg.optional) {
+      const none = document.createElement('div');
+      none.className = 'duo-item none' + (a[activeTab] === null ? ' active' : '');
+      none.textContent = 'Нет';
+      none.onclick = () => {
+        st.avatar[activeTab] = null;
+        save(false); haptic('light');
+        updateStage();
+        renderEditorGrid();
+      };
+      grid.appendChild(none);
+    }
+
+    cfg.values.forEach(val => {
+      const card = document.createElement('div');
+      card.className = 'duo-item' + (cfg.type === 'color' ? ' color-card' : '') + (a[activeTab] === val ? ' active' : '');
+
+      if (cfg.type === 'color') {
+        const sw = document.createElement('div');
+        sw.className = 'duo-swatch';
+        sw.style.background = '#' + val;
+        card.appendChild(sw);
+      } else {
+        card.innerHTML = renderAvatarSvg({ ...a, [activeTab]: val }, false);
+      }
+
+      card.onclick = () => {
+        st.avatar[activeTab] = val;
+        save(false); haptic('light');
+        updateStage();
+        grid.querySelectorAll('.duo-item').forEach(el => el.classList.remove('active'));
+        card.classList.add('active');
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  function refreshProfileBanner() {
+    const banner = document.querySelector('#profile-overlay .prof-hero-banner');
+    if (banner) {
+      banner.style.background = '#' + (st.avatar.backgroundColor || DEFAULT_AV.backgroundColor);
+      const avWrap = banner.querySelector('.prof-hero-av');
+      if (avWrap) avWrap.innerHTML = renderAvatarSvg(st.avatar, true);
+    }
+  }
+
+  const closeEditor = () => {
+    editorOv.classList.remove('open');
+    save();
+    renderBinder();
+    refreshProfileBanner();
+  };
+
+  editorOv.querySelector('#duo-close').onclick = closeEditor;
+  editorOv.querySelector('#duo-done').onclick = () => { haptic('ok'); closeEditor(); };
+  editorOv.querySelector('#duo-rand').onclick = () => {
+    haptic('light');
+    Object.entries(OPTIONS).forEach(([key, cfg]) => {
+      if (cfg.type === 'skin') return;
+      const pool = cfg.optional ? [null, null, ...cfg.values] : cfg.values;
+      st.avatar[key] = pool[Math.floor(Math.random() * pool.length)];
+    });
+    save(false);
+    updateStage();
+    renderEditorGrid();
+  };
 
   window.openAvatarCreator = function () {
     initAvState();
-    const a = st.avatar;
-    let bodyHtml = '';
-
-    if (editorTab === 'base') {
-      bodyHtml = `
-        <div class="duo-sec">Тон кожи</div>
-        <div class="duo-swatches">${SKINS.map(c => `<div class="duo-sw ${a.skin === c ? 'on' : ''}" data-set="skin:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
-        <div class="duo-sec">Фон карточки</div>
-        <div class="duo-swatches">${BGS.map((c, i) => `<div class="duo-sw ${a.bg === i ? 'on' : ''}" data-set="bg:${i}"><div class="duo-sw-in" style="background:${c}"></div></div>`).join('')}</div>`;
-    } else if (editorTab === 'hair') {
-      bodyHtml = `
-        <div class="duo-sec">Цвет волос</div>
-        <div class="duo-swatches" style="grid-template-columns:repeat(6,1fr)">${HAIR_COLS.map(c => `<div class="duo-sw ${a.hairCol === c ? 'on' : ''}" data-set="hairCol:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
-        <div class="duo-sec">Причёска (верх)</div>
-        ${renderCards(HAIRS, 'hair', a)}
-        <div class="duo-sec">Длина волос (сзади)</div>
-        ${renderCards(REAR_HAIRS, 'rearHair', a)}`;
-    } else if (editorTab === 'face') {
-      bodyHtml = `
-        <div class="duo-sec">Глаза</div>
-        ${renderCards(EYES, 'eyes', a)}
-        <div class="duo-sec">Брови</div>
-        ${renderCards(BROWS, 'brows', a)}
-        <div class="duo-sec">Эмоция</div>
-        ${renderCards(MOUTHS, 'mouth', a)}
-        <div class="duo-sec">Борода / Усы</div>
-        ${renderCards(BEARDS, 'beard', a)}`;
-    } else if (editorTab === 'cloth') {
-      bodyHtml = `
-        <div class="duo-sec">Цвет одежды</div>
-        <div class="duo-swatches" style="grid-template-columns:repeat(6,1fr)">${CLOTHES_COLS.map(c => `<div class="duo-sw ${a.clothesCol === c ? 'on' : ''}" data-set="clothesCol:${c}"><div class="duo-sw-in" style="background:#${c}"></div></div>`).join('')}</div>
-        <div class="duo-sec">Стиль одежды</div>
-        ${renderCards(CLOTHES, 'clothes', a)}`;
-    } else if (editorTab === 'acc') {
-      bodyHtml = `
-        <div class="duo-sec">Скины (открываются в Мозаике)</div>
-        <div class="duo-grid" style="grid-template-columns:repeat(2,1fr)">${ACCS.map(ac => {
-          const isLocked = ac.locked && !st.unlockedAcc.includes(ac.id);
-          return `<div class="duo-card ${a.acc === ac.id ? 'on' : ''} ${isLocked ? 'locked' : ''}" data-acc="${ac.id}">
-            <div class="duo-card-prev" style="width:90px;height:90px">${renderAvatarSvg({ ...a, acc: ac.id }, true)}</div>
-            <div class="duo-card-lbl">${isLocked ? '🔒 ' : ''}${ac.name}</div>
-          </div>`;
-        }).join('')}</div>`;
-    }
-
-    editorOv.innerHTML = `
-      <div class="duo-head">
-        <button class="close-btn" style="width:30px;height:30px;font-size:14px" id="duo-close">✕</button>
-        <div style="font-size:15px;font-weight:900">Редактор героя</div>
-        <button class="duo-done" id="duo-done">ГОТОВО</button>
-      </div>
-      <div class="duo-stage" style="background:${BGS[a.bg] || BGS[0]}">
-        <div class="duo-stage-av">${renderAvatarSvg(a, true)}</div>
-      </div>
-      <div class="duo-tabs">
-        ${EDITOR_TABS.map(t => `<button class="duo-tab ${editorTab === t.id ? 'active' : ''}" data-etab="${t.id}" title="${t.label}">${t.ico}</button>`).join('')}
-      </div>
-      <div class="duo-body">${bodyHtml}</div>`;
-
-    const closeEditor = () => {
-      editorOv.classList.remove('open');
-      save();
-      renderBinder();
-      const profAv = document.querySelector('#profile-overlay .av-circle');
-      if (profAv) { profAv.style.padding = '0'; profAv.innerHTML = renderAvatarSvg(); }
-    };
-    editorOv.querySelector('#duo-close').onclick = closeEditor;
-    editorOv.querySelector('#duo-done').onclick = () => { haptic('ok'); closeEditor(); };
-
-    editorOv.querySelectorAll('[data-etab]').forEach(btn => {
-      btn.onclick = () => { editorTab = btn.getAttribute('data-etab'); haptic('light'); openAvatarCreator(); };
-    });
-    editorOv.querySelectorAll('[data-set]').forEach(el => {
-      el.onclick = () => {
-        const [k, v] = el.getAttribute('data-set').split(':');
-        st.avatar[k] = k === 'bg' ? Number(v) : v;
-        save(false); haptic('light'); openAvatarCreator();
-      };
-    });
-    editorOv.querySelectorAll('[data-acc]').forEach(el => {
-      el.onclick = () => {
-        const id = el.getAttribute('data-acc');
-        const ac = ACCS.find(x => x.id === id);
-        if (ac.locked && !st.unlockedAcc.includes(id)) return alert(`Открой во вкладке «Мозаика»: собери ${ac.req}!`);
-        st.avatar.acc = id;
-        save(false); haptic('ok'); openAvatarCreator();
-      };
-    });
+    updateStage();
+    renderEditorTabs();
+    renderEditorGrid();
     editorOv.classList.add('open');
   };
 
-  /* Дроп кусочка мозаики */
+  /* ====== МОЗАИКА 3×3 ====== */
   window.dropMosaicPiece = function () {
     initAvState();
     const m = st.mosaic;
@@ -331,7 +388,6 @@
     renderBinder();
   };
 
-  /* 4-я вкладка «Мозаика» в Студии */
   const origSetStudioSubTab = window.setStudioSubTab;
   window.setStudioSubTab = function (t) {
     inMosaicTab = false;
@@ -350,7 +406,10 @@
     origRenderBinder();
 
     const avBox = document.querySelector('#screen-binder .av-circle');
-    if (avBox) { avBox.style.padding = '0'; avBox.innerHTML = renderAvatarSvg(); }
+    if (avBox) {
+      avBox.style.padding = '0';
+      avBox.innerHTML = renderAvatarSvg();
+    }
 
     const modeSwitch = document.querySelector('#screen-binder .mode-switch');
     if (modeSwitch) {
@@ -418,42 +477,37 @@
     }
   };
 
-  /* Подмена аватара в Профиле + скрытие старых эмодзи */
+  /* ====== КРУПНЫЙ БАННЕР ГЕРОЯ В ПРОФИЛЕ ====== */
   const origOpenProfile = window.openProfileModal;
   window.openProfileModal = function () {
     initAvState();
     origOpenProfile();
     const profAv = document.querySelector('#profile-overlay .av-circle');
     if (profAv) {
-      profAv.style.padding = '0';
-      profAv.innerHTML = renderAvatarSvg();
-      const btn = document.createElement('button');
-      btn.className = 'btn cyan full';
-      btn.style.marginBottom = '10px';
-      btn.textContent = '🎨 Редактор героя';
-      btn.onclick = openAvatarCreator;
-      profAv.parentElement.insertBefore(btn, profAv.nextSibling);
+      const banner = document.createElement('div');
+      banner.className = 'prof-hero-banner';
+      banner.style.background = '#' + (st.avatar.backgroundColor || DEFAULT_AV.backgroundColor);
+      banner.innerHTML = `
+        <div class="prof-hero-av">${renderAvatarSvg(st.avatar, true)}</div>
+        <button class="prof-hero-edit" type="button">🎨 Изменить</button>
+      `;
+      banner.onclick = openAvatarCreator;
+      profAv.replaceWith(banner);
+
       const oldPicks = document.querySelector('#profile-overlay .av-pick-row');
       if (oldPicks) oldPicks.style.display = 'none';
     }
   };
 
-  /* Шанс дропа кусочка мозаики после завершения урока */
+  /* ====== ШАНС ДРОПА МОЗАИКИ ПОСЛЕ УРОКА ====== */
   const origFinishAv = window.finishLesson;
   window.finishLesson = function () {
     const passed = !(curL && curL.isExam && mistakes > 4);
     origFinishAv();
     if (passed && Math.random() < 0.45) setTimeout(dropMosaicPiece, 700);
   };
-  /* ====== ЕДИНЫЙ СТИЛЬ TOON HEAD ДЛЯ ВСЕХ КАРТОЧЕК АРТИСТОВ ====== */
-  const cardArtCss = document.createElement('style');
-  cardArtCss.textContent = `
-    .toon-card-art { position: relative; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
-    .toon-card-art img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.08); display: block; pointer-events: none; }
-    .toon-role-pill { position: absolute; bottom: 5px; right: 5px; background: rgba(14,10,26,0.72); border: 1px solid rgba(255,255,255,0.2); border-radius: 7px; padding: 2px 5px; font-size: 9px; font-weight: 900; color: #fff; backdrop-filter: blur(4px); }
-  `;
-  document.head.appendChild(cardArtCss);
 
+  /* ====== КАРТОЧКИ АРТИСТОВ В СТИЛЕ AVATAAARS ====== */
   const CARD_BGS = [
     "linear-gradient(145deg, #ff2e93, #4a148c)",
     "linear-gradient(145deg, #00e5ff, #1a237e)",
@@ -466,31 +520,28 @@
   window.cardArtHtml = function (c) {
     const id = Number(c.id) || 1;
     const pick = (arr, shift) => arr[(id * 3 + shift) % arr.length];
-
-    const hairObj = pick(HAIRS.filter(h => h.v !== 'none'), 1);
-    const rearObj = pick(REAR_HAIRS, 2);
     const cfg = {
-      skin: pick(SKINS, 0),
-      hair: hairObj.v,
-      rearHair: rearObj.v,
-      hairCol: pick(HAIR_COLS, 2),
-      eyes: pick(EYES, 1),
-      brows: pick(BROWS, 0),
-      mouth: pick(MOUTHS, 3),
-      beard: "none",
-      clothes: pick(CLOTHES, 1),
-      clothesCol: pick(CLOTHES_COLS, 4)
+      v: 3,
+      top: pick(OPTIONS.top.values, 1),
+      hairColor: pick(OPTIONS.hairColor.values, 2),
+      skinColor: pick(OPTIONS.skinColor.values, 0),
+      eyes: pick(OPTIONS.eyes.values, 1),
+      eyebrows: pick(OPTIONS.eyebrows.values, 0),
+      mouth: pick(OPTIONS.mouth.values, 2),
+      clothing: pick(OPTIONS.clothing.values, 1),
+      clothesColor: pick(OPTIONS.clothesColor.values, 4),
+      accessories: id % 3 === 0 ? pick(OPTIONS.accessories.values, 1) : null
     };
-
-    const url = buildToonUrl(cfg);
+    const svg = createAvatar(avataaars, buildConfig(cfg, false)).toString();
     const bg = CARD_BGS[id % CARD_BGS.length];
     const roleTag = c.tag || (c.role ? c.role.slice(0, 3).toUpperCase() : 'IDOL');
 
     return `<div class="pc-art toon-card-art" style="background:${bg}">
-      <img src="${url}" alt="${c.name}" loading="lazy"/>
+      ${svg}
       <div class="toon-role-pill">${roleTag}</div>
     </div>`;
   };
+
   initAvState();
   renderBinder();
 })();
