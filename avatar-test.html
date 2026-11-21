@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Avatar Editor Test</title>
+  <title>Avataaars Editor Test</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
@@ -14,107 +14,45 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 14px;
+      padding: 16px;
     }
     .preview-wrap {
-      position: relative;
-      width: 240px;
-      height: 240px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       background: #1e1e2c;
       border: 3px solid #2e2e44;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .preview-wrap img {
-      position: absolute;
-      transform: translateX(-50%);
-      object-fit: contain;
-      object-position: center top;
-      pointer-events: none;
+    .preview-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
-    #layer-bg {
-      top: 0; left: 0;
-      transform: scale(1.16);
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
-
     .actions {
       display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 14px;
       width: 100%;
       max-width: 440px;
     }
     .btn {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      background: #6c5ce7;
-      color: #fff;
-    }
-    .btn.secondary { background: #26263a; border: 1px solid #3a3a54; }
-    .btn:active { transform: scale(0.97); }
-
-    .tuner {
-      width: 100%;
-      max-width: 440px;
-      background: #1b1b28;
-      border: 1px solid #2e2e44;
       border-radius: 14px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-    .tuner-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 2px;
-    }
-    .mode-pill {
-      padding: 5px 10px;
-      border-radius: 9px;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 600;
-      border: 1px solid #3a3a54;
-      background: #252538;
-      color: #d6d6f0;
       cursor: pointer;
-    }
-    .mode-pill.active {
       background: #6c5ce7;
-      border-color: #6c5ce7;
       color: #fff;
     }
-    .reset-link {
-      font-size: 12px;
-      color: #a594f9;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .tuner-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #b8b8d4;
-    }
-    .tuner-row span { width: 78px; flex-shrink: 0; }
-    .tuner-row input { flex: 1; accent-color: #6c5ce7; }
-    .tuner-row b { width: 34px; text-align: right; color: #fff; }
-
+    .btn:active { transform: scale(0.97); }
     .tabs {
       display: flex;
       gap: 8px;
@@ -136,8 +74,11 @@
       border: 1px solid #2e2e44;
       cursor: pointer;
     }
-    .tab.active { background: #fff; color: #12121a; border-color: #fff; }
-
+    .tab.active {
+      background: #fff;
+      color: #12121a;
+      border-color: #fff;
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -154,323 +95,158 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
+      padding: 4px;
       cursor: pointer;
       overflow: hidden;
-      position: relative;
     }
-    .item.active { border-color: #6c5ce7; background: #272540; }
-    .item.custom::after {
-      content: "•";
-      position: absolute;
-      top: 4px;
-      right: 7px;
-      color: #00cec9;
-      font-size: 16px;
-      line-height: 1;
+    .item.active {
+      border-color: #6c5ce7;
+      background: #272540;
     }
-    .item img { width: 100%; height: 100%; object-fit: contain; }
-    .item.none { font-size: 13px; color: #8888a8; font-weight: 600; }
+    .item svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .item.none {
+      font-size: 13px;
+      color: #8888a8;
+      font-weight: 600;
+    }
+    .swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.18);
+    }
   </style>
 </head>
 <body>
 
-  <div class="preview-wrap" id="preview">
-    <img id="layer-bg" alt="" />
-    <img id="layer-face" alt="" />
-    <img id="layer-outfit" alt="" />
-    <img id="layer-eyes" alt="" />
-    <img id="layer-mouth" alt="" />
-    <img id="layer-hair" alt="" />
-    <img id="layer-acc" alt="" />
-  </div>
+  <div class="preview-wrap" id="preview">Загрузка...</div>
 
   <div class="actions">
     <button class="btn" id="randomBtn">🎲 Случайный</button>
-    <button class="btn secondary" id="resetAllBtn">↩ Сброс всего</button>
-    <button class="btn secondary" id="copyBtn">📋 Копировать</button>
-  </div>
-
-  <div class="tuner" id="tuner">
-    <div class="tuner-top">
-      <div style="display:flex; gap:6px;">
-        <button class="mode-pill active" id="modeTabBtn">Вся вкладка</button>
-        <button class="mode-pill" id="modeItemBtn">Только этот файл</button>
-      </div>
-      <button class="reset-link" id="resetCurrentBtn">Сбросить текущее</button>
-    </div>
-    <div class="tuner-row">
-      <span>Вверх/Вниз</span>
-      <input type="range" id="sl-top" min="0" max="80" step="1">
-      <b id="val-top">0%</b>
-    </div>
-    <div class="tuner-row">
-      <span>Влево/Вправо</span>
-      <input type="range" id="sl-left" min="20" max="80" step="1">
-      <b id="val-left">50%</b>
-    </div>
-    <div class="tuner-row">
-      <span>Размер</span>
-      <input type="range" id="sl-width" min="5" max="115" step="1">
-      <b id="val-width">50%</b>
-    </div>
   </div>
 
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
 
-  <script>
-    const BASE = './img/avatar/';
+  <script type="module">
+    import { createAvatar } from 'https://cdn.jsdelivr.net/npm/@dicebear/core@9/+esm';
+    import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+esm';
 
-    const ASSETS = {
-      bg: {
-        label: 'Фон', optional: true,
-        files: ['Background=Background1.svg','Background=Background2.svg','Background=Background3.svg','Background=Background4.svg']
-      },
-      face: {
-        label: 'Кожа', optional: false,
-        files: ['Face=Skin 1 - Fair.svg','Face=Skin 2 - Light.svg','Face=Skin 3 - Tanned.svg','Face=Skin 4 - Darker.svg']
-      },
-      hair: {
-        label: 'Волосы', optional: true,
-        files: [
-          'Hair=Style 01.svg','Hair=Style 02.svg','Hair=Style 03.svg','Hair=Style 04.svg','Hair=Style 05.svg',
-          'Hair=Style 06.svg','Hair=Style 07.svg','Hair=Style 08.svg','Hair=Style 10.svg','Hair=Style 11.svg',
-          'Hair=Style 12.svg','Hair=Style 13.svg','Hair=Style 14.svg','Hair=Style 15.svg','Hair=Style 16.svg',
-          'Hair=Style 17.svg','Hair=Style 19.svg','Hair=Style 20.svg','Hair=Style 21.svg','Hair=Style 22.svg','Hair=Style 23.svg'
+    const OPTIONS = {
+      top: {
+        label: 'Волосы',
+        type: 'part',
+        values: [
+          'shortFlat', 'shortRound', 'shortWaved', 'shortCurly', 'shaggy',
+          'shaggyMullet', 'theCaesar', 'frizzle', 'dreads01', 'sides',
+          'bob', 'bun', 'curly', 'curvy', 'longButNotTooLong',
+          'miaWallace', 'straight01', 'straight02', 'straightAndStrand', 'bigHair'
         ]
+      },
+      hairColor: {
+        label: 'Цвет волос',
+        type: 'color',
+        values: ['2c1b18', '4a312c', '724133', 'a55728', 'b58143', 'd6b370', 'e8e1e1', 'c93305', 'f59797']
+      },
+      skinColor: {
+        label: 'Кожа',
+        type: 'color',
+        values: ['ffdbb4', 'edb98a', 'd08b5b', 'ae5d29', '614335', 'f8d25c']
       },
       eyes: {
-        label: 'Глаза', optional: false,
-        files: ['Eyes=Normal.svg','Eyes=Angry.svg','Eyes=Closed.svg','Eyes=Cynic.svg','Eyes=Sad.svg','Eyes=Thin.svg']
+        label: 'Глаза',
+        type: 'part',
+        values: ['default', 'happy', 'wink', 'winkWacky', 'side', 'squint', 'surprised', 'hearts', 'closed', 'cry', 'eyeRoll']
+      },
+      eyebrows: {
+        label: 'Брови',
+        type: 'part',
+        values: ['default', 'defaultNatural', 'raisedExcited', 'raisedExcitedNatural', 'flatNatural', 'sadConcerned', 'angryNatural', 'upDown']
       },
       mouth: {
-        label: 'Рот', optional: false,
-        files: [
-          'Mouth=Normal Smile.svg','Mouth=Cute.svg','Mouth=Smiliey.svg',
-          'Mouth=Open Mouth.svg','Mouth=Open Tooth.svg','Mouth=Eat.svg','Mouth=Sad.svg','Mouth=Angry.svg','Mouth=Hate.svg'
-        ]
+        label: 'Рот',
+        type: 'part',
+        values: ['smile', 'default', 'twinkle', 'tongue', 'serious', 'concerned', 'disbelief', 'eating', 'grimace', 'sad']
       },
-      outfit: {
-        label: 'Одежда', optional: false,
-        files: [
-          'Outfit=Outfit 01.svg','Outfit=Outfit 02.svg','Outfit=Outfit 03.svg','Outfit=Outfit 04.svg','Outfit=Outfit 05.svg',
-          'Outfit=Outfit 06.svg','Outfit=Outfit 07.svg','Outfit=Outfit 08.svg','Outfit=Outfit 09.svg','Outfit=Outfit 10.svg',
-          'Outfit=Outfit 11.svg','Outfit=Outfit 12.svg','Outfit=Outfit 13.svg','Outfit=Outfit 14.svg','Outfit=Outfit 16.svg',
-          'Outfit=Outfit 17.svg','Outfit=Outfit 18.svg','Outfit=Outfit 19.svg','Outfit=Outfit 20.svg','Outfit=Outfit 21.svg',
-          'Outfit=Outfit 22.svg','Outfit=Outfit 23.svg'
-        ]
+      clothing: {
+        label: 'Одежда',
+        type: 'part',
+        values: ['hoodie', 'blazerAndShirt', 'blazerAndSweater', 'collarAndSweater', 'graphicShirt', 'shirtCrewNeck', 'shirtScoopNeck', 'shirtVNeck', 'overall']
       },
-      acc: {
-        label: 'Аксессуары', optional: true,
-        files: [
-          'Accessories=Circle Earring.svg','Accessories=Earphone.svg','Accessories=Earring.svg',
-          'Accessories=Futuristic Glasses.svg','Accessories=Glasses.svg','Accessories=Mask Google.svg',
-          'Accessories=Mask.svg','Accessories=Rounded Glasses.svg','Accessories=Simple Earring.svg',
-          'Accessories=Stylish Glasses.svg'
-        ]
+      clothesColor: {
+        label: 'Цвет одежды',
+        type: 'color',
+        values: ['262e33', '3c4f5c', '5199e4', '65c9ff', '929598', 'a7ffc4', 'b1e2ff', 'e6e6e6', 'ff488e', 'ff5c5c', 'ffafb9', 'ffffb1']
+      },
+      accessories: {
+        label: 'Очки',
+        type: 'part',
+        optional: true,
+        values: ['round', 'prescription01', 'prescription02', 'sunglasses', 'wayfarers', 'kurt']
+      },
+      backgroundColor: {
+        label: 'Фон',
+        type: 'color',
+        values: ['b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf', 'c8f7dc', '2b2d42']
       }
     };
-
-    // Крупнее и ближе к краям круга
-    const DEFAULT_LAYOUT = {
-      face:   { top: 27, left: 49, width: 61 },
-      outfit: { top: 64, left: 54, width: 92 },
-      eyes:   { top: 43, left: 62, width: 23 },
-      mouth:  { top: 60, left: 60, width: 11 },
-      hair:   { top: 21, left: 52, width: 79 },
-      acc:    { top: 41, left: 60, width: 38 }
-    };
-
-    const DEFAULT_OVERRIDES = {
-      'Hair=Style 02.svg':                  { top: 21, left: 52, width: 78 },
-      'Outfit=Outfit 01.svg':               { top: 63, left: 53, width: 91 },
-      'Outfit=Outfit 02.svg':               { top: 64, left: 54, width: 92 },
-      'Outfit=Outfit 08.svg':               { top: 64, left: 54, width: 90 },
-      'Outfit=Outfit 12.svg':               { top: 64, left: 53, width: 88 },
-      'Outfit=Outfit 20.svg':               { top: 64, left: 54, width: 93 },
-      'Outfit=Outfit 21.svg':               { top: 64, left: 53, width: 91 },
-      'Outfit=Outfit 23.svg':               { top: 64, left: 54, width: 100 },
-      'Outfit=Outfit 14.svg':               { top: 64, left: 53, width: 92 },
-      'Hair=Style 03.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 04.svg':                  { top: 17, left: 52, width: 79 },
-      'Hair=Style 05.svg':                  { top: 23, left: 52, width: 79 },
-      'Hair=Style 06.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 07.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 10.svg':                  { top: 19, left: 52, width: 79 },
-      'Hair=Style 11.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 12.svg':                  { top: 19, left: 52, width: 79 },
-      'Hair=Style 14.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 15.svg':                  { top: 20, left: 52, width: 79 },
-      'Hair=Style 16.svg':                  { top: 21, left: 52, width: 79 },
-      'Hair=Style 17.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 19.svg':                  { top: 22, left: 52, width: 79 },
-      'Hair=Style 20.svg':                  { top: 23, left: 52, width: 78 },
-      'Hair=Style 21.svg':                  { top: 22, left: 52, width: 78 },
-      'Hair=Style 22.svg':                  { top: 19, left: 52, width: 78 },
-      'Mouth=Normal Smile.svg':             { top: 61, left: 60, width: 11 },
-      'Mouth=Cute.svg':                     { top: 62, left: 60, width: 11 },
-      'Mouth=Smiliey.svg':                  { top: 61, left: 60, width: 11 },
-      'Mouth=Open Mouth.svg':               { top: 61, left: 59, width: 11 },
-      'Mouth=Open Tooth.svg':               { top: 61, left: 59, width: 11 },
-      'Mouth=Eat.svg':                      { top: 62, left: 60, width: 11 },
-      'Mouth=Angry.svg':                    { top: 61, left: 59, width: 11 },
-      'Mouth=Hate.svg':                     { top: 62, left: 60, width: 11 },
-      'Accessories=Circle Earring.svg':     { top: 51, left: 56, width: 45 },
-      'Accessories=Earphone.svg':           { top: 51, left: 56, width: 45 },
-      'Accessories=Earring.svg':            { top: 51, left: 56, width: 45 },
-      'Accessories=Futuristic Glasses.svg': { top: 40, left: 55, width: 48 },
-      'Hair=Style 23.svg':                  { top: 25, left: 51, width: 80 },
-      'Accessories=Glasses.svg':            { top: 45, left: 55, width: 48 },
-      'Accessories=Mask Google.svg':        { top: 51, left: 56, width: 45 },
-      'Accessories=Mask.svg':               { top: 51, left: 57, width: 45 },
-      'Accessories=Rounded Glasses.svg':    { top: 43, left: 57, width: 44 },
-      'Accessories=Simple Earring.svg':     { top: 51, left: 56, width: 45 },
-      'Accessories=Stylish Glasses.svg':    { top: 46, left: 56, width: 41 }
-    };
-
-    let layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-    let itemOverrides = JSON.parse(JSON.stringify(DEFAULT_OVERRIDES));
-    let editMode = 'tab';
 
     const state = {
-      bg: ASSETS.bg.files[0],
-      face: ASSETS.face.files[0],
-      hair: ASSETS.hair.files[0],
-      eyes: ASSETS.eyes.files[0],
-      mouth: ASSETS.mouth.files[0],
-      outfit: ASSETS.outfit.files[0],
-      acc: null
+      top: 'shortFlat',
+      hairColor: '2c1b18',
+      skinColor: 'ffdbb4',
+      eyes: 'default',
+      eyebrows: 'defaultNatural',
+      mouth: 'smile',
+      clothing: 'hoodie',
+      clothesColor: '5199e4',
+      accessories: null,
+      backgroundColor: 'b6e3f4'
     };
 
-    let activeTab = 'hair';
+    let activeTab = 'top';
 
-    function fileUrl(name) { return BASE + encodeURIComponent(name); }
-
-    function getPosForLayer(key) {
-      const file = state[key];
-      if (file && itemOverrides[file]) return itemOverrides[file];
-      return layout[key];
-    }
-
-    function applyLayout() {
-      Object.keys(DEFAULT_LAYOUT).forEach(key => {
-        const pos = getPosForLayer(key);
-        const img = document.getElementById('layer-' + key);
-        if (pos && img) {
-          img.style.top = pos.top + '%';
-          img.style.left = pos.left + '%';
-          img.style.width = pos.width + '%';
-        }
-      });
-    }
-
-    function getActiveEditablePos() {
-      const currentFile = state[activeTab];
-      if (editMode === 'item' && currentFile) {
-        if (!itemOverrides[currentFile]) {
-          itemOverrides[currentFile] = { ...layout[activeTab] };
-        }
-        return itemOverrides[currentFile];
-      }
-      return layout[activeTab];
-    }
-
-    function syncSliders() {
-      const tuner = document.getElementById('tuner');
-      if (!DEFAULT_LAYOUT[activeTab]) { tuner.style.display = 'none'; return; }
-      tuner.style.display = 'flex';
-
-      const currentFile = state[activeTab];
-      const modeTabBtn = document.getElementById('modeTabBtn');
-      const modeItemBtn = document.getElementById('modeItemBtn');
-      modeTabBtn.classList.toggle('active', editMode === 'tab');
-      modeItemBtn.classList.toggle('active', editMode === 'item');
-      modeItemBtn.disabled = !currentFile;
-      modeItemBtn.style.opacity = currentFile ? '1' : '0.4';
-
-      const pos = (editMode === 'item' && currentFile && itemOverrides[currentFile])
-        ? itemOverrides[currentFile]
-        : layout[activeTab];
-
-      ['top', 'left', 'width'].forEach(prop => {
-        document.getElementById('sl-' + prop).value = pos[prop];
-        document.getElementById('val-' + prop).textContent = pos[prop] + '%';
-      });
-    }
-
-    ['top', 'left', 'width'].forEach(prop => {
-      document.getElementById('sl-' + prop).oninput = (e) => {
-        if (!DEFAULT_LAYOUT[activeTab]) return;
-        const pos = getActiveEditablePos();
-        pos[prop] = Number(e.target.value);
-        document.getElementById('val-' + prop).textContent = e.target.value + '%';
-        applyLayout();
-        renderGrid();
+    function buildConfig(customState) {
+      const cfg = {
+        seed: 'base',
+        top: [customState.top],
+        hairColor: [customState.hairColor],
+        skinColor: [customState.skinColor],
+        eyes: [customState.eyes],
+        eyebrows: [customState.eyebrows],
+        mouth: [customState.mouth],
+        clothing: [customState.clothing],
+        clothesColor: [customState.clothesColor],
+        backgroundColor: [customState.backgroundColor],
+        facialHairProbability: 0,
+        accessoriesProbability: customState.accessories ? 100 : 0
       };
-    });
-
-    document.getElementById('modeTabBtn').onclick = () => {
-      editMode = 'tab';
-      syncSliders();
-    };
-
-    document.getElementById('modeItemBtn').onclick = () => {
-      if (!state[activeTab]) return;
-      editMode = 'item';
-      getActiveEditablePos();
-      syncSliders();
-      renderGrid();
-    };
-
-    document.getElementById('resetCurrentBtn').onclick = () => {
-      const currentFile = state[activeTab];
-      if (editMode === 'item' && currentFile) {
-        delete itemOverrides[currentFile];
-      } else if (DEFAULT_LAYOUT[activeTab]) {
-        layout[activeTab] = { ...DEFAULT_LAYOUT[activeTab] };
+      if (customState.accessories) {
+        cfg.accessories = [customState.accessories];
       }
-      applyLayout();
-      syncSliders();
-      renderGrid();
-    };
-
-    document.getElementById('resetAllBtn').onclick = () => {
-      layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
-      itemOverrides = JSON.parse(JSON.stringify(DEFAULT_OVERRIDES));
-      editMode = 'tab';
-      applyLayout();
-      syncSliders();
-      renderGrid();
-    };
+      return cfg;
+    }
 
     function renderPreview() {
-      Object.keys(state).forEach(key => {
-        const img = document.getElementById('layer-' + key);
-        if (state[key]) {
-          img.src = fileUrl(state[key]);
-          img.style.display = 'block';
-        } else {
-          img.removeAttribute('src');
-          img.style.display = 'none';
-        }
-      });
-      applyLayout();
+      const svg = createAvatar(avataaars, buildConfig(state)).toString();
+      document.getElementById('preview').innerHTML = svg;
     }
 
     function renderTabs() {
       const wrap = document.getElementById('tabs');
       wrap.innerHTML = '';
-      Object.entries(ASSETS).forEach(([key, cfg]) => {
+      Object.entries(OPTIONS).forEach(([key, cfg]) => {
         const btn = document.createElement('button');
         btn.className = 'tab' + (activeTab === key ? ' active' : '');
         btn.textContent = cfg.label;
         btn.onclick = () => {
           activeTab = key;
-          if (!state[activeTab]) editMode = 'tab';
           renderTabs();
           renderGrid();
-          syncSliders();
         };
         wrap.appendChild(btn);
       });
@@ -479,63 +255,55 @@
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      const cfg = ASSETS[activeTab];
+      const cfg = OPTIONS[activeTab];
+
       if (cfg.optional) {
         const none = document.createElement('div');
         none.className = 'item none' + (state[activeTab] === null ? ' active' : '');
         none.textContent = 'Нет';
         none.onclick = () => {
           state[activeTab] = null;
-          editMode = 'tab';
           renderPreview();
           renderGrid();
-          syncSliders();
         };
         grid.appendChild(none);
       }
-      cfg.files.forEach(file => {
-        const hasCustom = Boolean(itemOverrides[file]);
+
+      cfg.values.forEach(val => {
         const card = document.createElement('div');
-        card.className = 'item'
-          + (state[activeTab] === file ? ' active' : '')
-          + (hasCustom ? ' custom' : '');
-        const img = document.createElement('img');
-        img.src = fileUrl(file);
-        img.loading = 'lazy';
-        card.appendChild(img);
+        card.className = 'item' + (state[activeTab] === val ? ' active' : '');
+
+        if (cfg.type === 'color') {
+          const swatch = document.createElement('div');
+          swatch.className = 'swatch';
+          swatch.style.background = '#' + val;
+          card.appendChild(swatch);
+        } else {
+          const previewState = { ...state, [activeTab]: val };
+          card.innerHTML = createAvatar(avataaars, buildConfig(previewState)).toString();
+        }
+
         card.onclick = () => {
-          state[activeTab] = file;
+          state[activeTab] = val;
           renderPreview();
           renderGrid();
-          syncSliders();
         };
         grid.appendChild(card);
       });
     }
 
     document.getElementById('randomBtn').onclick = () => {
-      Object.entries(ASSETS).forEach(([key, cfg]) => {
-        const pool = cfg.optional ? [null, ...cfg.files] : cfg.files;
+      Object.entries(OPTIONS).forEach(([key, cfg]) => {
+        const pool = cfg.optional ? [null, null, ...cfg.values] : cfg.values;
         state[key] = pool[Math.floor(Math.random() * pool.length)];
       });
-      if (!state[activeTab]) editMode = 'tab';
       renderPreview();
       renderGrid();
-      syncSliders();
-    };
-
-    document.getElementById('copyBtn').onclick = () => {
-      const payload = JSON.stringify({ layout, itemOverrides });
-      navigator.clipboard.writeText(payload);
-      const btn = document.getElementById('copyBtn');
-      btn.textContent = '✅ Скопировано!';
-      setTimeout(() => btn.textContent = '📋 Копировать', 1500);
     };
 
     renderTabs();
     renderGrid();
     renderPreview();
-    syncSliders();
   </script>
 </body>
 </html>
