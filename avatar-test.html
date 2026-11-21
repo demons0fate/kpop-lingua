@@ -27,14 +27,20 @@
       margin-bottom: 14px;
       flex-shrink: 0;
     }
-    .preview-wrap img {
+        .preview-wrap img {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      left: 50%;
+      transform: translateX(-50%);
+      height: auto;
       pointer-events: none;
     }
+    #layer-bg     { top: 4%;   width: 92%; }
+    #layer-face   { top: 18%;  width: 42%; }
+    #layer-outfit { bottom: 0; width: 76%; }
+    #layer-eyes   { top: 39%;  width: 22%; }
+    #layer-mouth  { top: 51%;  width: 12%; }
+    #layer-hair   { top: 11%;  width: 54%; }
+    #layer-acc    { top: 34%;  width: 46%; }
     .actions {
       display: flex;
       gap: 10px;
