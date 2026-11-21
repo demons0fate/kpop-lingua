@@ -16,7 +16,7 @@
       align-items: center;
       padding: 16px;
     }
-        .preview-wrap {
+    .preview-wrap {
       position: relative;
       width: 240px;
       height: 240px;
@@ -31,16 +31,57 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      height: auto;
+      object-fit: contain;
       pointer-events: none;
     }
-    #layer-bg     { top: 0;    width: 100%; }
-    #layer-face   { top: 18%;  width: 42%; }
-    #layer-outfit { bottom: 0; width: 76%; }
-    #layer-eyes   { top: 33%;  left: 54%; width: 17%; }
-    #layer-mouth  { top: 43%;  left: 54%; width: 10%; }
-    #layer-hair   { top: 11%;  left: 49%; width: 53%; }
-    #layer-acc    { top: 31%;  left: 53%; width: 30%; }
+    #layer-bg {
+      top: 0;
+      left: 0;
+      transform: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #layer-face {
+      top: 17%;
+      left: 50%;
+      width: 46%;
+      height: 48%;
+      object-position: center top;
+    }
+    #layer-outfit {
+      top: 56%;
+      left: 50%;
+      width: 78%;
+      height: 46%;
+      object-position: center top;
+    }
+    #layer-eyes {
+      top: 31%;
+      left: 53%;
+      width: 17%;
+      height: 8%;
+    }
+    #layer-mouth {
+      top: 40%;
+      left: 53%;
+      width: 11%;
+      height: 7%;
+    }
+    #layer-hair {
+      top: 10%;
+      left: 49%;
+      width: 56%;
+      height: 48%;
+      object-position: center top;
+    }
+    #layer-acc {
+      top: 30%;
+      left: 53%;
+      width: 30%;
+      height: 18%;
+    }
+
     .actions {
       display: flex;
       gap: 10px;
@@ -223,6 +264,21 @@
       }
     };
 
+    const ACC_POS = {
+      'Accessories=Cap.svg':                { top: '8%',  left: '49%', width: '48%', height: '24%' },
+      'Accessories=Earphone.svg':           { top: '13%', left: '48%', width: '52%', height: '32%' },
+      'Accessories=Circle Earring.svg':     { top: '38%', left: '34%', width: '9%',  height: '10%' },
+      'Accessories=Earring.svg':            { top: '38%', left: '34%', width: '8%',  height: '10%' },
+      'Accessories=Simple Earring.svg':     { top: '38%', left: '34%', width: '7%',  height: '10%' },
+      'Accessories=Glasses.svg':            { top: '30%', left: '53%', width: '28%', height: '14%' },
+      'Accessories=Rounded Glasses.svg':    { top: '30%', left: '53%', width: '28%', height: '14%' },
+      'Accessories=Stylish Glasses.svg':    { top: '29%', left: '53%', width: '30%', height: '14%' },
+      'Accessories=Futuristic Glasses.svg': { top: '29%', left: '53%', width: '30%', height: '14%' },
+      'Accessories=Mask.svg':               { top: '37%', left: '53%', width: '30%', height: '20%' },
+      'Accessories=Mask Google.svg':        { top: '36%', left: '53%', width: '30%', height: '20%' },
+      'Accessories=Moustache.svg':          { top: '39%', left: '53%', width: '13%', height: '6%'  }
+    };
+
     const state = {
       bg: ASSETS.bg.files[0],
       face: ASSETS.face.files[0],
@@ -234,26 +290,12 @@
     };
 
     let activeTab = 'hair';
-    const ACC_POS = {
-      'Accessories=Cap.svg':                { top: '9%',  left: '49%', width: '48%' },
-      'Accessories=Earphone.svg':           { top: '14%', left: '48%', width: '52%' },
-      'Accessories=Circle Earring.svg':     { top: '39%', left: '33%', width: '9%'  },
-      'Accessories=Earring.svg':            { top: '39%', left: '33%', width: '8%'  },
-      'Accessories=Simple Earring.svg':     { top: '39%', left: '33%', width: '7%'  },
-      'Accessories=Glasses.svg':            { top: '31%', left: '53%', width: '30%' },
-      'Accessories=Rounded Glasses.svg':    { top: '31%', left: '53%', width: '30%' },
-      'Accessories=Stylish Glasses.svg':    { top: '30%', left: '53%', width: '32%' },
-      'Accessories=Futuristic Glasses.svg': { top: '30%', left: '53%', width: '32%' },
-      'Accessories=Mask.svg':               { top: '38%', left: '53%', width: '32%' },
-      'Accessories=Mask Google.svg':        { top: '37%', left: '53%', width: '32%' },
-      'Accessories=Moustache.svg':          { top: '41%', left: '55%', width: '14%' }
-    };
 
     function fileUrl(name) {
       return BASE + encodeURIComponent(name);
     }
 
-        function renderPreview() {
+    function renderPreview() {
       Object.keys(state).forEach(key => {
         const img = document.getElementById('layer-' + key);
         if (state[key]) {
