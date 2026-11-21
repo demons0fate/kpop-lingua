@@ -445,7 +445,52 @@
     origFinishAv();
     if (passed && Math.random() < 0.45) setTimeout(dropMosaicPiece, 700);
   };
+  /* ====== ЕДИНЫЙ СТИЛЬ TOON HEAD ДЛЯ ВСЕХ КАРТОЧЕК АРТИСТОВ ====== */
+  const cardArtCss = document.createElement('style');
+  cardArtCss.textContent = `
+    .toon-card-art { position: relative; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; }
+    .toon-card-art img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.08); display: block; pointer-events: none; }
+    .toon-role-pill { position: absolute; bottom: 5px; right: 5px; background: rgba(14,10,26,0.72); border: 1px solid rgba(255,255,255,0.2); border-radius: 7px; padding: 2px 5px; font-size: 9px; font-weight: 900; color: #fff; backdrop-filter: blur(4px); }
+  `;
+  document.head.appendChild(cardArtCss);
 
+  const CARD_BGS = [
+    "linear-gradient(145deg, #ff2e93, #4a148c)",
+    "linear-gradient(145deg, #00e5ff, #1a237e)",
+    "linear-gradient(145deg, #ffd700, #bf360c)",
+    "linear-gradient(145deg, #b46eff, #311b92)",
+    "linear-gradient(145deg, #00e676, #004d40)",
+    "linear-gradient(145deg, #ff5252, #4a148c)"
+  ];
+
+  window.cardArtHtml = function (c) {
+    const id = Number(c.id) || 1;
+    const pick = (arr, shift) => arr[(id * 3 + shift) % arr.length];
+
+    const hairObj = pick(HAIRS.filter(h => h.v !== 'none'), 1);
+    const rearObj = pick(REAR_HAIRS, 2);
+    const cfg = {
+      skin: pick(SKINS, 0),
+      hair: hairObj.v,
+      rearHair: rearObj.v,
+      hairCol: pick(HAIR_COLS, 2),
+      eyes: pick(EYES, 1),
+      brows: pick(BROWS, 0),
+      mouth: pick(MOUTHS, 3),
+      beard: "none",
+      clothes: pick(CLOTHES, 1),
+      clothesCol: pick(CLOTHES_COLS, 4)
+    };
+
+    const url = buildToonUrl(cfg);
+    const bg = CARD_BGS[id % CARD_BGS.length];
+    const roleTag = c.tag || (c.role ? c.role.slice(0, 3).toUpperCase() : 'IDOL');
+
+    return `<div class="pc-art toon-card-art" style="background:${bg}">
+      <img src="${url}" alt="${c.name}" loading="lazy"/>
+      <div class="toon-role-pill">${roleTag}</div>
+    </div>`;
+  };
   initAvState();
   renderBinder();
 })();
