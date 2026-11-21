@@ -1,4 +1,4 @@
-/* ====== СТУДИЯ (ЛИГИ, КАРТЫ 3-КОЛОНКИ, КВЕСТЫ 50 БАЛЛОВ И БЕЙДЖИ) + МАГАЗИН БОКСОВ + ТОП ====== */
+/* ====== СТУДИЯ (12 РАНГОВ, ДОСТИЖЕНИЯ, КАРТЫ 3-КОЛОНКИ, КВЕСТ 50 БАЛЛОВ) + МАГАЗИН + ТОП ====== */
 (function () {
   const ROLES = [
     { key: "vocal", title: "Вокал", desc: "Бонус XP" },
@@ -15,11 +15,20 @@
     neon:     { name: "Неон",    mult: 3.2, power: 600, color: "#ff2e93" }
   };
 
+  /* 12 ступеней: 4 лиги × 3 ранга (I, II, III) */
   const LEAGUES = [
-    { id: "bronze", name: "Лига Трейни",   minXp: 0,    icon: "◆", cls: "lg-bronze", color: "#cd9b6a" },
-    { id: "silver", name: "Инди-лейбл",    minXp: 250,  icon: "◈", cls: "lg-silver", color: "#cfd8dc" },
-    { id: "gold",   name: "Топ-лейбл",     minXp: 700,  icon: "★", cls: "lg-gold",   color: "#ffd700" },
-    { id: "neon",   name: "Мировой чарт",  minXp: 1500, icon: "✦", cls: "lg-neon",   color: "#ff2e93" }
+    { id: "bronze1", name: "Трейни I",        minXp: 0,    icon: "◆", cls: "lg-bronze", color: "#cd9b6a" },
+    { id: "bronze2", name: "Трейни II",       minXp: 100,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a" },
+    { id: "bronze3", name: "Трейни III",      minXp: 220,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a" },
+    { id: "silver1", name: "Инди-лейбл I",    minXp: 360,  icon: "◈", cls: "lg-silver", color: "#cfd8dc" },
+    { id: "silver2", name: "Инди-лейбл II",   minXp: 520,  icon: "◈", cls: "lg-silver", color: "#cfd8dc" },
+    { id: "silver3", name: "Инди-лейбл III",  minXp: 700,  icon: "◈", cls: "lg-silver", color: "#cfd8dc" },
+    { id: "gold1",   name: "Топ-лейбл I",     minXp: 900,  icon: "★", cls: "lg-gold",   color: "#ffd700" },
+    { id: "gold2",   name: "Топ-лейбл II",    minXp: 1150, icon: "★", cls: "lg-gold",   color: "#ffd700" },
+    { id: "gold3",   name: "Топ-лейбл III",   minXp: 1450, icon: "★", cls: "lg-gold",   color: "#ffd700" },
+    { id: "neon1",   name: "Мировой чарт I",  minXp: 1800, icon: "✦", cls: "lg-neon",   color: "#ff2e93" },
+    { id: "neon2",   name: "Мировой чарт II", minXp: 2200, icon: "✦", cls: "lg-neon",   color: "#ff2e93" },
+    { id: "neon3",   name: "Мировой чарт III",minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93" }
   ];
 
   const MONTHS = [
@@ -39,14 +48,11 @@
 
   const MONTHLY_GOAL = 50;
 
-  const TROPHIES = [
-    { id: "hangul_master", name: "Код Хангыля", desc: "За сдачу Экзамена 1", buff: "+5% XP", icon: "★" },
-    { id: "gold_mic", name: "Золотой микрофон", desc: "Редкий дроп из боксов", buff: "+5% 🎤", icon: "🎙" },
-    { id: "streak_7", name: "Неоновый лайтстик", desc: "Серия 7 дней подряд", buff: "-5м ⚡", icon: "⚡" }
-  ];
+  /* Пути к картинкам боксов (оставлены пустыми, чтобы работали чистые CSS-обложки) */
+  const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
 
-  let studioSubTab = 'cards'; // 'cards' | 'quests'
-  let shopSubTab = 'boxes';   // 'boxes' | 'vip'
+  let studioSubTab = 'cards';
+  let shopSubTab = 'boxes';
 
   // 1. Стили
   const css = document.createElement('style');
@@ -55,7 +61,7 @@
     .nav-dot.show { display: block; }
 
     /* Карточка агентства и рамки лиг */
-    .agency-card { border-radius: 20px; padding: 14px 16px; margin-bottom: 12px; position: relative; overflow: hidden; }
+    .agency-card { border-radius: 20px; padding: 14px 16px; margin-bottom: 10px; position: relative; overflow: hidden; }
     .agency-card.lg-bronze { background: linear-gradient(135deg, #2b1f1a, #17111a); border: 1.5px solid rgba(205,155,106,0.5); }
     .agency-card.lg-silver { background: linear-gradient(135deg, #232838, #141224); border: 1.5px solid rgba(207,216,220,0.6); box-shadow: 0 0 16px rgba(207,216,220,0.14); }
     .agency-card.lg-gold   { background: linear-gradient(135deg, #3b2c10, #1c1326); border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.22); }
@@ -64,6 +70,28 @@
     .league-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.6px; padding: 3px 8px; border-radius: 8px; background: rgba(0,0,0,0.38); margin-bottom: 4px; }
     .agency-name { font-size: 18px; font-weight: 900; color: #fff; }
     .agency-buffs { font-size: 11px; color: #d8cce8; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+    /* Кнопка открытия списка трофеев и достижений */
+    .ach-banner { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid rgba(255,215,0,0.28); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; cursor: pointer; transition: 0.18s; }
+    .ach-banner:active { transform: scale(0.98); }
+    .ach-banner-l { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; }
+    .ach-badge-cnt { font-size: 11px; font-weight: 800; color: var(--gold); background: rgba(255,215,0,0.14); padding: 3px 8px; border-radius: 8px; }
+    .ach-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; margin-left: 6px; }
+
+    /* Полноэкранный листающийся список достижений */
+    .ach-overlay { position: fixed; inset: 0; background: #0e0a1a; z-index: 9500; display: none; flex-direction: column; }
+    .ach-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .ach-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(20,14,34,0.95); }
+    .ach-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 32px; -webkit-overflow-scrolling: touch; }
+    .ach-card { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+    .ach-card.done { border-color: rgba(255,215,0,0.45); background: linear-gradient(135deg, rgba(43,33,66,0.9), rgba(20,14,34,0.95)); }
+    .ach-ico { width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; background: rgba(255,255,255,0.06); }
+    .ach-card.done .ach-ico { background: rgba(255,215,0,0.18); box-shadow: 0 0 12px rgba(255,215,0,0.2); }
+    .ach-body { flex: 1; min-width: 0; }
+    .ach-title { font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .ach-desc { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
+    .ach-rew { font-size: 10px; font-weight: 800; color: var(--cyan); }
 
     .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 10px; }
     .team-slot { background: var(--surface); border: 1.5px dashed rgba(255,255,255,0.16); border-radius: 14px; padding: 8px 4px; text-align: center; cursor: pointer; transition: 0.2s; min-height: 74px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -114,17 +142,21 @@
 
     /* Анимация открытия: Коробка + Выезжающий винил */
     .album-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
-    .album-vinyl { position: absolute; width: 176px; height: 176px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #1f1f2b 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); z-index: 1; }
-    .vinyl-label { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
-    .vinyl-hole { width: 12px; height: 12px; border-radius: 50%; background: #0b0814; }
-    .album-sleeve { position: relative; z-index: 2; width: 186px; height: 186px; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.65); transition: transform 0.7s var(--spring); animation: packFloat 2.2s infinite ease-in-out; }
-    .album-sleeve.silver { background: linear-gradient(145deg, #3a4052, #1b1e29); border: 2px solid #cfd8dc; }
-    .album-sleeve.gold { background: linear-gradient(145deg, #694c14, #261b0b); border: 2px solid #ffd700; }
-    .album-sleeve.platinum { background: linear-gradient(145deg, #124d66, #23123d); border: 2px solid #00e5ff; }
-    .album-stage.opening .album-sleeve { animation: none; transform: translateX(-34px) rotate(-5deg); }
-    .album-stage.opening .album-vinyl { transform: translateX(72px) rotate(540deg); }
+    .album-vinyl { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #1f1f2b 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.5s ease-in, opacity 0.4s ease; opacity: 0; z-index: 1; pointer-events: none; }
+    .vinyl-label { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
+    .vinyl-hole { width: 10px; height: 10px; border-radius: 50%; background: #0b0814; }
+    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.25s var(--spring), opacity 0.3s ease; animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .album-sleeve.no-img.silver { background: linear-gradient(145deg, #3a4052, #1b1e29); border: 2px solid #cfd8dc; border-radius: 18px; }
+    .album-sleeve.no-img.gold { background: linear-gradient(145deg, #694c14, #261b0b); border: 2px solid #ffd700; border-radius: 18px; }
+    .album-sleeve.no-img.platinum { background: linear-gradient(145deg, #124d66, #23123d); border: 2px solid #00e5ff; border-radius: 18px; }
+    @keyframes packFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+    @keyframes packShake { 0%, 100% { transform: scale(1.05) rotate(0); } 20%, 60% { transform: scale(1.05) rotate(-5deg); } 40%, 80% { transform: scale(1.05) rotate(5deg); } }
+    .album-stage.opening .album-sleeve { animation: packShake 0.4s ease-in-out; }
+    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(85px) rotate(420deg); }
+    .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; }
+    .flash-overlay.active { opacity: 1; }
 
-    /* Задания, Ежемесячные бейджи (50 баллов) и Трофеи */
+    /* Задания и Ежемесячные бейджи (50 баллов) */
     .quest-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 14px 0 8px; display: flex; justify-content: space-between; }
     .contract-row { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .contract-row.done { border-color: rgba(0,230,118,0.45); background: rgba(0,230,118,0.08); }
@@ -141,13 +173,6 @@
     .m-badge-ico { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: rgba(255,255,255,0.08); }
     .m-badge-name { font-size: 10px; font-weight: 800; }
 
-    .trophy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
-    .trophy-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 6px; text-align: center; opacity: 0.4; filter: grayscale(1); }
-    .trophy-item.has { opacity: 1; filter: none; border-color: rgba(255,215,0,0.45); background: linear-gradient(155deg, #2b2142, #181129); }
-    .trophy-ico { font-size: 18px; margin-bottom: 3px; color: var(--gold); }
-    .trophy-name { font-size: 10px; font-weight: 800; line-height: 1.2; }
-    .trophy-buff { font-size: 9px; color: var(--cyan); margin-top: 2px; font-weight: 700; }
-
     .rank-prize { font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 8px; background: rgba(255,255,255,0.08); margin-right: 8px; }
 
     .fusion-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -160,6 +185,21 @@
     @keyframes fMerge3 { 0% { transform: translate(0, 75px) rotate(0deg); opacity: 1; } 100% { transform: translate(0, 0) scale(0.2) rotate(360deg); opacity: 0; } }
   `;
   document.head.appendChild(css);
+
+  // Вспышка для открытия боксов
+  const flashEl = document.createElement('div');
+  flashEl.className = 'flash-overlay';
+  document.body.appendChild(flashEl);
+  function triggerFlash(cb) {
+    flashEl.classList.add('active');
+    setTimeout(() => { if (cb) cb(); flashEl.classList.remove('active'); }, 160);
+  }
+
+  // Полноэкранный контейнер для листающегося списка достижений
+  const achOverlay = document.createElement('div');
+  achOverlay.className = 'ach-overlay';
+  achOverlay.id = 'ach-overlay';
+  document.body.appendChild(achOverlay);
 
   function todayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
   function weekKey() {
@@ -194,13 +234,89 @@
     if (!st.cards.includes(cardId)) st.cards.push(cardId);
   }
 
-  // Начисление баллов месяца строго за выполненные дневные задания (макс. 3 в день)
   function checkDailyMonthlyPts() {
     const d = st.daily;
     if (d.lessons >= 1 && !d.p1) { d.p1 = true; st.monthly.pts++; }
     if (d.dict >= 2 && !d.p2) { d.p2 = true; st.monthly.pts++; }
     if (d.cards >= 3 && !d.p3) { d.p3 = true; st.monthly.pts++; }
   }
+
+  /* ====== СИСТЕМА ДОСТИЖЕНИЙ И ТРОФЕЕВ (10 ШТ.) ====== */
+  function getAchievements() {
+    const ownedCnt = typeof CARDS !== 'undefined' ? CARDS.filter(c => getBestTier(c.id)).length : 0;
+    const teamCnt = st.team ? Object.values(st.team).filter(Boolean).length : 0;
+    return [
+      { id: "first_step", icon: "🎵", name: "Первый шаг", desc: "Пройди свой первый урок", cur: st.done.length, goal: 1, rewText: "+20 🎤", claim: () => { st.coins += 20; } },
+      { id: "hangul_master", icon: "★", name: "Код Хангыля", desc: "Сдай Большой Экзамен 1", cur: st.done.includes(9) ? 1 : 0, goal: 1, rewText: "Пассив: +5% XP", passive: true },
+      { id: "lesson_5", icon: "📚", name: "Усердный трейни", desc: "Пройди 5 разных уроков", cur: st.done.length, goal: 5, rewText: "Серебряный бокс", claim: () => { st.cases.silver++; } },
+      { id: "full_squad", icon: "🎤", name: "Дебютный состав", desc: "Заполни все 4 роли в Студии", cur: teamCnt, goal: 4, rewText: "Серебряный бокс", claim: () => { st.cases.silver++; } },
+      { id: "collector_5", icon: "💿", name: "Коллекционер", desc: "Собери 5 уникальных артистов", cur: ownedCnt, goal: 5, rewText: "+50 🎤", claim: () => { st.coins += 50; } },
+      { id: "first_fusion", icon: "✨", name: "Алхимия сцены", desc: "Выполни слияние карт 3 → 1", cur: st.fusionsCount || 0, goal: 1, rewText: "+40 🎤", claim: () => { st.coins += 40; } },
+      { id: "streak_7", icon: "⚡", name: "Неоновый лайтстик", desc: "Держи серию 7 дней подряд", cur: st.streak ? st.streak.count : 1, goal: 7, rewText: "Пассив: -5м ⚡", passive: true },
+      { id: "gold_mic", icon: "🎙️", name: "Золотой микрофон", desc: "Выбей редкий трофей из бокса", cur: st.trophies.includes('gold_mic') ? 1 : 0, goal: 1, rewText: "Пассив: +5% 🎤", passive: true },
+      { id: "xp_1000", icon: "🏆", name: "Звезда чартов", desc: "Набери 1000 XP в агентстве", cur: st.xp, goal: 1000, rewText: "Золотой бокс", claim: () => { st.cases.gold++; } },
+      { id: "collector_12", icon: "👑", name: "Полный каталог", desc: "Собери 12 уникальных артистов", cur: ownedCnt, goal: 12, rewText: "Золотой бокс", claim: () => { st.cases.gold++; } }
+    ];
+  }
+
+  function hasUnclaimedAch() {
+    if (!st.achClaimed) return false;
+    return getAchievements().some(a => !a.passive && a.cur >= a.goal && !st.achClaimed.includes(a.id));
+  }
+
+  window.openAchievementsModal = function () {
+    haptic('light');
+    const list = getAchievements();
+    const doneCnt = list.filter(a => a.cur >= a.goal).length;
+    achOverlay.innerHTML = `
+      <div class="ach-header">
+        <div>
+          <div style="font-size:16px;font-weight:900">Трофеи и достижения</div>
+          <div style="font-size:11px;color:var(--muted)">Выполнено: ${doneCnt} из ${list.length}</div>
+        </div>
+        <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('ach-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div class="ach-scroll">
+        ${list.map(a => {
+          const done = a.cur >= a.goal;
+          const claimed = a.passive ? done : (st.achClaimed && st.achClaimed.includes(a.id));
+          const pct = Math.min(100, Math.round((Math.min(a.cur, a.goal) / a.goal) * 100));
+          return `
+            <div class="ach-card ${done ? 'done' : ''}">
+              <div class="ach-ico">${a.icon}</div>
+              <div class="ach-body">
+                <div class="ach-title">
+                  <span>${a.name}</span>
+                  <span style="font-size:11px;color:${done ? 'var(--gold)' : 'var(--muted)'}">${Math.min(a.cur, a.goal)}/${a.goal}</span>
+                </div>
+                <div class="ach-desc">${a.desc}</div>
+                <div class="bar-bg" style="margin-bottom:6px"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span class="ach-rew">${a.rewText}</span>
+                  ${done && !claimed
+                    ? `<button class="btn gold" style="padding:4px 10px;font-size:11px" data-claim-ach="${a.id}">Забрать</button>`
+                    : (claimed ? `<span style="font-size:11px;color:var(--success);font-weight:800">✓ Получено</span>` : '')}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+
+    achOverlay.querySelectorAll('[data-claim-ach]').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-claim-ach');
+        const item = getAchievements().find(x => x.id === id);
+        if (item && item.claim && !st.achClaimed.includes(id)) {
+          item.claim();
+          st.achClaimed.push(id);
+          save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti();
+          openAchievementsModal();
+          renderBinder();
+        }
+      };
+    });
+    achOverlay.classList.add('open');
+  };
 
   // Настройка нижней навигации
   const navBinder = document.getElementById('nav-binder');
@@ -222,7 +338,7 @@
       const dailyReady = st.daily.lessons >= 1 && st.daily.dict >= 2 && st.daily.cards >= 3 && !st.daily.claimed;
       const weeklyReady = st.weekly.days.length >= 5 && !st.weekly.claimed;
       const monthlyReady = st.monthly.pts >= MONTHLY_GOAL && !st.monthly.claimed;
-      sDot.classList.toggle('show', dailyReady || weeklyReady || monthlyReady);
+      sDot.classList.toggle('show', dailyReady || weeklyReady || monthlyReady || hasUnclaimedAch());
     }
     if (shDot && st.cases) {
       shDot.classList.toggle('show', (st.cases.silver + st.cases.gold + st.cases.platinum) > 0);
@@ -236,6 +352,8 @@
     if (!st.cases) st.cases = { silver: 0, gold: 0, platinum: 0 };
     if (!st.trophies) st.trophies = [];
     if (!st.monthlyBadges) st.monthlyBadges = [];
+    if (!st.achClaimed) st.achClaimed = [];
+    if (!st.fusionsCount) st.fusionsCount = 0;
     if (st.packTickets > 0) { st.cases.silver += st.packTickets; st.packTickets = 0; }
 
     st.cards.forEach(id => {
@@ -300,7 +418,7 @@
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
   window.setShopSubTab = function (t) { haptic('light'); shopSubTab = t; renderShop(); };
 
-  /* ====== 1. ЭКРАН СТУДИИ (ЛИЧНЫЙ КАБИНЕТ + МОИ КАРТЫ + ЗАДАНИЯ) ====== */
+  /* ====== 1. ЭКРАН СТУДИИ ====== */
   window.renderBinder = function () {
     if (typeof CARDS === 'undefined') return;
     initStudioState();
@@ -309,6 +427,11 @@
     const lg = getLeague(st.xp);
     const nextLg = LEAGUES.find(x => x.minXp > st.xp);
     const ownedCards = CARDS.filter(c => getBestTier(c.id));
+    const achList = getAchievements();
+    const achDone = achList.filter(a => a.cur >= a.goal).length;
+    const achNotify = hasUnclaimedAch();
+
+    const pctNext = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
 
     screen.innerHTML = `
       <div class="agency-card ${lg.cls}">
@@ -322,13 +445,20 @@
             <button class="btn ghost" style="padding:6px 10px;font-size:11px" id="rename-agency">Имя</button>
           </div>
         </div>
-        ${nextLg ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До лиги «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((st.xp / nextLg.minXp) * 100))}%"></div></div>` : `<div style="font-size:11px;color:var(--gold);font-weight:800">Максимальная лига достигнута!</div>`}
+        ${nextLg
+          ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До ранга «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${pctNext}%"></div></div>`
+          : `<div style="font-size:11px;color:var(--gold);font-weight:800">Максимальный ранг достигнут!</div>`}
         <div class="agency-buffs">
           <span>Серия: <b>${st.streak.count} дн.</b></span>
           <span>Фандом: <b style="color:var(--accent)">${b.power}</b></span>
           <span style="color:var(--cyan);font-weight:800">+${b.xp}% XP</span>
           <span style="color:#ff85cb;font-weight:800">+${b.coins}% 🎤</span>
         </div>
+      </div>
+
+      <div class="ach-banner" onclick="openAchievementsModal()">
+        <div class="ach-banner-l"><span>🏆</span><span>Трофеи и достижения${achNotify ? '<span class="ach-dot"></span>' : ''}</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="ach-badge-cnt">${achDone}/${achList.length}</span><span style="color:var(--muted);font-weight:900">›</span></div>
       </div>
 
       <div class="team-grid" id="team-grid"></div>
@@ -371,7 +501,7 @@
 
     const sub = document.getElementById('studio-sub-body');
 
-    // МОИ КАРТЫ (компактно 3 колонки + увеличение по клику)
+    // МОИ КАРТЫ (3 колонки)
     if (studioSubTab === 'cards') {
       if (!ownedCards.length) {
         sub.innerHTML = `<div class="card-box" style="text-align:center;padding:24px 16px"><h3 style="margin:0 0 8px">Инвентарь пуст</h3><p style="color:var(--muted)">Открывай виниловые боксы в Магазине — все твои артисты появятся здесь.</p><button class="btn" style="margin-top:8px" onclick="shopSubTab='boxes';switchTab('shop')">В Магазин боксов</button></div>`;
@@ -397,7 +527,7 @@
       sub.appendChild(grid);
     }
 
-    // ЗАДАНИЯ (Ежедневные + Еженедельные + Ежемесячный квест 50 баллов + Архив бейджей)
+    // ЗАДАНИЯ (50 баллов + Дневные + Недельные + Архив бейджей)
     if (studioSubTab === 'quests') {
       const d = st.daily, w = st.weekly, m = st.monthly;
       const dCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
@@ -456,18 +586,6 @@
               <div class="m-badge-name">${mo.name}</div>
             </div>`;
           }).join('')}
-        </div>
-
-        <div class="quest-sec"><span>Полка трофеев</span><span>${st.trophies.length}/${TROPHIES.length}</span></div>
-        <div class="trophy-grid">
-          ${TROPHIES.map(t => {
-            const has = st.trophies.includes(t.id);
-            return `<div class="trophy-item ${has ? 'has' : ''}" onclick="alert('${t.name}\\n${t.desc}\\nЭффект: ${t.buff}')">
-              <div class="trophy-ico">${t.icon}</div>
-              <div class="trophy-name">${t.name}</div>
-              <div class="trophy-buff">${has ? t.buff : 'Закрыто'}</div>
-            </div>`;
-          }).join('')}
         </div>`;
 
       const cd = document.getElementById('claim-daily');
@@ -479,7 +597,7 @@
     }
   };
 
-  /* ====== 2. МАГАЗИН (2 ВКЛАДКИ: БОКСЫ | ДОНАТ И VIP) ====== */
+  /* ====== 2. МАГАЗИН (БОКСЫ | ДОНАТ И VIP) ====== */
   window.renderShop = function () {
     syncResources(); initStudioState();
     const screen = document.getElementById('screen-shop');
@@ -532,7 +650,7 @@
     }
   };
 
-  /* ====== 3. РЕЙТИНГ (ТОП-3 ПОЛУЧАЮТ БОКСЫ РАЗНЫХ РАНГОВ) ====== */
+  /* ====== 3. РЕЙТИНГ ====== */
   window.renderRank = function () {
     initStudioState();
     const lg = getLeague(st.xp);
@@ -579,7 +697,7 @@
     modal.querySelectorAll('[data-pick]').forEach(row => {
       row.onclick = () => {
         st.team[role.key] = Number(row.getAttribute('data-pick'));
-        save(); haptic('ok'); sfx('ok'); modal.classList.remove('open'); renderBinder();
+        save(); updateNavDots(); haptic('ok'); sfx('ok'); modal.classList.remove('open'); renderBinder();
       };
     });
   }
@@ -616,7 +734,7 @@
       </div>`;
 
     document.getElementById('do-equip').onclick = () => {
-      st.team[c.roleKey] = cardId; save(); haptic('ok'); sfx('ok');
+      st.team[c.roleKey] = cardId; save(); updateNavDots(); haptic('ok'); sfx('ok');
       renderBinder(); openArtistModal(cardId);
     };
     const craftBtn = document.getElementById('do-craft');
@@ -634,7 +752,8 @@
     setTimeout(() => {
       st.inv[cardId][fromTier] -= 3;
       st.inv[cardId][toTier] = (st.inv[cardId][toTier] || 0) + 1;
-      save(); renderBinder();
+      st.fusionsCount = (st.fusionsCount || 0) + 1;
+      save(); updateNavDots(); renderBinder();
       haptic('ok'); sfx('win'); fireConfetti();
       if (c.quoteFile) playAudio(c.quoteFile, c.quoteKr);
 
@@ -667,14 +786,22 @@
     const titleMap = { silver: "SILVER EDITION", gold: "GOLD EDITION", platinum: "PLATINUM EDITION" };
     const modal = document.getElementById('pack-modal');
     modal.classList.add('open');
+
+    const boxUrl = BOX_IMAGES[type];
+    const vinylUrl = BOX_IMAGES.vinyl;
+
     modal.innerHTML = `
-      <div style="font-size:12px;color:var(--cyan);font-weight:800;letter-spacing:1px;margin-bottom:10px">НАЖМИ НА АЛЬБОМ, ЧТОБЫ ДОСТАТЬ ПЛАСТИНКУ</div>
+      <div style="font-size:12px;color:var(--cyan);font-weight:800;letter-spacing:1.5px;margin-bottom:10px">НАЖМИ НА АЛЬБОМ, ЧТОБЫ ДОСТАТЬ ПЛАСТИНКУ</div>
       <div class="album-stage" id="album-stage">
-        <div class="album-vinyl"><div class="vinyl-label"><div class="vinyl-hole"></div></div></div>
-        <div class="album-sleeve ${type}">
-          <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;opacity:0.8">K-POP LINGUA</div>
-          <div style="font-size:18px;font-weight:900;line-height:1.1">${titleMap[type]}</div>
-          <div style="font-size:10px;opacity:0.65">LIMITED VINYL BOX</div>
+        <div class="album-vinyl" id="vinyl-anim" style="${vinylUrl ? `background: url('${vinylUrl}') no-repeat center; background-size: contain; border: none; box-shadow: none;` : ''}">
+          ${vinylUrl ? '' : '<div class="vinyl-label"><div class="vinyl-hole"></div></div>'}
+        </div>
+        <div class="album-sleeve ${type} ${boxUrl ? '' : 'no-img'}" id="sleeve-anim" style="${boxUrl ? `background-image: url('${boxUrl}'); box-shadow: none;` : ''}">
+          ${boxUrl ? '' : `
+            <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;opacity:0.8">K-POP LINGUA</div>
+            <div style="font-size:18px;font-weight:900;line-height:1.1">${titleMap[type]}</div>
+            <div style="font-size:10px;opacity:0.65">LIMITED VINYL BOX</div>
+          `}
         </div>
       </div>`;
 
@@ -685,44 +812,46 @@
       haptic('heavy'); sfx('tap');
 
       setTimeout(() => {
-        const luck = getTeamBonuses().luck / 100, r = Math.random();
-        let tier = 'silver';
-        if (type === 'platinum') tier = 'platinum';
-        else if (type === 'gold') tier = r < (0.2 + luck * 0.5) ? 'platinum' : 'gold';
-        else tier = r < (0.02 + luck * 0.2) ? 'platinum' : (r < (0.2 + luck) ? 'gold' : 'silver');
+        triggerFlash(() => {
+          const luck = getTeamBonuses().luck / 100, r = Math.random();
+          let tier = 'silver';
+          if (type === 'platinum') tier = 'platinum';
+          else if (type === 'gold') tier = r < (0.2 + luck * 0.5) ? 'platinum' : 'gold';
+          else tier = r < (0.02 + luck * 0.2) ? 'platinum' : (r < (0.2 + luck) ? 'gold' : 'silver');
 
-        const c = CARDS[Math.floor(Math.random() * CARDS.length)];
-        addCardCopy(c.id, tier);
+          const c = CARDS[Math.floor(Math.random() * CARDS.length)];
+          addCardCopy(c.id, tier);
 
-        let trophyMsg = '';
-        if ((type === 'gold' && Math.random() < 0.12) || (type === 'platinum' && Math.random() < 0.35)) {
-          if (!st.trophies.includes('gold_mic')) {
-            st.trophies.push('gold_mic');
-            trophyMsg = `<div style="margin-top:8px;color:var(--gold);font-size:12px;font-weight:800">★ ТРОФЕЙ: Золотой микрофон!</div>`;
+          let trophyMsg = '';
+          if ((type === 'gold' && Math.random() < 0.12) || (type === 'platinum' && Math.random() < 0.35)) {
+            if (!st.trophies.includes('gold_mic')) {
+              st.trophies.push('gold_mic');
+              trophyMsg = `<div style="margin-top:8px;color:var(--gold);font-size:12px;font-weight:800">★ ТРОФЕЙ: Золотой микрофон!</div>`;
+            }
           }
-        }
-        save(); updateNavDots();
-        haptic('ok'); sfx('win');
-        if (tier !== 'silver') fireConfetti();
-        if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 250);
+          save(); updateNavDots();
+          haptic('ok'); sfx('win');
+          if (tier !== 'silver') fireConfetti();
+          if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 100);
 
-        const tm = TIER_META[tier], cnt = st.inv[c.id][tier];
-        modal.innerHTML = `
-          <div style="font-size:14px;font-weight:900;color:${tm.color};margin-bottom:14px">${tm.name.toUpperCase()} • КОПИЙ: ${cnt}${cnt >= 3 ? ' (СЛИЯНИЕ 3→1!)' : ''}</div>
-          <div class="photocard tier-${tier} reveal-card">
-            <div class="pc-rarity" style="color:${tm.color}">${tm.name}</div>
-            ${cardArtHtml(c)}
-            <div class="pc-name" style="font-size:16px">${c.name}</div>
-            <div class="pc-role">${c.role}</div>
-            <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${c.quoteKr}»</div>
-            ${trophyMsg}
-          </div>
-          <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">В Студию</button>`;
-      }, 900);
+          const tm = TIER_META[tier], cnt = st.inv[c.id][tier];
+          modal.innerHTML = `
+            <div style="font-size:14px;font-weight:900;color:${tm.color};margin-bottom:14px">${tm.name.toUpperCase()} • КОПИЙ: ${cnt}${cnt >= 3 ? ' (СЛИЯНИЕ 3→1!)' : ''}</div>
+            <div class="photocard tier-${tier} reveal-card">
+              <div class="pc-rarity" style="color:${tm.color}">${tm.name}</div>
+              ${cardArtHtml(c)}
+              <div class="pc-name" style="font-size:16px">${c.name}</div>
+              <div class="pc-role">${c.role}</div>
+              <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${c.quoteKr}»</div>
+              ${trophyMsg}
+            </div>
+            <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">В Студию</button>`;
+        });
+      }, 350);
     };
   };
 
-  // Перехваты для квестов (дневных -> 1 балл в месяц за каждое задание)
+  // Перехваты для квестов
   const origFinishLesson = window.finishLesson;
   window.finishLesson = function () {
     const passed = !(curL && curL.isExam && mistakes > 4);
@@ -761,7 +890,8 @@
       initStudioState(); st.daily.cards++; checkDailyMonthlyPts(); save(); updateNavDots();
     }
   });
-/* ====== АВТОСОХРАНЕНИЕ ПРОГРЕССА УРОКА (БЕЗ ПОВТОРНОЙ ТРАТЫ ЭНЕРГИИ) ====== */
+
+  /* ====== АВТОСОХРАНЕНИЕ ПРОГРЕССА УРОКА ====== */
   const origStartLesson = window.startLesson;
   window.startLesson = function (id) {
     if (!st.inProgress) st.inProgress = {};
@@ -819,38 +949,12 @@
       }
     });
   };
-  /* ====== ТЁМНЫЙ НЕОНОВЫЙ ТОСТ ВМЕСТО СИСТЕМНОГО ALERT ====== */
+
+  /* ====== ТЁМНЫЙ ТОСТ ====== */
   const toastCss = document.createElement('style');
   toastCss.textContent = `
-    .app-toast {
-      position: fixed;
-      left: 50%;
-      bottom: 86px;
-      transform: translateX(-50%) translateY(18px);
-      background: rgba(20, 14, 34, 0.96);
-      border: 1.5px solid rgba(0, 229, 255, 0.45);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.18);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.35;
-      text-align: center;
-      padding: 11px 16px;
-      border-radius: 14px;
-      max-width: calc(100vw - 32px);
-      width: max-content;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
-      white-space: pre-line;
-      backdrop-filter: blur(8px);
-    }
-    .app-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
+    .app-toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(18px); background: rgba(20, 14, 34, 0.96); border: 1.5px solid rgba(0, 229, 255, 0.45); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.18); color: #fff; font-size: 13px; font-weight: 700; line-height: 1.35; text-align: center; padding: 11px 16px; border-radius: 14px; max-width: calc(100vw - 32px); width: max-content; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.22s ease, transform 0.26s cubic-bezier(0.22, 1, 0.36, 1); white-space: pre-line; backdrop-filter: blur(8px); }
+    .app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   `;
   document.head.appendChild(toastCss);
 
@@ -867,6 +971,7 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
   };
+
   initStudioState();
   renderLessons();
 })();
