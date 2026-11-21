@@ -43,7 +43,7 @@
     .actions {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       width: 100%;
       max-width: 440px;
     }
@@ -52,7 +52,7 @@
       padding: 10px;
       border: none;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       background: #6c5ce7;
@@ -71,7 +71,37 @@
       margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
+    }
+    .tuner-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .mode-pill {
+      padding: 5px 10px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #3a3a54;
+      background: #252538;
+      color: #d6d6f0;
+      cursor: pointer;
+    }
+    .mode-pill.active {
+      background: #6c5ce7;
+      border-color: #6c5ce7;
+      color: #fff;
+    }
+    .reset-link {
+      font-size: 12px;
+      color: #a594f9;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
     }
     .tuner-row {
       display: flex;
@@ -126,8 +156,18 @@
       padding: 8px;
       cursor: pointer;
       overflow: hidden;
+      position: relative;
     }
     .item.active { border-color: #6c5ce7; background: #272540; }
+    .item.custom::after {
+      content: "•";
+      position: absolute;
+      top: 4px;
+      right: 7px;
+      color: #00cec9;
+      font-size: 16px;
+      line-height: 1;
+    }
     .item img { width: 100%; height: 100%; object-fit: contain; }
     .item.none { font-size: 13px; color: #8888a8; font-weight: 600; }
   </style>
@@ -146,10 +186,18 @@
 
   <div class="actions">
     <button class="btn" id="randomBtn">🎲 Случайный</button>
-    <button class="btn secondary" id="copyBtn">📋 Скопировать</button>
+    <button class="btn secondary" id="resetAllBtn">↩ Сброс всего</button>
+    <button class="btn secondary" id="copyBtn">📋 Копировать</button>
   </div>
 
   <div class="tuner" id="tuner">
+    <div class="tuner-top">
+      <div style="display:flex; gap:6px;">
+        <button class="mode-pill active" id="modeTabBtn">Вся вкладка</button>
+        <button class="mode-pill" id="modeItemBtn">Только этот файл</button>
+      </div>
+      <button class="reset-link" id="resetCurrentBtn">Сбросить текущее</button>
+    </div>
     <div class="tuner-row">
       <span>Вверх/Вниз</span>
       <input type="range" id="sl-top" min="0" max="80" step="1">
@@ -222,14 +270,18 @@
       }
     };
 
-    const LAYOUT = {
-      face:   { top: 17, left: 50, width: 46 },
-      outfit: { top: 51, left: 51, width: 82 },
-      eyes:   { top: 31, left: 53, width: 17 },
-      mouth:  { top: 41, left: 53, width: 11 },
-      hair:   { top: 10, left: 49, width: 56 },
-      acc:    { top: 30, left: 53, width: 30 }
+    const DEFAULT_LAYOUT = {
+      face:   { top: 21, left: 49, width: 46 },
+      outfit: { top: 51, left: 54, width: 71 },
+      eyes:   { top: 34, left: 60, width: 17 },
+      mouth:  { top: 47, left: 58, width: 8  },
+      hair:   { top: 17, left: 52, width: 59 },
+      acc:    { top: 32, left: 58, width: 28 }
     };
+
+    let layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+    let itemOverrides = {}; // { 'Hair=Style 04.svg': { top, left, width } }
+    let editMode = 'tab'; // 'tab' | 'item'
 
     const state = {
       bg: ASSETS.bg.files[0],
@@ -241,24 +293,56 @@
       acc: null
     };
 
-    let activeTab = 'outfit';
+    let activeTab = 'hair';
 
     function fileUrl(name) { return BASE + encodeURIComponent(name); }
 
+    function getPosForLayer(key) {
+      const file = state[key];
+      if (file && itemOverrides[file]) return itemOverrides[file];
+      return layout[key];
+    }
+
     function applyLayout() {
-      Object.entries(LAYOUT).forEach(([key, pos]) => {
+      Object.keys(DEFAULT_LAYOUT).forEach(key => {
+        const pos = getPosForLayer(key);
         const img = document.getElementById('layer-' + key);
-        img.style.top = pos.top + '%';
-        img.style.left = pos.left + '%';
-        img.style.width = pos.width + '%';
+        if (pos && img) {
+          img.style.top = pos.top + '%';
+          img.style.left = pos.left + '%';
+          img.style.width = pos.width + '%';
+        }
       });
+    }
+
+    function getActiveEditablePos() {
+      const currentFile = state[activeTab];
+      if (editMode === 'item' && currentFile) {
+        if (!itemOverrides[currentFile]) {
+          itemOverrides[currentFile] = { ...layout[activeTab] };
+        }
+        return itemOverrides[currentFile];
+      }
+      return layout[activeTab];
     }
 
     function syncSliders() {
       const tuner = document.getElementById('tuner');
-      if (!LAYOUT[activeTab]) { tuner.style.display = 'none'; return; }
+      if (!DEFAULT_LAYOUT[activeTab]) { tuner.style.display = 'none'; return; }
       tuner.style.display = 'flex';
-      const pos = LAYOUT[activeTab];
+
+      const currentFile = state[activeTab];
+      const modeTabBtn = document.getElementById('modeTabBtn');
+      const modeItemBtn = document.getElementById('modeItemBtn');
+      modeTabBtn.classList.toggle('active', editMode === 'tab');
+      modeItemBtn.classList.toggle('active', editMode === 'item');
+      modeItemBtn.disabled = !currentFile;
+      modeItemBtn.style.opacity = currentFile ? '1' : '0.4';
+
+      const pos = (editMode === 'item' && currentFile && itemOverrides[currentFile])
+        ? itemOverrides[currentFile]
+        : layout[activeTab];
+
       ['top', 'left', 'width'].forEach(prop => {
         document.getElementById('sl-' + prop).value = pos[prop];
         document.getElementById('val-' + prop).textContent = pos[prop] + '%';
@@ -267,12 +351,48 @@
 
     ['top', 'left', 'width'].forEach(prop => {
       document.getElementById('sl-' + prop).oninput = (e) => {
-        if (!LAYOUT[activeTab]) return;
-        LAYOUT[activeTab][prop] = Number(e.target.value);
+        if (!DEFAULT_LAYOUT[activeTab]) return;
+        const pos = getActiveEditablePos();
+        pos[prop] = Number(e.target.value);
         document.getElementById('val-' + prop).textContent = e.target.value + '%';
         applyLayout();
+        renderGrid();
       };
     });
+
+    document.getElementById('modeTabBtn').onclick = () => {
+      editMode = 'tab';
+      syncSliders();
+    };
+
+    document.getElementById('modeItemBtn').onclick = () => {
+      if (!state[activeTab]) return;
+      editMode = 'item';
+      getActiveEditablePos();
+      syncSliders();
+      renderGrid();
+    };
+
+    document.getElementById('resetCurrentBtn').onclick = () => {
+      const currentFile = state[activeTab];
+      if (editMode === 'item' && currentFile) {
+        delete itemOverrides[currentFile];
+      } else if (DEFAULT_LAYOUT[activeTab]) {
+        layout[activeTab] = { ...DEFAULT_LAYOUT[activeTab] };
+      }
+      applyLayout();
+      syncSliders();
+      renderGrid();
+    };
+
+    document.getElementById('resetAllBtn').onclick = () => {
+      layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+      itemOverrides = {};
+      editMode = 'tab';
+      applyLayout();
+      syncSliders();
+      renderGrid();
+    };
 
     function renderPreview() {
       Object.keys(state).forEach(key => {
@@ -297,6 +417,7 @@
         btn.textContent = cfg.label;
         btn.onclick = () => {
           activeTab = key;
+          if (!state[activeTab]) editMode = 'tab';
           renderTabs();
           renderGrid();
           syncSliders();
@@ -313,17 +434,31 @@
         const none = document.createElement('div');
         none.className = 'item none' + (state[activeTab] === null ? ' active' : '');
         none.textContent = 'Нет';
-        none.onclick = () => { state[activeTab] = null; renderPreview(); renderGrid(); };
+        none.onclick = () => {
+          state[activeTab] = null;
+          editMode = 'tab';
+          renderPreview();
+          renderGrid();
+          syncSliders();
+        };
         grid.appendChild(none);
       }
       cfg.files.forEach(file => {
+        const hasCustom = Boolean(itemOverrides[file]);
         const card = document.createElement('div');
-        card.className = 'item' + (state[activeTab] === file ? ' active' : '');
+        card.className = 'item'
+          + (state[activeTab] === file ? ' active' : '')
+          + (hasCustom ? ' custom' : '');
         const img = document.createElement('img');
         img.src = fileUrl(file);
         img.loading = 'lazy';
         card.appendChild(img);
-        card.onclick = () => { state[activeTab] = file; renderPreview(); renderGrid(); };
+        card.onclick = () => {
+          state[activeTab] = file;
+          renderPreview();
+          renderGrid();
+          syncSliders();
+        };
         grid.appendChild(card);
       });
     }
@@ -333,15 +468,18 @@
         const pool = cfg.optional ? [null, ...cfg.files] : cfg.files;
         state[key] = pool[Math.floor(Math.random() * pool.length)];
       });
+      if (!state[activeTab]) editMode = 'tab';
       renderPreview();
       renderGrid();
+      syncSliders();
     };
 
     document.getElementById('copyBtn').onclick = () => {
-      navigator.clipboard.writeText(JSON.stringify(LAYOUT));
+      const payload = JSON.stringify({ layout, itemOverrides });
+      navigator.clipboard.writeText(payload);
       const btn = document.getElementById('copyBtn');
       btn.textContent = '✅ Скопировано!';
-      setTimeout(() => btn.textContent = '📋 Скопировать', 1500);
+      setTimeout(() => btn.textContent = '📋 Копировать', 1500);
     };
 
     renderTabs();
