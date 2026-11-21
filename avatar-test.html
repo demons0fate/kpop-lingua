@@ -234,17 +234,34 @@
     };
 
     let activeTab = 'hair';
+    const ACC_POS = {
+      'Accessories=Cap.svg':                { top: '9%',  left: '49%', width: '48%' },
+      'Accessories=Earphone.svg':           { top: '14%', left: '48%', width: '52%' },
+      'Accessories=Circle Earring.svg':     { top: '39%', left: '33%', width: '9%'  },
+      'Accessories=Earring.svg':            { top: '39%', left: '33%', width: '8%'  },
+      'Accessories=Simple Earring.svg':     { top: '39%', left: '33%', width: '7%'  },
+      'Accessories=Glasses.svg':            { top: '31%', left: '53%', width: '30%' },
+      'Accessories=Rounded Glasses.svg':    { top: '31%', left: '53%', width: '30%' },
+      'Accessories=Stylish Glasses.svg':    { top: '30%', left: '53%', width: '32%' },
+      'Accessories=Futuristic Glasses.svg': { top: '30%', left: '53%', width: '32%' },
+      'Accessories=Mask.svg':               { top: '38%', left: '53%', width: '32%' },
+      'Accessories=Mask Google.svg':        { top: '37%', left: '53%', width: '32%' },
+      'Accessories=Moustache.svg':          { top: '41%', left: '55%', width: '14%' }
+    };
 
     function fileUrl(name) {
       return BASE + encodeURIComponent(name);
     }
 
-    function renderPreview() {
+        function renderPreview() {
       Object.keys(state).forEach(key => {
         const img = document.getElementById('layer-' + key);
         if (state[key]) {
           img.src = fileUrl(state[key]);
           img.style.display = 'block';
+          if (key === 'acc' && ACC_POS[state[key]]) {
+            Object.assign(img.style, ACC_POS[state[key]]);
+          }
         } else {
           img.removeAttribute('src');
           img.style.display = 'none';
