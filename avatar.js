@@ -188,7 +188,13 @@
       </div>
       <div class="duo-body">${bodyHtml}</div>`;
 
-    const closeEditor = () => { editorOv.classList.remove('open'); save(false); renderBinder(); };
+      const closeEditor = () => {
+      editorOv.classList.remove('open');
+      save();
+      renderBinder();
+      const profAv = document.querySelector('#profile-overlay .av-circle');
+      if (profAv) { profAv.style.padding = '0'; profAv.innerHTML = renderAvatarSvg(); }
+    };
     editorOv.querySelector('#duo-close').onclick = closeEditor;
     editorOv.querySelector('#duo-done').onclick = () => { haptic('ok'); closeEditor(); };
 
@@ -335,6 +341,8 @@
       btn.textContent = '🎨 Редактор героя';
       btn.onclick = openAvatarCreator;
       profAv.parentElement.insertBefore(btn, profAv.nextSibling);
+      const oldPicks = document.querySelector('#profile-overlay .av-pick-row');
+      if (oldPicks) oldPicks.style.display = 'none';
     }
   };
 
