@@ -1,4 +1,4 @@
-/* ====== СТУДИЯ (12 РАНГОВ, ДОСТИЖЕНИЯ, КАРТЫ 3-КОЛОНКИ, КВЕСТ 50 БАЛЛОВ) + МАГАЗИН + ТОП ====== */
+/* ====== СТУДИЯ (ОНБОРДИНГ, ПРОФИЛЬ + 12 РАНГОВ, 3 ВКЛАДКИ: ГРУППА / КВЕСТЫ / ЗАЛ СЛАВЫ) + МАГАЗИН + ТОП ====== */
 (function () {
   const ROLES = [
     { key: "vocal", title: "Вокал", desc: "Бонус XP" },
@@ -31,6 +31,14 @@
     { id: "neon3",   name: "Мировой чарт III",minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93" }
   ];
 
+  const AVATAR_PRESETS = [
+    { icon: "🎧", bg: "linear-gradient(135deg, #ff2e93, #7b2cbf)" },
+    { icon: "🎤", bg: "linear-gradient(135deg, #00e5ff, #3a0ca3)" },
+    { icon: "⚡", bg: "linear-gradient(135deg, #ffd700, #ff6b00)" },
+    { icon: "💿", bg: "linear-gradient(135deg, #b46eff, #00c6ff)" },
+    { icon: "🌟", bg: "linear-gradient(135deg, #ff4757, #ff9f43)" }
+  ];
+
   const MONTHS = [
     { m: 0,  name: "Янв", icon: "❄️", col: "#00e5ff" },
     { m: 1,  name: "Фев", icon: "💜", col: "#b46eff" },
@@ -47,52 +55,55 @@
   ];
 
   const MONTHLY_GOAL = 50;
-
-  /* Пути к картинкам боксов (оставлены пустыми, чтобы работали чистые CSS-обложки) */
   const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
 
-  let studioSubTab = 'cards';
-  let shopSubTab = 'boxes';
+  let studioSubTab = 'group'; // 'group' | 'quests' | 'hall'
+  let shopSubTab = 'boxes';   // 'boxes' | 'vip'
 
   // 1. Стили
   const css = document.createElement('style');
   css.textContent = `
     .nav-dot { position: absolute; top: 4px; right: 22%; width: 8px; height: 8px; border-radius: 50%; background: var(--success); border: 1.5px solid #0f0b1a; display: none; }
     .nav-dot.show { display: block; }
+    .tab-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--success); margin-left: 4px; vertical-align: middle; }
 
-    /* Карточка агентства и рамки лиг */
-    .agency-card { border-radius: 20px; padding: 14px 16px; margin-bottom: 10px; position: relative; overflow: hidden; }
-    .agency-card.lg-bronze { background: linear-gradient(135deg, #2b1f1a, #17111a); border: 1.5px solid rgba(205,155,106,0.5); }
-    .agency-card.lg-silver { background: linear-gradient(135deg, #232838, #141224); border: 1.5px solid rgba(207,216,220,0.6); box-shadow: 0 0 16px rgba(207,216,220,0.14); }
+    /* Кликабельная шапка агентства */
+    .agency-card { border-radius: 20px; padding: 14px 15px; margin-bottom: 14px; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.18s ease; }
+    .agency-card:active { transform: scale(0.98); }
+    .agency-card.lg-bronze { background: linear-gradient(135deg, #2b1f1a, #17111a); border: 1.5px solid rgba(205,155,106,0.55); }
+    .agency-card.lg-silver { background: linear-gradient(135deg, #232838, #141224); border: 1.5px solid rgba(207,216,220,0.65); box-shadow: 0 0 16px rgba(207,216,220,0.14); }
     .agency-card.lg-gold   { background: linear-gradient(135deg, #3b2c10, #1c1326); border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.22); }
     .agency-card.lg-neon   { background: linear-gradient(135deg, #3b1240, #12293d); border: 2px solid #ff2e93; box-shadow: 0 0 24px rgba(255,46,147,0.35), inset 0 0 18px rgba(0,229,255,0.2); }
-    .agency-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .league-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.6px; padding: 3px 8px; border-radius: 8px; background: rgba(0,0,0,0.38); margin-bottom: 4px; }
-    .agency-name { font-size: 18px; font-weight: 900; color: #fff; }
-    .agency-buffs { font-size: 11px; color: #d8cce8; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .agency-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .av-circle { width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+    .agency-name { font-size: 17px; font-weight: 900; color: #fff; line-height: 1.15; }
+    .agency-id { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
+    .league-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 9px; border-radius: 8px; background: rgba(0,0,0,0.42); margin-top: 5px; }
+    .agency-buffs { font-size: 11px; color: #d8cce8; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 
-    /* Кнопка открытия списка трофеев и достижений */
-    .ach-banner { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid rgba(255,215,0,0.28); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; cursor: pointer; transition: 0.18s; }
-    .ach-banner:active { transform: scale(0.98); }
-    .ach-banner-l { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; }
-    .ach-badge-cnt { font-size: 11px; font-weight: 800; color: var(--gold); background: rgba(255,215,0,0.14); padding: 3px 8px; border-radius: 8px; }
-    .ach-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; margin-left: 6px; }
-
-    /* Полноэкранный листающийся список достижений */
-    .ach-overlay { position: fixed; inset: 0; background: #0e0a1a; z-index: 9500; display: none; flex-direction: column; }
-    .ach-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    /* Полноэкранный оверлей (Профиль + 12 рангов) */
+    .full-overlay { position: fixed; inset: 0; background: #0e0a1a; z-index: 9500; display: none; flex-direction: column; }
+    .full-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .ach-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(20,14,34,0.95); }
-    .ach-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 32px; -webkit-overflow-scrolling: touch; }
-    .ach-card { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
-    .ach-card.done { border-color: rgba(255,215,0,0.45); background: linear-gradient(135deg, rgba(43,33,66,0.9), rgba(20,14,34,0.95)); }
-    .ach-ico { width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; background: rgba(255,255,255,0.06); }
-    .ach-card.done .ach-ico { background: rgba(255,215,0,0.18); box-shadow: 0 0 12px rgba(255,215,0,0.2); }
-    .ach-body { flex: 1; min-width: 0; }
-    .ach-title { font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-    .ach-desc { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
-    .ach-rew { font-size: 10px; font-weight: 800; color: var(--cyan); }
+    .ov-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(20,14,34,0.96); }
+    .ov-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 36px; -webkit-overflow-scrolling: touch; }
 
+    /* Лестница 12 рангов */
+    .rank-step { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; opacity: 0.5; }
+    .rank-step.reached { opacity: 1; }
+    .rank-step.current { opacity: 1; border-width: 1.5px; background: linear-gradient(135deg, rgba(40,28,68,0.95), rgba(20,14,34,0.95)); box-shadow: 0 0 14px rgba(255,46,147,0.2); }
+    .rs-ico { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; background: rgba(0,0,0,0.35); flex-shrink: 0; }
+
+    /* Приветственный контракт продюсера */
+    .onb-overlay { position: fixed; inset: 0; background: radial-gradient(circle at top, #271242, #0b0714 75%); z-index: 9800; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .onb-overlay.open { display: flex; animation: fadeIn 0.28s ease; }
+    .onb-card { width: 100%; max-width: 340px; background: rgba(22, 16, 38, 0.94); border: 1.5px solid rgba(255,46,147,0.45); box-shadow: 0 0 36px rgba(255,46,147,0.22); border-radius: 24px; padding: 22px 18px; text-align: center; }
+    .onb-input { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.38); border: 1.5px solid rgba(0,229,255,0.4); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 15px; font-weight: 800; text-align: center; outline: none; margin: 10px 0 14px; }
+    .av-pick-row { display: flex; justify-content: center; gap: 10px; margin: 10px 0 18px; }
+    .av-pick { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.18s; }
+    .av-pick.sel { opacity: 1; border-color: #fff; transform: scale(1.1); box-shadow: 0 0 12px rgba(255,255,255,0.35); }
+
+    /* Состав группы и Синергия */
     .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 10px; }
     .team-slot { background: var(--surface); border: 1.5px dashed rgba(255,255,255,0.16); border-radius: 14px; padding: 8px 4px; text-align: center; cursor: pointer; transition: 0.2s; min-height: 74px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .team-slot.filled { border-style: solid; background: linear-gradient(160deg, #201836, #140f24); }
@@ -101,7 +112,7 @@
     .slot-tag { font-size: 15px; font-weight: 900; margin: 3px 0 1px; color: #fff; }
     .slot-tier { font-size: 9px; font-weight: 800; }
 
-    .synergy-bar { font-size: 11px; padding: 7px 12px; border-radius: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); color: var(--muted); }
+    .synergy-bar { font-size: 11px; padding: 7px 12px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); color: var(--muted); }
     .synergy-bar.on { background: rgba(0,230,118,0.12); border-color: var(--success); color: #b8ffd6; }
 
     /* Компактная сетка Моих карт (3 колонки) */
@@ -130,6 +141,16 @@
     .t-pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 6px 4px; text-align: center; font-size: 10px; }
     .t-pill b { display: block; font-size: 14px; margin-top: 2px; }
 
+    /* Карточки достижений в Зале славы */
+    .ach-card { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 13px; margin-bottom: 9px; }
+    .ach-card.done { border-color: rgba(255,215,0,0.45); background: linear-gradient(135deg, rgba(43,33,66,0.9), rgba(20,14,34,0.95)); }
+    .ach-ico { width: 44px; height: 44px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: rgba(255,255,255,0.06); }
+    .ach-card.done .ach-ico { background: rgba(255,215,0,0.18); box-shadow: 0 0 12px rgba(255,215,0,0.2); }
+    .ach-body { flex: 1; min-width: 0; }
+    .ach-title { font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .ach-desc { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
+    .ach-rew { font-size: 10px; font-weight: 800; color: var(--cyan); }
+
     /* Витрина боксов в Магазине */
     .box-list { display: grid; gap: 10px; }
     .box-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: 18px; padding: 12px 14px; border: 1.5px solid rgba(255,255,255,0.1); }
@@ -140,7 +161,7 @@
     .mini-album::after { content: ''; position: absolute; right: -8px; top: 5px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #ff2e93 18%, #111 22%, #222 45%, #111 70%); z-index: 0; }
     .mini-album span { position: relative; z-index: 1; width: 100%; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 
-    /* Анимация открытия: Коробка + Выезжающий винил */
+    /* Анимация открытия бокса */
     .album-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
     .album-vinyl { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #1f1f2b 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.5s ease-in, opacity 0.4s ease; opacity: 0; z-index: 1; pointer-events: none; }
     .vinyl-label { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
@@ -156,7 +177,7 @@
     .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; }
     .flash-overlay.active { opacity: 1; }
 
-    /* Задания и Ежемесячные бейджи (50 баллов) */
+    /* Квесты и Бейджи */
     .quest-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 14px 0 8px; display: flex; justify-content: space-between; }
     .contract-row { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .contract-row.done { border-color: rgba(0,230,118,0.45); background: rgba(0,230,118,0.08); }
@@ -165,7 +186,7 @@
     .c-prog { font-size: 12px; color: var(--cyan); font-weight: 800; }
     .daily-prize { background: linear-gradient(135deg, rgba(255,184,0,0.14), rgba(255,46,147,0.14)); border: 1px solid rgba(255,215,0,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
 
-    .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+    .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
     .m-badge { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 8px 4px; text-align: center; opacity: 0.35; filter: grayscale(1); }
     .m-badge.missed { opacity: 0.48; filter: grayscale(1); border-color: rgba(255,255,255,0.08); }
     .m-badge.cur { opacity: 0.95; filter: none; border-style: dashed; border-color: var(--cyan); }
@@ -186,7 +207,7 @@
   `;
   document.head.appendChild(css);
 
-  // Вспышка для открытия боксов
+  // Вспышка, Профиль-оверлей и Онбординг-оверлей
   const flashEl = document.createElement('div');
   flashEl.className = 'flash-overlay';
   document.body.appendChild(flashEl);
@@ -195,11 +216,15 @@
     setTimeout(() => { if (cb) cb(); flashEl.classList.remove('active'); }, 160);
   }
 
-  // Полноэкранный контейнер для листающегося списка достижений
-  const achOverlay = document.createElement('div');
-  achOverlay.className = 'ach-overlay';
-  achOverlay.id = 'ach-overlay';
-  document.body.appendChild(achOverlay);
+  const profileOverlay = document.createElement('div');
+  profileOverlay.className = 'full-overlay';
+  profileOverlay.id = 'profile-overlay';
+  document.body.appendChild(profileOverlay);
+
+  const onbOverlay = document.createElement('div');
+  onbOverlay.className = 'onb-overlay';
+  onbOverlay.id = 'onb-overlay';
+  document.body.appendChild(onbOverlay);
 
   function todayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
   function weekKey() {
@@ -241,7 +266,7 @@
     if (d.cards >= 3 && !d.p3) { d.p3 = true; st.monthly.pts++; }
   }
 
-  /* ====== СИСТЕМА ДОСТИЖЕНИЙ И ТРОФЕЕВ (10 ШТ.) ====== */
+  /* ====== ДОСТИЖЕНИЯ И ТРОФЕИ ====== */
   function getAchievements() {
     const ownedCnt = typeof CARDS !== 'undefined' ? CARDS.filter(c => getBestTier(c.id)).length : 0;
     const teamCnt = st.team ? Object.values(st.team).filter(Boolean).length : 0;
@@ -264,58 +289,119 @@
     return getAchievements().some(a => !a.passive && a.cur >= a.goal && !st.achClaimed.includes(a.id));
   }
 
-  window.openAchievementsModal = function () {
-    haptic('light');
-    const list = getAchievements();
-    const doneCnt = list.filter(a => a.cur >= a.goal).length;
-    achOverlay.innerHTML = `
-      <div class="ach-header">
-        <div>
-          <div style="font-size:16px;font-weight:900">Трофеи и достижения</div>
-          <div style="font-size:11px;color:var(--muted)">Выполнено: ${doneCnt} из ${list.length}</div>
+  function hasUnclaimedQuests() {
+    if (!st.daily || !st.weekly || !st.monthly) return false;
+    const dReady = st.daily.lessons >= 1 && st.daily.dict >= 2 && st.daily.cards >= 3 && !st.daily.claimed;
+    const wReady = st.weekly.days.length >= 5 && !st.weekly.claimed;
+    const mReady = st.monthly.pts >= MONTHLY_GOAL && !st.monthly.claimed;
+    return dReady || wReady || mReady;
+  }
+
+  /* ====== ОКНО ПРИВЕТСТВИЯ (КОНТРАКТ ПРОДЮСЕРА) ====== */
+  window.openOnboarding = function () {
+    let selIdx = st.avatarIdx || 0;
+    onbOverlay.innerHTML = `
+      <div class="onb-card">
+        <div style="font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--cyan);margin-bottom:6px">K-POP LINGUA • ДЕБЮТ</div>
+        <h2 style="margin:0 0 6px;font-size:21px">Контракт продюсера</h2>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Придумай название своего агентства и выбери значок студии</div>
+        <div style="display:inline-block;font-size:11px;font-weight:800;color:var(--gold);background:rgba(255,215,0,0.12);padding:4px 10px;border-radius:8px;margin-bottom:4px">Твой ID: ${st.producerId}</div>
+        <input id="onb-name" class="onb-input" maxlength="22" placeholder="Название студии..." value="${st.agencyName}">
+        <div class="av-pick-row" id="onb-av-row">
+          ${AVATAR_PRESETS.map((av, i) => `<div class="av-pick ${i === selIdx ? 'sel' : ''}" data-av="${i}" style="background:${av.bg}">${av.icon}</div>`).join('')}
         </div>
-        <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('ach-overlay').classList.remove('open')">✕</button>
-      </div>
-      <div class="ach-scroll">
-        ${list.map(a => {
-          const done = a.cur >= a.goal;
-          const claimed = a.passive ? done : (st.achClaimed && st.achClaimed.includes(a.id));
-          const pct = Math.min(100, Math.round((Math.min(a.cur, a.goal) / a.goal) * 100));
-          return `
-            <div class="ach-card ${done ? 'done' : ''}">
-              <div class="ach-ico">${a.icon}</div>
-              <div class="ach-body">
-                <div class="ach-title">
-                  <span>${a.name}</span>
-                  <span style="font-size:11px;color:${done ? 'var(--gold)' : 'var(--muted)'}">${Math.min(a.cur, a.goal)}/${a.goal}</span>
-                </div>
-                <div class="ach-desc">${a.desc}</div>
-                <div class="bar-bg" style="margin-bottom:6px"><div class="bar-fill" style="width:${pct}%"></div></div>
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                  <span class="ach-rew">${a.rewText}</span>
-                  ${done && !claimed
-                    ? `<button class="btn gold" style="padding:4px 10px;font-size:11px" data-claim-ach="${a.id}">Забрать</button>`
-                    : (claimed ? `<span style="font-size:11px;color:var(--success);font-weight:800">✓ Получено</span>` : '')}
-                </div>
-              </div>
-            </div>`;
-        }).join('')}
+        <button class="btn full" id="onb-start">Дебютировать ✨</button>
       </div>`;
 
-    achOverlay.querySelectorAll('[data-claim-ach]').forEach(btn => {
-      btn.onclick = () => {
-        const id = btn.getAttribute('data-claim-ach');
-        const item = getAchievements().find(x => x.id === id);
-        if (item && item.claim && !st.achClaimed.includes(id)) {
-          item.claim();
-          st.achClaimed.push(id);
-          save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti();
-          openAchievementsModal();
-          renderBinder();
-        }
+    onbOverlay.querySelectorAll('[data-av]').forEach(el => {
+      el.onclick = () => {
+        selIdx = Number(el.getAttribute('data-av'));
+        onbOverlay.querySelectorAll('[data-av]').forEach(x => x.classList.remove('sel'));
+        el.classList.add('sel');
+        haptic('light');
       };
     });
-    achOverlay.classList.add('open');
+
+    document.getElementById('onb-start').onclick = () => {
+      const val = document.getElementById('onb-name').value.trim();
+      if (val) st.agencyName = val.slice(0, 22);
+      st.avatarIdx = selIdx;
+      st.onboarded = true;
+      save(); haptic('ok'); sfx('win'); fireConfetti();
+      onbOverlay.classList.remove('open');
+      renderBinder();
+    };
+    onbOverlay.classList.add('open');
+  };
+
+  /* ====== ОКНО ПРОФИЛЯ И ЛЕСТНИЦЫ 12 РАНГОВ ====== */
+  window.openProfileModal = function () {
+    haptic('light');
+    const lg = getLeague(st.xp);
+    const av = AVATAR_PRESETS[st.avatarIdx || 0];
+
+    profileOverlay.innerHTML = `
+      <div class="ov-header">
+        <div>
+          <div style="font-size:16px;font-weight:900">Профиль и Лиги</div>
+          <div style="font-size:11px;color:var(--muted)">ID: ${st.producerId} • ${st.xp} XP</div>
+        </div>
+        <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('profile-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div class="ov-scroll">
+        <div class="card-box" style="margin-bottom:14px;text-align:center">
+          <div class="av-circle" style="background:${av.bg};border-color:${lg.color};margin:0 auto 10px;width:62px;height:62px;font-size:30px">${av.icon}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Название твоей студии</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <input id="prof-name-in" class="onb-input" style="margin:0;padding:9px 12px;font-size:14px;text-align:left" maxlength="22" value="${st.agencyName}">
+            <button class="btn cyan" id="prof-name-save" style="padding:0 14px">Ок</button>
+          </div>
+          <div class="av-pick-row" style="margin:8px 0 4px">
+            ${AVATAR_PRESETS.map((p, i) => `<div class="av-pick ${i === (st.avatarIdx || 0) ? 'sel' : ''}" data-pav="${i}" style="background:${p.bg};width:38px;height:38px;font-size:18px">${p.icon}</div>`).join('')}
+          </div>
+        </div>
+
+        <div class="quest-sec" style="margin-top:4px"><span>Лестница рангов (12 ступеней)</span><span style="color:${lg.color}">${lg.name}</span></div>
+        ${LEAGUES.map(l => {
+          const isCur = l.id === lg.id;
+          const reached = st.xp >= l.minXp;
+          return `
+            <div class="rank-step ${isCur ? 'current' : (reached ? 'reached' : '')}" style="${isCur ? `border-color:${l.color}` : ''}">
+              <div class="rs-ico" style="color:${l.color}">${l.icon}</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:800;color:${reached ? '#fff' : 'var(--muted)'}">${l.name} ${isCur ? '<span style="font-size:10px;color:var(--cyan)">• Сейчас</span>' : ''}</div>
+                <div style="font-size:11px;color:var(--muted)">От ${l.minXp} XP</div>
+              </div>
+              <div style="font-size:12px;font-weight:800;color:${reached ? 'var(--success)' : 'var(--muted)'}">${reached ? '✓' : '🔒'}</div>
+            </div>`;
+        }).join('')}
+
+        <div class="quest-sec" style="margin-top:18px"><span>Тестовые инструменты</span></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn cyan" style="flex:1;font-size:12px" id="prof-test-coins">+500 🎤</button>
+          <button class="btn ghost" style="flex:1;font-size:12px" id="prof-test-onb">Приветствие</button>
+        </div>
+      </div>`;
+
+    document.getElementById('prof-name-save').onclick = () => {
+      const n = document.getElementById('prof-name-in').value.trim();
+      if (n) { st.agencyName = n.slice(0, 22); save(); haptic('ok'); alert('Название обновлено!'); renderBinder(); }
+    };
+    profileOverlay.querySelectorAll('[data-pav]').forEach(el => {
+      el.onclick = () => {
+        st.avatarIdx = Number(el.getAttribute('data-pav'));
+        save(); haptic('light'); renderBinder(); openProfileModal();
+      };
+    });
+    document.getElementById('prof-test-coins').onclick = () => {
+      st.coins += 500; save(); haptic('ok'); sfx('tap'); alert('+500 микрофонов начислено!'); renderBinder();
+    };
+    document.getElementById('prof-test-onb').onclick = () => {
+      profileOverlay.classList.remove('open');
+      openOnboarding();
+    };
+
+    profileOverlay.classList.add('open');
   };
 
   // Настройка нижней навигации
@@ -334,19 +420,14 @@
   function updateNavDots() {
     const sDot = document.getElementById('studio-nav-dot');
     const shDot = document.getElementById('shop-nav-dot');
-    if (sDot && st.daily && st.weekly && st.monthly) {
-      const dailyReady = st.daily.lessons >= 1 && st.daily.dict >= 2 && st.daily.cards >= 3 && !st.daily.claimed;
-      const weeklyReady = st.weekly.days.length >= 5 && !st.weekly.claimed;
-      const monthlyReady = st.monthly.pts >= MONTHLY_GOAL && !st.monthly.claimed;
-      sDot.classList.toggle('show', dailyReady || weeklyReady || monthlyReady || hasUnclaimedAch());
-    }
-    if (shDot && st.cases) {
-      shDot.classList.toggle('show', (st.cases.silver + st.cases.gold + st.cases.platinum) > 0);
-    }
+    if (sDot) sDot.classList.toggle('show', hasUnclaimedQuests() || hasUnclaimedAch());
+    if (shDot && st.cases) shDot.classList.toggle('show', (st.cases.silver + st.cases.gold + st.cases.platinum) > 0);
   }
 
   function initStudioState() {
     if (!st.agencyName) st.agencyName = "Neon Wave Ent.";
+    if (!st.producerId) st.producerId = "KP-" + Math.floor(10000 + Math.random() * 90000);
+    if (typeof st.avatarIdx !== 'number') st.avatarIdx = 0;
     if (!st.team) st.team = { vocal: null, dance: null, rap: null, visual: null };
     if (!st.inv) st.inv = {};
     if (!st.cases) st.cases = { silver: 0, gold: 0, platinum: 0 };
@@ -418,7 +499,7 @@
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
   window.setShopSubTab = function (t) { haptic('light'); shopSubTab = t; renderShop(); };
 
-  /* ====== 1. ЭКРАН СТУДИИ ====== */
+  /* ====== 1. ЭКРАН СТУДИИ (КЛИКАБЕЛЬНАЯ ШАПКА + 3 ЧИСТЫЕ ВКЛАДКИ) ====== */
   window.renderBinder = function () {
     if (typeof CARDS === 'undefined') return;
     initStudioState();
@@ -427,84 +508,72 @@
     const lg = getLeague(st.xp);
     const nextLg = LEAGUES.find(x => x.minXp > st.xp);
     const ownedCards = CARDS.filter(c => getBestTier(c.id));
-    const achList = getAchievements();
-    const achDone = achList.filter(a => a.cur >= a.goal).length;
-    const achNotify = hasUnclaimedAch();
-
+    const av = AVATAR_PRESETS[st.avatarIdx || 0];
     const pctNext = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
 
     screen.innerHTML = `
-      <div class="agency-card ${lg.cls}">
-        <div class="agency-top">
-          <div>
-            <div class="league-pill" style="color:${lg.color}">${lg.icon} ${lg.name} • ${st.xp} XP</div>
+      <div class="agency-card ${lg.cls}" onclick="openProfileModal()">
+        <div class="agency-head">
+          <div class="av-circle" style="background:${av.bg};border-color:${lg.color}">${av.icon}</div>
+          <div style="flex:1;min-width:0">
             <div class="agency-name">${st.agencyName}</div>
+            <div class="agency-id">${st.producerId} • Серия ${st.streak.count} дн.</div>
+            <div class="league-pill" style="color:${lg.color}">${lg.icon} ${lg.name} • ${st.xp} XP</div>
           </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn cyan" style="padding:6px 9px;font-size:11px" id="test-add-coins">+500</button>
-            <button class="btn ghost" style="padding:6px 10px;font-size:11px" id="rename-agency">Имя</button>
-          </div>
+          <div style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:900">›</div>
         </div>
         ${nextLg
-          ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До ранга «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${pctNext}%"></div></div>`
+          ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${pctNext}%"></div></div>`
           : `<div style="font-size:11px;color:var(--gold);font-weight:800">Максимальный ранг достигнут!</div>`}
         <div class="agency-buffs">
-          <span>Серия: <b>${st.streak.count} дн.</b></span>
           <span>Фандом: <b style="color:var(--accent)">${b.power}</b></span>
           <span style="color:var(--cyan);font-weight:800">+${b.xp}% XP</span>
           <span style="color:#ff85cb;font-weight:800">+${b.coins}% 🎤</span>
         </div>
       </div>
 
-      <div class="ach-banner" onclick="openAchievementsModal()">
-        <div class="ach-banner-l"><span>🏆</span><span>Трофеи и достижения${achNotify ? '<span class="ach-dot"></span>' : ''}</span></div>
-        <div style="display:flex;align-items:center;gap:6px"><span class="ach-badge-cnt">${achDone}/${achList.length}</span><span style="color:var(--muted);font-weight:900">›</span></div>
-      </div>
-
-      <div class="team-grid" id="team-grid"></div>
-      <div class="synergy-bar ${b.synergy ? 'on' : ''}">
-        <span>${b.synergy ? 'Синергия эры активна (+15% к наградам)' : '4 карты одной Эры дадут бонус Синергии'}</span>
-        <b>${b.count}/4</b>
-      </div>
-
       <div class="mode-switch">
-        <button class="mode-btn ${studioSubTab === 'cards' ? 'active' : ''}" onclick="setStudioSubTab('cards')">Мои карты (${ownedCards.length})</button>
-        <button class="mode-btn ${studioSubTab === 'quests' ? 'active' : ''}" onclick="setStudioSubTab('quests')">Задания и Бейджи</button>
+        <button class="mode-btn ${studioSubTab === 'group' ? 'active' : ''}" onclick="setStudioSubTab('group')">Группа</button>
+        <button class="mode-btn ${studioSubTab === 'quests' ? 'active' : ''}" onclick="setStudioSubTab('quests')">Квесты${hasUnclaimedQuests() ? '<span class="tab-dot"></span>' : ''}</button>
+        <button class="mode-btn ${studioSubTab === 'hall' ? 'active' : ''}" onclick="setStudioSubTab('hall')">Зал славы${hasUnclaimedAch() ? '<span class="tab-dot"></span>' : ''}</button>
       </div>
       <div id="studio-sub-body"></div>
     `;
 
-    document.getElementById('test-add-coins').onclick = () => {
-      st.coins += 500; save(); haptic('ok'); sfx('tap'); renderBinder();
-    };
-    document.getElementById('rename-agency').onclick = () => {
-      const n = prompt('Название твоего агентства:', st.agencyName);
-      if (n && n.trim()) { st.agencyName = n.trim().slice(0, 22); save(); renderBinder(); }
-    };
-
-    const tgGrid = document.getElementById('team-grid');
-    ROLES.forEach(r => {
-      const cid = st.team[r.key], tier = cid ? getBestTier(cid) : null;
-      const c = tier ? CARDS.find(x => x.id === cid) : null;
-      const el = document.createElement('div');
-      el.className = 'team-slot' + (c ? ' filled' : '');
-      if (c) {
-        const tm = TIER_META[tier];
-        el.style.borderColor = tm.color;
-        el.innerHTML = `<div class="slot-role">${r.title}</div><div class="slot-tag">${c.tag}</div><div class="slot-tier" style="color:${tm.color}">${tm.name}</div>`;
-      } else {
-        el.innerHTML = `<div class="slot-role">${r.title}</div><div style="font-size:20px;opacity:0.35;margin-top:4px">+</div>`;
-      }
-      el.onclick = () => openSlotPicker(r);
-      tgGrid.appendChild(el);
-    });
-
     const sub = document.getElementById('studio-sub-body');
 
-    // МОИ КАРТЫ (3 колонки)
-    if (studioSubTab === 'cards') {
+    // ВКЛАДКА 1: ГРУППА (4 СЛОТА + СИНЕРГИЯ + МОИ КАРТЫ)
+    if (studioSubTab === 'group') {
+      sub.innerHTML = `
+        <div class="team-grid" id="team-grid"></div>
+        <div class="synergy-bar ${b.synergy ? 'on' : ''}">
+          <span>${b.synergy ? 'Синергия эры активна (+15% к наградам)' : '4 карты одной Эры дадут бонус Синергии'}</span>
+          <b>${b.count}/4</b>
+        </div>
+        <div class="quest-sec" style="margin-top:6px"><span>Мои артисты</span><span>${ownedCards.length} шт.</span></div>
+        <div id="owned-cards-wrap"></div>
+      `;
+
+      const tgGrid = document.getElementById('team-grid');
+      ROLES.forEach(r => {
+        const cid = st.team[r.key], tier = cid ? getBestTier(cid) : null;
+        const c = tier ? CARDS.find(x => x.id === cid) : null;
+        const el = document.createElement('div');
+        el.className = 'team-slot' + (c ? ' filled' : '');
+        if (c) {
+          const tm = TIER_META[tier];
+          el.style.borderColor = tm.color;
+          el.innerHTML = `<div class="slot-role">${r.title}</div><div class="slot-tag">${c.tag}</div><div class="slot-tier" style="color:${tm.color}">${tm.name}</div>`;
+        } else {
+          el.innerHTML = `<div class="slot-role">${r.title}</div><div style="font-size:20px;opacity:0.35;margin-top:4px">+</div>`;
+        }
+        el.onclick = () => openSlotPicker(r);
+        tgGrid.appendChild(el);
+      });
+
+      const wrap = document.getElementById('owned-cards-wrap');
       if (!ownedCards.length) {
-        sub.innerHTML = `<div class="card-box" style="text-align:center;padding:24px 16px"><h3 style="margin:0 0 8px">Инвентарь пуст</h3><p style="color:var(--muted)">Открывай виниловые боксы в Магазине — все твои артисты появятся здесь.</p><button class="btn" style="margin-top:8px" onclick="shopSubTab='boxes';switchTab('shop')">В Магазин боксов</button></div>`;
+        wrap.innerHTML = `<div class="card-box" style="text-align:center;padding:22px 16px"><h3 style="margin:0 0 8px">Инвентарь пуст</h3><p style="color:var(--muted)">Открывай виниловые боксы в Магазине — все твои артисты появятся здесь.</p><button class="btn" style="margin-top:8px" onclick="shopSubTab='boxes';switchTab('shop')">В Магазин боксов</button></div>`;
         return;
       }
       const grid = document.createElement('div');
@@ -524,10 +593,10 @@
         el.onclick = () => openArtistModal(c.id);
         grid.appendChild(el);
       });
-      sub.appendChild(grid);
+      wrap.appendChild(grid);
     }
 
-    // ЗАДАНИЯ (50 баллов + Дневные + Недельные + Архив бейджей)
+    // ВКЛАДКА 2: КВЕСТЫ (МЕСЯЦ 50 БАЛЛОВ + ДЕНЬ + НЕДЕЛЯ)
     if (studioSubTab === 'quests') {
       const d = st.daily, w = st.weekly, m = st.monthly;
       const dCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
@@ -535,19 +604,19 @@
       const curYear = new Date().getFullYear();
 
       sub.innerHTML = `
-        <div class="quest-sec"><span>Ежемесячный квест • ${MONTHS[curMonthIdx].name} ${curYear}</span><span style="color:var(--accent)">${Math.min(m.pts, MONTHLY_GOAL)}/${MONTHLY_GOAL}</span></div>
+        <div class="quest-sec" style="margin-top:4px"><span>Ежемесячный квест • ${MONTHS[curMonthIdx].name} ${curYear}</span><span style="color:var(--accent)">${Math.min(m.pts, MONTHLY_GOAL)}/${MONTHLY_GOAL}</span></div>
         <div class="card-box" style="padding:13px 14px;margin-bottom:12px;border-color:rgba(255,46,147,0.35)">
           <div style="font-size:13px;font-weight:800;margin-bottom:3px">Набери ${MONTHLY_GOAL} баллов за месяц</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Каждое дневное задание = +1 балл (до 3 в день) • Награда: Рарный бейдж + Золотой бокс</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Каждое дневное задание = +1 балл (до 3 в день) • Награда: Бейдж + Золотой бокс</div>
           ${m.pts >= MONTHLY_GOAL && !m.claimed
             ? `<button class="btn full" id="claim-monthly">Получить бейдж «${MONTHS[curMonthIdx].name} ${curYear}»!</button>`
             : (m.claimed
-                ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Бейдж этого месяца в твоей коллекции!</div>`
+                ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Бейдж этого месяца в Зале славы!</div>`
                 : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((m.pts / MONTHLY_GOAL) * 100))}%"></div></div>`)
           }
         </div>
 
-        <div class="quest-sec"><span>Ежедневные задания (до 3 баллов в день)</span><span style="color:var(--cyan)">${dCnt}/3</span></div>
+        <div class="quest-sec"><span>Ежедневные задания</span><span style="color:var(--cyan)">${dCnt}/3</span></div>
         <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}">
           <div><div class="c-title">Пройти 1 урок или повтор</div><div class="c-sub">+1 балл в квест месяца</div></div>
           <div class="c-prog">${Math.min(d.lessons, 1)}/1</div>
@@ -570,9 +639,25 @@
           <div style="font-size:13px;font-weight:800;margin-bottom:4px">Заходи 5 дней за неделю</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Награда: Золотой бокс + 50 🎤</div>
           ${w.days.length >= 5 && !w.claimed ? `<button class="btn gold full" id="claim-weekly">Забрать Золотой бокс!</button>` : (w.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Награда недели получена!</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.round((w.days.length / 5) * 100))}%"></div></div>`)}
-        </div>
+        </div>`;
 
-        <div class="quest-sec"><span>Бейджи ${curYear} (Архив)</span><span>${st.monthlyBadges.length}/12</span></div>
+      const cd = document.getElementById('claim-daily');
+      if (cd) cd.onclick = () => { st.daily.claimed = true; st.cases.silver++; st.coins += 25; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
+      const cw = document.getElementById('claim-weekly');
+      if (cw) cw.onclick = () => { st.weekly.claimed = true; st.cases.gold++; st.coins += 50; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
+      const cm = document.getElementById('claim-monthly');
+      if (cm) cm.onclick = () => { st.monthly.claimed = true; if (!st.monthlyBadges.includes(m.key)) st.monthlyBadges.push(m.key); st.cases.gold++; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
+    }
+
+    // ВКЛАДКА 3: ЗАЛ СЛАВЫ (БЕЙДЖИ ГОДА + ДОСТИЖЕНИЯ И ТРОФЕИ)
+    if (studioSubTab === 'hall') {
+      const curMonthIdx = new Date().getMonth();
+      const curYear = new Date().getFullYear();
+      const achList = getAchievements();
+      const achDone = achList.filter(a => a.cur >= a.goal).length;
+
+      sub.innerHTML = `
+        <div class="quest-sec" style="margin-top:4px"><span>Бейджи ${curYear}</span><span>${st.monthlyBadges.length}/12</span></div>
         <div class="badges-grid">
           ${MONTHS.map(mo => {
             const key = `${curYear}-${mo.m}`;
@@ -586,14 +671,45 @@
               <div class="m-badge-name">${mo.name}</div>
             </div>`;
           }).join('')}
-        </div>`;
+        </div>
 
-      const cd = document.getElementById('claim-daily');
-      if (cd) cd.onclick = () => { st.daily.claimed = true; st.cases.silver++; st.coins += 25; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
-      const cw = document.getElementById('claim-weekly');
-      if (cw) cw.onclick = () => { st.weekly.claimed = true; st.cases.gold++; st.coins += 50; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
-      const cm = document.getElementById('claim-monthly');
-      if (cm) cm.onclick = () => { st.monthly.claimed = true; if (!st.monthlyBadges.includes(m.key)) st.monthlyBadges.push(m.key); st.cases.gold++; save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
+        <div class="quest-sec"><span>Достижения и трофеи</span><span style="color:var(--gold)">${achDone}/${achList.length}</span></div>
+        ${achList.map(a => {
+          const done = a.cur >= a.goal;
+          const claimed = a.passive ? done : (st.achClaimed && st.achClaimed.includes(a.id));
+          const pct = Math.min(100, Math.round((Math.min(a.cur, a.goal) / a.goal) * 100));
+          return `
+            <div class="ach-card ${done ? 'done' : ''}">
+              <div class="ach-ico">${a.icon}</div>
+              <div class="ach-body">
+                <div class="ach-title">
+                  <span>${a.name}</span>
+                  <span style="font-size:11px;color:${done ? 'var(--gold)' : 'var(--muted)'}">${Math.min(a.cur, a.goal)}/${a.goal}</span>
+                </div>
+                <div class="ach-desc">${a.desc}</div>
+                <div class="bar-bg" style="margin-bottom:6px"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span class="ach-rew">${a.rewText}</span>
+                  ${done && !claimed
+                    ? `<button class="btn gold" style="padding:4px 10px;font-size:11px" data-claim-ach="${a.id}">Забрать</button>`
+                    : (claimed ? `<span style="font-size:11px;color:var(--success);font-weight:800">✓ Получено</span>` : '')}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}`;
+
+      sub.querySelectorAll('[data-claim-ach]').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.getAttribute('data-claim-ach');
+          const item = getAchievements().find(x => x.id === id);
+          if (item && item.claim && !st.achClaimed.includes(id)) {
+            item.claim();
+            st.achClaimed.push(id);
+            save(); updateNavDots(); haptic('ok'); sfx('win'); fireConfetti();
+            renderBinder();
+          }
+        };
+      });
     }
   };
 
@@ -974,4 +1090,5 @@
 
   initStudioState();
   renderLessons();
+  if (!st.onboarded) setTimeout(openOnboarding, 250);
 })();
