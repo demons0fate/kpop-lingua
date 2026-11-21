@@ -1,8 +1,8 @@
 /* ====== РЕДАКТОР ГЕРОЯ (AVATAAARS + СТИЛЬ DUOLINGO) + МОЗАИКА + КАРТОЧКИ ====== */
-import { createAvatar } from 'https://cdn.jsdelivr.net/npm/@dicebear/core@9/+esm';
-import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+esm';
-
 (function () {
+  let createAvatar = null;
+  let avataaars = null;
+
   const OPTIONS = {
     top: {
       label: 'Волосы',
@@ -215,8 +215,11 @@ import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+
   window.renderAvatarSvg = function (cfg, transparentBg = false) {
     initAvState();
     const a = (cfg && cfg.v === 3) ? cfg : st.avatar;
-    const svg = createAvatar(avataaars, buildConfig(a, false)).toString();
     const bg = transparentBg ? 'transparent' : ('#' + (a.backgroundColor || DEFAULT_AV.backgroundColor));
+    if (!createAvatar || !avataaars) {
+      return `<div class="av-svg-wrap" style="background:${bg};align-items:center;font-size:24px">⏳</div>`;
+    }
+    const svg = createAvatar(avataaars, buildConfig(a, false)).toString();
     const visorSvg = a.acc === 'visor'
       ? `<svg class="av-visor-ov" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
            <rect x="27" y="42" width="46" height="14" rx="7" fill="rgba(0,229,255,0.62)" stroke="#00e5ff" stroke-width="2.5"/>
@@ -532,7 +535,9 @@ import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+
       clothesColor: pick(OPTIONS.clothesColor.values, 4),
       accessories: id % 3 === 0 ? pick(OPTIONS.accessories.values, 1) : null
     };
-    const svg = createAvatar(avataaars, buildConfig(cfg, false)).toString();
+    const svg = (createAvatar && avataaars)
+      ? createAvatar(avataaars, buildConfig(cfg, false)).toString()
+      : `<div style="padding:20px;font-size:20px">⏳</div>`;
     const bg = CARD_BGS[id % CARD_BGS.length];
     const roleTag = c.tag || (c.role ? c.role.slice(0, 3).toUpperCase() : 'IDOL');
 
@@ -544,4 +549,21 @@ import * as avataaars from 'https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+
 
   initAvState();
   renderBinder();
+
+  /* Асинхронная подгрузка движка Avataaars */
+  Promise.all([
+    import('https://cdn.jsdelivr.net/npm/@dicebear/core@9/+esm'),
+    import('https://cdn.jsdelivr.net/npm/@dicebear/avataaars@9/+esm')
+  ]).then(([coreMod, styleMod]) => {
+    createAvatar = coreMod.createAvatar;
+    avataaars = styleMod;
+    renderBinder();
+    refreshProfileBanner();
+    if (editorOv.classList.contains('open')) {
+      updateStage();
+      renderEditorGrid();
+    }
+  }).catch((err) => {
+    console.error('DiceBear load error:', err);
+  });
 })();
