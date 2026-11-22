@@ -176,19 +176,29 @@
     .mini-album::after { content: ''; position: absolute; right: -8px; top: 5px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #ff2e93 18%, #111 22%, #222 45%, #111 70%); z-index: 0; }
     .mini-album span { position: relative; z-index: 1; width: 100%; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 
-    .album-stage { position: relative; width: 250px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
-    .album-vinyl { position: absolute; width: 154px; height: 154px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #242433 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease; opacity: 0; z-index: 1; pointer-events: none; }
+      .album-stage { position: relative; width: 260px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
+    .album-vinyl { position: absolute; width: 156px; height: 156px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #242433 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg) scale(0.92); transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease, box-shadow 0.5s ease; opacity: 0; z-index: 1; pointer-events: none; }
     .vinyl-label { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
     .vinyl-hole { width: 10px; height: 10px; border-radius: 50%; background: #0b0814; }
-    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.35s ease; animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
     .album-sleeve.no-img.silver { background: linear-gradient(145deg, #3a4052, #1b1e29); border: 2px solid #cfd8dc; border-radius: 18px; }
     .album-sleeve.no-img.gold { background: linear-gradient(145deg, #694c14, #261b0b); border: 2px solid #ffd700; border-radius: 18px; }
     .album-sleeve.no-img.platinum { background: linear-gradient(145deg, #124d66, #23123d); border: 2px solid #00e5ff; border-radius: 18px; }
-    @keyframes packFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
-    @keyframes packShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-18px) rotate(-5deg); } 60% { transform: translateX(-22px) rotate(3deg); } }
-    .album-stage.opening .album-sleeve { animation: packShake 0.45s ease-in-out forwards; }
-    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(92px) rotate(540deg); box-shadow: 0 0 28px rgba(0,229,255,0.45); }
+    @keyframes packFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-7px) rotate(1deg); } }
+    .album-stage.opening .album-sleeve { animation: none; transform: translateX(-36px) rotate(-9deg) scale(0.96); }
+    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(88px) rotate(480deg) scale(1); box-shadow: 0 0 32px rgba(0,229,255,0.5); }
     .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.16s ease-out; }
+    .flash-overlay.active { opacity: 1; }
+
+    /* Анимация слияния 3 карт в 1 */
+    .fusion-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .f-orb { position: absolute; width: 64px; height: 90px; border-radius: 12px; border: 2px solid #fff; background: linear-gradient(145deg, var(--accent), var(--purple)); box-shadow: 0 0 18px rgba(255,46,147,0.6); }
+    .f-orb.o1 { animation: fMerge1 0.85s ease-in forwards; }
+    .f-orb.o2 { animation: fMerge2 0.85s ease-in forwards; }
+    .f-orb.o3 { animation: fMerge3 0.85s ease-in forwards; }
+    @keyframes fMerge1 { 0% { transform: translate(-80px, -45px) rotate(-18deg); opacity: 1; } 100% { transform: translate(0, 0) scale(0.2) rotate(180deg); opacity: 0; } }
+    @keyframes fMerge2 { 0% { transform: translate(80px, -45px) rotate(18deg); opacity: 1; } 100% { transform: translate(0, 0) scale(0.2) rotate(-180deg); opacity: 0; } }
+    @keyframes fMerge3 { 0% { transform: translate(0, 75px) rotate(0deg); opacity: 1; } 100% { transform: translate(0, 0) scale(0.2) rotate(360deg); opacity: 0; } }
     .flash-overlay.active { opacity: 1; }
 
     .zoom-modal { width: 100%; max-width: 330px; padding: 16px; }
@@ -688,7 +698,7 @@
       </div>`;
 
     document.getElementById('do-equip').onclick = () => { st.team[c.roleKey] = cardId; save(); haptic('ok'); sfx('ok'); renderBinder(); openArtistModal(cardId); };
-    const craftBtn = document.getElementById('do-craft');
+        const craftBtn = document.getElementById('do-craft');
     if (craftBtn) craftBtn.onclick = () => {
       st.inv[cardId][craftTier] -= 3;
       st.inv[cardId][nextTier] = (st.inv[cardId][nextTier] || 0) + 1;
