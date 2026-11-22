@@ -207,6 +207,30 @@
     .t-pill b { display: block; font-size: 14px; margin-top: 2px; }
     .app-toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(18px); background: rgba(20, 14, 34, 0.96); border: 1.5px solid rgba(0, 229, 255, 0.45); color: #fff; font-size: 13px; font-weight: 700; text-align: center; padding: 11px 16px; border-radius: 14px; max-width: calc(100vw - 32px); width: max-content; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.22s ease; white-space: pre-line; backdrop-filter: blur(8px); }
     .app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    /* === ТЕСТ РАМОК КАРТ (чтобы откатить — просто удали этот блок) === */
+    .mini-card[class*="tier-"],
+    .photocard[class*="tier-"] {
+      position: relative;
+      overflow: visible !important;
+      border-color: transparent !important;
+    }
+    .mini-card[class*="tier-"]::after,
+    .photocard[class*="tier-"]::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .mc-dot, .mc-craft { z-index: 5 !important; }
+    .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/silver.png'); }
+    .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/gold.png'); }
+    .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/platinum.png'); }
+    .mini-card.tier-neon::after,     .photocard.tier-neon::after     { background-image: url('img/frames/neon.png'); }
+    /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
 
