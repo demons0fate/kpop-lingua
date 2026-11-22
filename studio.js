@@ -31,7 +31,7 @@
     { id: "neon3",   name: "Мировой чарт III",minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 }
   ];
 
-  /* Площадки карьеры: открывают новые Эры карт (нельзя выбить всё сразу!) */
+  /* Площадки карьеры: открывают новые Эры карт */
   const STAGES = [
     { idx: 0, name: "Улица Хондэ",     era: "trainee", reqLessons: 0, reqExam: false, reqFandom: 0,    rateMult: 1.0, ico: "🎸" },
     { idx: 1, name: "Клуб в Сеуле",    era: "debut",   reqLessons: 4, reqExam: false, reqFandom: 500,  rateMult: 1.5, ico: "🎤" },
@@ -39,7 +39,7 @@
     { idx: 3, name: "Мировой стадион", era: "tour",    reqLessons: 9, reqExam: true,  reqFandom: 3000, rateMult: 3.2, ico: "🏟️" }
   ];
 
-  /* 4 апгрейда студии за микрофоны (лимит уровня зависит от Лиги по XP) */
+  /* 4 апгрейда студии за микрофоны */
   const UPGRADES = [
     { key: "practice", name: "Зал практики",  ico: "🪞", baseCost: 60,  desc: "+80 к Фандому за ур." },
     { key: "sound",    name: "Звукозапись",   ico: "🎚️", baseCost: 80,  desc: "+5% к 🎤 за уроки" },
@@ -57,6 +57,7 @@
   ];
 
   const MONTHLY_GOAL = 50;
+  const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
   let studioSubTab = 'group'; // 'group' | 'studio' | 'quests'
   let shopSubTab = 'boxes';   // 'boxes' | 'vip'
   let lessonTalents = { shields: 0, hints: 0, combo: 0, comboPct: 0, hypePct: 0 };
@@ -94,7 +95,7 @@
     /* Касса выступлений */
     .cashbox-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(255,46,147,0.12)); border: 1px solid rgba(0,229,255,0.35); border-radius: 16px; padding: 11px 13px; margin-bottom: 12px; }
 
-    /* Состав группы (4 роли + иконка таланта) */
+    /* Состав группы */
     .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 10px; }
     .team-slot { background: var(--surface); border: 1.5px dashed rgba(255,255,255,0.16); border-radius: 14px; padding: 8px 4px; text-align: center; cursor: pointer; transition: 0.2s; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .team-slot.filled { border-style: solid; background: linear-gradient(160deg, #201836, #140f24); }
@@ -137,7 +138,7 @@
     .upg-ico { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
     .stage-box { background: linear-gradient(135deg, #251542, #141930); border: 1.5px solid rgba(0,229,255,0.35); border-radius: 18px; padding: 14px; margin-bottom: 14px; }
 
-    /* Оверлеи профиля, онбординга, квестов и зала славы */
+    /* Оверлеи профиля, квестов и зала славы */
     .full-overlay { position: fixed; inset: 0; background: #0e0a1a; z-index: 9500; display: none; flex-direction: column; }
     .full-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
     .ov-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(20,14,34,0.96); }
@@ -146,17 +147,12 @@
     .rank-step.reached, .rank-step.current { opacity: 1; }
     .rank-step.current { border-width: 1.5px; background: linear-gradient(135deg, rgba(40,28,68,0.95), rgba(20,14,34,0.95)); }
     .rs-ico { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; background: rgba(0,0,0,0.35); flex-shrink: 0; }
-
-    .onb-overlay { position: fixed; inset: 0; background: radial-gradient(circle at top, #271242, #0b0714 75%); z-index: 9800; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .onb-overlay.open { display: flex; animation: fadeIn 0.28s ease; }
-    .onb-card { width: 100%; max-width: 340px; background: rgba(22, 16, 38, 0.94); border: 1.5px solid rgba(255,46,147,0.45); border-radius: 24px; padding: 22px 18px; text-align: center; }
     .onb-input { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.38); border: 1.5px solid rgba(0,229,255,0.4); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 15px; font-weight: 800; text-align: center; outline: none; margin: 10px 0 14px; }
 
     .quest-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin: 14px 0 8px; display: flex; justify-content: space-between; }
     .contract-row { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .contract-row.done { border-color: rgba(0,230,118,0.45); background: rgba(0,230,118,0.08); }
     .c-title { font-size: 13px; font-weight: 700; }
-    .c-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
     .c-prog { font-size: 12px; color: var(--cyan); font-weight: 800; }
     .daily-prize { background: linear-gradient(135deg, rgba(255,184,0,0.14), rgba(255,46,147,0.14)); border: 1px solid rgba(255,215,0,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
     .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
@@ -166,33 +162,52 @@
     .m-badge-ico { width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 17px; background: rgba(255,255,255,0.08); }
     .m-badge-name { font-size: 10px; font-weight: 800; }
 
+    /* Витрина боксов и анимация винила */
     .box-list { display: grid; gap: 10px; }
     .box-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: 18px; padding: 12px 14px; border: 1.5px solid rgba(255,255,255,0.1); }
     .box-row.silver { border-color: rgba(207,216,220,0.4); background: linear-gradient(135deg, #1f2330, #13151f); }
     .box-row.gold { border-color: rgba(255,215,0,0.45); background: linear-gradient(135deg, #332710, #17120c); }
     .box-row.platinum { border-color: rgba(0,229,255,0.5); background: linear-gradient(135deg, #112b3b, #151026); }
-    .mini-album { width: 46px; height: 46px; border-radius: 10px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; }
-    .mini-album span { width: 100%; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .mini-album { width: 46px; height: 46px; border-radius: 10px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .mini-album::after { content: ''; position: absolute; right: -8px; top: 5px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #ff2e93 18%, #111 22%, #222 45%, #111 70%); z-index: 0; }
+    .mini-album span { position: relative; z-index: 1; width: 100%; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+    .album-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
+    .album-vinyl { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #1f1f2b 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.5s ease-in, opacity 0.4s ease; opacity: 0; z-index: 1; pointer-events: none; }
+    .vinyl-label { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
+    .vinyl-hole { width: 10px; height: 10px; border-radius: 50%; background: #0b0814; }
+    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.25s var(--spring), opacity 0.3s ease; animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .album-sleeve.no-img.silver { background: linear-gradient(145deg, #3a4052, #1b1e29); border: 2px solid #cfd8dc; border-radius: 18px; }
+    .album-sleeve.no-img.gold { background: linear-gradient(145deg, #694c14, #261b0b); border: 2px solid #ffd700; border-radius: 18px; }
+    .album-sleeve.no-img.platinum { background: linear-gradient(145deg, #124d66, #23123d); border: 2px solid #00e5ff; border-radius: 18px; }
+    @keyframes packFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+    @keyframes packShake { 0%, 100% { transform: scale(1.05) rotate(0); } 20%, 60% { transform: scale(1.05) rotate(-5deg); } 40%, 80% { transform: scale(1.05) rotate(5deg); } }
+    .album-stage.opening .album-sleeve { animation: packShake 0.4s ease-in-out; }
+    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(85px) rotate(420deg); }
+    .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; }
+    .flash-overlay.active { opacity: 1; }
 
     .zoom-modal { width: 100%; max-width: 330px; padding: 16px; }
     .tier-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
     .t-pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 6px 4px; text-align: center; font-size: 10px; }
     .t-pill b { display: block; font-size: 14px; margin-top: 2px; }
-    .rank-prize { font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 8px; background: rgba(255,255,255,0.08); margin-right: 8px; }
     .app-toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(18px); background: rgba(20, 14, 34, 0.96); border: 1.5px solid rgba(0, 229, 255, 0.45); color: #fff; font-size: 13px; font-weight: 700; text-align: center; padding: 11px 16px; border-radius: 14px; max-width: calc(100vw - 32px); width: max-content; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.22s ease; white-space: pre-line; backdrop-filter: blur(8px); }
     .app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
   `;
   document.head.appendChild(css);
 
+  const flashEl = document.createElement('div');
+  flashEl.className = 'flash-overlay';
+  document.body.appendChild(flashEl);
+  function triggerFlash(cb) {
+    flashEl.classList.add('active');
+    setTimeout(() => { if (cb) cb(); flashEl.classList.remove('active'); }, 160);
+  }
+
   const profileOverlay = document.createElement('div');
   profileOverlay.className = 'full-overlay';
   profileOverlay.id = 'profile-overlay';
   document.body.appendChild(profileOverlay);
-
-  const onbOverlay = document.createElement('div');
-  onbOverlay.className = 'onb-overlay';
-  onbOverlay.id = 'onb-overlay';
-  document.body.appendChild(onbOverlay);
 
   let toastTimer = null;
   const toastEl = document.createElement('div');
@@ -254,7 +269,6 @@
     return STAGES.filter(s => s.idx <= curStage).map(s => s.era);
   }
 
-  /* Рендер аватарки игрока (выбранная карта + рамка Лиги) */
   function renderProfileAvatarHtml(size = 56) {
     const lg = getLeague(st.xp);
     const c = st.avatarCardId ? CARDS.find(x => x.id === st.avatarCardId && getBestTier(x.id)) : null;
@@ -264,7 +278,6 @@
     return `<div class="av-frame ${lg.cls}" style="width:${size}px;height:${size}px">${inner}<div class="av-league-badge" style="color:${lg.color}">${lg.icon}</div></div>`;
   }
 
-  /* Касса выступлений (пассивный доход до 12 часов) */
   function calcCashbox() {
     const b = getTeamBonuses();
     const stg = STAGES[getCurrentStageIdx()];
@@ -413,7 +426,7 @@
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
   window.setShopSubTab = function (t) { haptic('light'); shopSubTab = t; renderShop(); };
 
-  /* ====== ЭКРАН СТУДИИ (3 ЧИСТЫЕ ВКЛАДКИ: ГРУППА | СТУДИЯ | КВЕСТЫ) ====== */
+  /* ====== ЭКРАН СТУДИИ (3 ВКЛАДКИ: ГРУППА | СТУДИЯ | КВЕСТЫ) ====== */
   window.renderBinder = function () {
     if (typeof CARDS === 'undefined') return;
     initStudioState();
@@ -455,7 +468,6 @@
 
     const sub = document.getElementById('studio-sub-body');
 
-    /* ВКЛАДКА 1: ГРУППА + КАССА + КАРТЫ ПО ЭРАМ */
     if (studioSubTab === 'group') {
       const unlockedEras = getUnlockedEras();
       sub.innerHTML = `
@@ -540,7 +552,6 @@
       });
     }
 
-    /* ВКЛАДКА 2: СТУДИЯ (ПЛОЩАДКИ КАРЬЕРЫ + 4 АПГРЕЙДА) */
     if (studioSubTab === 'studio') {
       const curIdx = getCurrentStageIdx();
       const curStg = STAGES[curIdx];
@@ -588,9 +599,8 @@
       });
     }
 
-    /* ВКЛАДКА 3: КВЕСТЫ И БЕЙДЖИ */
     if (studioSubTab === 'quests') {
-      const d = st.daily, w = st.weekly, m = st.monthly;
+      const d = st.daily, m = st.monthly;
       const dCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
       const curMonthIdx = new Date().getMonth(), curYear = new Date().getFullYear();
 
@@ -685,7 +695,7 @@
     };
   }
 
-  /* ====== МАГАЗИН (БОКСЫ ВЫПАДАЮТ ТОЛЬКО ИЗ ОТКРЫТЫХ ЭР!) ====== */
+  /* ====== МАГАЗИН + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
   window.renderShop = function () {
     syncResources(); initStudioState();
     const screen = document.getElementById('screen-shop');
@@ -742,31 +752,65 @@
       if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} микрофонов!`);
       st.coins -= prices[type];
     }
-    const unlockedEras = getUnlockedEras();
-    const pool = CARDS.filter(c => unlockedEras.includes(c.album));
-    const c = pool[Math.floor(Math.random() * pool.length)];
-    const r = Math.random();
-    const tier = type === 'platinum' ? 'platinum' : (type === 'gold' ? (r < 0.25 ? 'platinum' : 'gold') : (r < 0.2 ? 'gold' : 'silver'));
-    addCardCopy(c.id, tier);
-    save(); renderShop(); haptic('ok'); sfx('win');
-    if (tier !== 'silver') fireConfetti();
+    save(); renderShop(); haptic('medium');
 
-    const tm = TIER_META[tier], cnt = st.inv[c.id][tier];
+    const titleMap = { silver: "SILVER EDITION", gold: "GOLD EDITION", platinum: "PLATINUM EDITION" };
+    const boxUrl = BOX_IMAGES[type];
+    const vinylUrl = BOX_IMAGES.vinyl;
     const modal = document.getElementById('pack-modal');
     modal.classList.add('open');
+
     modal.innerHTML = `
-      <div style="font-size:14px;font-weight:900;color:${tm.color};margin-bottom:14px">${tm.name.toUpperCase()} • КОПИЙ: ${cnt}${cnt >= 3 ? ' (СЛИЯНИЕ 3→1!)' : ''}</div>
-      <div class="photocard tier-${tier} reveal-card">
-        <div class="pc-rarity" style="color:${tm.color}">${tm.name}</div>
-        ${cardArtHtml(c)}
-        <div class="pc-name" style="font-size:16px">${c.name}</div>
-        <div class="pc-role">${c.role}</div>
-        <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${c.quoteKr}»</div>
-      </div>
-      <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
+      <div style="font-size:12px;color:var(--cyan);font-weight:800;letter-spacing:1.5px;margin-bottom:10px">НАЖМИ НА АЛЬБОМ, ЧТОБЫ ДОСТАТЬ ПЛАСТИНКУ</div>
+      <div class="album-stage" id="album-stage">
+        <div class="album-vinyl" style="${vinylUrl ? `background:url('${vinylUrl}') no-repeat center;background-size:contain;border:none;box-shadow:none;` : ''}">
+          ${vinylUrl ? '' : '<div class="vinyl-label"><div class="vinyl-hole"></div></div>'}
+        </div>
+        <div class="album-sleeve ${type} ${boxUrl ? '' : 'no-img'}" style="${boxUrl ? `background-image:url('${boxUrl}');box-shadow:none;` : ''}">
+          ${boxUrl ? '' : `
+            <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;opacity:0.8">K-POP LINGUA</div>
+            <div style="font-size:18px;font-weight:900;line-height:1.1">${titleMap[type]}</div>
+            <div style="font-size:10px;opacity:0.65">LIMITED VINYL BOX</div>
+          `}
+        </div>
+      </div>`;
+
+    document.getElementById('album-stage').onclick = () => {
+      const stg = document.getElementById('album-stage');
+      if (stg.classList.contains('opening')) return;
+      stg.classList.add('opening');
+      haptic('heavy'); sfx('tap');
+
+      setTimeout(() => {
+        triggerFlash(() => {
+          const unlockedEras = getUnlockedEras();
+          const pool = CARDS.filter(c => unlockedEras.includes(c.album));
+          const c = pool[Math.floor(Math.random() * pool.length)];
+          const r = Math.random();
+          const tier = type === 'platinum' ? 'platinum' : (type === 'gold' ? (r < 0.25 ? 'platinum' : 'gold') : (r < 0.2 ? 'gold' : 'silver'));
+          addCardCopy(c.id, tier);
+          save(); renderBinder();
+          haptic('ok'); sfx('win');
+          if (tier !== 'silver') fireConfetti();
+          if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 120);
+
+          const tm = TIER_META[tier], cnt = st.inv[c.id][tier];
+          modal.innerHTML = `
+            <div style="font-size:14px;font-weight:900;color:${tm.color};margin-bottom:14px">${tm.name.toUpperCase()} • КОПИЙ: ${cnt}${cnt >= 3 ? ' (СЛИЯНИЕ 3→1!)' : ''}</div>
+            <div class="photocard tier-${tier} reveal-card">
+              <div class="pc-rarity" style="color:${tm.color}">${tm.name}</div>
+              ${cardArtHtml(c)}
+              <div class="pc-name" style="font-size:16px">${c.name}</div>
+              <div class="pc-role">${c.role}</div>
+              <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${c.quoteKr}»</div>
+            </div>
+            <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
+        });
+      }, 380);
+    };
   };
 
-  /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ (ЩИТ + 50/50 + КОМБО + КРИТ ×2) ====== */
+  /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ ====== */
   const origStartLesson = window.startLesson;
   window.startLesson = function (id) {
     const b = getTeamBonuses();
@@ -793,7 +837,6 @@
     body.prepend(bar);
 
     const opts = Array.from(body.querySelectorAll('.opt-btn'));
-    /* Подсказка 50/50 (Вижуал) */
     document.getElementById('tb-hint').onclick = (e) => {
       if (lessonTalents.hints <= 0) return;
       const wrongBtns = opts.filter((b, idx) => idx !== s.correct && !b.disabled);
@@ -805,7 +848,6 @@
       haptic('ok'); sfx('tap');
     };
 
-    /* Щит Вокала и Комбо Танцора */
     opts.forEach((btn, idx) => {
       const origClick = btn.onclick;
       btn.onclick = () => {
@@ -827,7 +869,6 @@
     });
   };
 
-  /* Финиш урока: комбо XP + Хайп Рэпера (×2 микрофоны) + анти-фарм повторов */
   const origFinishLesson = window.finishLesson;
   window.finishLesson = function () {
     const passed = !(curL && curL.isExam && mistakes > 4);
@@ -851,14 +892,12 @@
       if (curL.isExam) st.cases.platinum++;
       else if (curL.id % 4 === 0) st.cases.gold++;
     } else {
-      /* Анти-фарм: за повтор даётся скромная награда 10% */
       const repCoins = Math.max(5, Math.round(curL.coins * 0.1));
       st.coins += repCoins;
     }
     save();
   };
 
-  /* Переименование вкладки Альбомы → Студия */
   const navBinder = document.getElementById('nav-binder');
   if (navBinder && navBinder.lastChild) navBinder.lastChild.textContent = 'Студия';
 
