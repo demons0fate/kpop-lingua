@@ -698,15 +698,38 @@
       </div>`;
 
     document.getElementById('do-equip').onclick = () => { st.team[c.roleKey] = cardId; save(); haptic('ok'); sfx('ok'); renderBinder(); openArtistModal(cardId); };
-        const craftBtn = document.getElementById('do-craft');
-    if (craftBtn) craftBtn.onclick = () => {
-      st.inv[cardId][craftTier] -= 3;
-      st.inv[cardId][nextTier] = (st.inv[cardId][nextTier] || 0) + 1;
-      st.fusionsCount = (st.fusionsCount || 0) + 1;
-      save(); haptic('ok'); sfx('win'); fireConfetti();
-      alert(`✨ Слияние успешно! Получен ранг: ${TIER_META[nextTier].name}`);
-      renderBinder(); openArtistModal(cardId);
-    };
+            const craftBtn = document.getElementById('do-craft');
+    if (craftBtn) craftBtn.onclick = () => runFusionAnim(cardId, craftTier, nextTier);
+  }
+
+  function runFusionAnim(cardId, fromTier, toTier) {
+    const c = CARDS.find(x => x.id === cardId);
+    const modal = document.getElementById('pack-modal');
+    haptic('heavy'); sfx('tap');
+    modal.innerHTML = `
+      <div style="font-size:14px;font-weight:900;color:${TIER_META[toTier].color};margin-bottom:12px">СЛИЯНИЕ В ${TIER_META[toTier].name.toUpperCase()}...</div>
+      <div class="fusion-stage"><div class="f-orb o1"></div><div class="f-orb o2"></div><div class="f-orb o3"></div></div>`;
+
+    setTimeout(() => {
+      triggerFlash(() => {
+        st.inv[cardId][fromTier] -= 3;
+        st.inv[cardId][toTier] = (st.inv[cardId][toTier] || 0) + 1;
+        st.fusionsCount = (st.fusionsCount || 0) + 1;
+        save(); renderBinder();
+        haptic('ok'); sfx('win'); fireConfetti();
+        if (c.quoteFile) playAudio(c.quoteFile, c.quoteKr);
+
+        modal.innerHTML = `
+          <div style="font-size:15px;font-weight:900;color:${TIER_META[toTier].color};margin-bottom:14px">НОВЫЙ РАНГ: ${TIER_META[toTier].name.toUpperCase()}!</div>
+          <div class="photocard tier-${toTier} reveal-card">
+            <div class="pc-rarity" style="color:${TIER_META[toTier].color}">${TIER_META[toTier].name}</div>
+            ${cardArtHtml(c)}
+            <div class="pc-name" style="font-size:16px">${c.name}</div>
+            <div class="pc-bonus" style="font-size:12px;margin-top:6px">Фандом: ${TIER_META[toTier].power}</div>
+          </div>
+          <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
+      });
+    }, 850);
   }
 
   /* ====== МАГАЗИН + ПЛАВНАЯ АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
