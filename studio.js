@@ -207,25 +207,111 @@
     .t-pill b { display: block; font-size: 14px; margin-top: 2px; }
     .app-toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(18px); background: rgba(20, 14, 34, 0.96); border: 1.5px solid rgba(0, 229, 255, 0.45); color: #fff; font-size: 13px; font-weight: 700; text-align: center; padding: 11px 16px; border-radius: 14px; max-width: calc(100vw - 32px); width: max-content; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.22s ease; white-space: pre-line; backdrop-filter: blur(8px); }
     .app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-    /* === ТЕСТ РАМОК КАРТ (чтобы откатить — просто удали этот блок) === */
-    .mini-card[class*="tier-"],
+        /* === ТЕСТ РАМОК КАРТ (Адаптировано под рамку из Figma) === */
+    .mini-card[class*="tier-"] {
+      position: relative;
+      box-sizing: border-box;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      flex-direction: column;
+      /* Отступы: сверху и снизу побольше под эквалайзеры, по бокам под скосы */
+      padding: 16% 12% 16% 12% !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      overflow: visible !important;
+    }
+    .mini-card[class*="tier-"]::before {
+      content: "";
+      position: absolute;
+      /* Внутренний фон подкладываем строго под рамку */
+      inset: 8% 7%;
+      background: #120d21;
+      border-radius: 12px;
+      z-index: 0;
+    }
+    .mini-card[class*="tier-"] > * {
+      position: relative;
+      z-index: 1;
+    }
+    .mini-card[class*="tier-"] .pc-art {
+      flex: 1;
+      height: auto !important;
+      min-height: 0;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      object-fit: cover;
+    }
+    .mini-card[class*="tier-"] .mc-name { 
+      font-size: 10px; 
+      font-weight: 800;
+      line-height: 1.15; 
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mini-card[class*="tier-"] .mc-sub { 
+      font-size: 8px; 
+      font-weight: 700;
+      line-height: 1.15; 
+    }
+
+    /* Специфика для больших карт (в модалках и при открытии) */
     .photocard[class*="tier-"] {
       position: relative;
+      box-sizing: border-box;
+      aspect-ratio: 3 / 4;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+      padding: 42px 32px 42px 32px !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      animation: none !important;
       overflow: visible !important;
-      border-color: transparent !important;
     }
+    .photocard[class*="tier-"]::before {
+      content: "";
+      position: absolute;
+      inset: 22px 18px;
+      background: #120d21;
+      border-radius: 16px;
+      z-index: 0;
+    }
+    .photocard[class*="tier-"] > * {
+      position: relative;
+      z-index: 1;
+    }
+    .photocard[class*="tier-"] .pc-art {
+      flex: 1;
+      height: auto !important;
+      min-height: 0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* Наложение самой рамки поверх всего */
     .mini-card[class*="tier-"]::after,
     .photocard[class*="tier-"]::after {
       content: "";
       position: absolute;
-      inset: -5px;
+      /* Растягиваем рамку на всю площадь */
+      inset: 0;
       background-position: center;
       background-repeat: no-repeat;
       background-size: 100% 100%;
       pointer-events: none;
       z-index: 4;
     }
-    .mc-dot, .mc-craft { z-index: 5 !important; }
+
+    /* Точки и маркеры поверх рамки */
+    .mc-dot   { top: 10% !important; left: 10% !important; z-index: 5 !important; }
+    .mc-craft { top: 9% !important; right: 10% !important; z-index: 5 !important; }
+
+    /* Подключение файлов из твоей папки */
     .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/silver.png'); }
     .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/gold.png'); }
     .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/platinum.png'); }
