@@ -127,11 +127,15 @@
     .tier-neon { border: 2px solid #ff2e93; box-shadow: 0 0 18px rgba(255,46,147,0.55); animation: neonPulse 2s infinite alternate; }
     @keyframes neonPulse { from { box-shadow: 0 0 12px rgba(255,46,147,0.4); } to { box-shadow: 0 0 22px rgba(0,229,255,0.75); } }
 
-    /* Панель талантов внутри урока */
-    .talent-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: rgba(22,17,36,0.9); border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; padding: 7px 10px; margin-bottom: 12px; font-size: 11px; font-weight: 800; }
-    .t-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 9px; background: rgba(255,255,255,0.06); }
-    .t-hint-btn { background: linear-gradient(135deg, #00c6ff, #7b2cbf); border: none; color: #fff; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 9px; cursor: pointer; }
-    .t-hint-btn:disabled { opacity: 0.35; cursor: default; }
+    /* Панель талантов внутри урока (понятные плашки) */
+    .talent-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 12px; }
+    .t-chip { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #e2d9f3; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform 0.15s; }
+    .t-chip:active { transform: scale(0.95); }
+    .t-chip.shield-on { border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.1); color: #bdf7ff; }
+    .t-chip.combo-on { border-color: rgba(255,159,67,0.4); background: rgba(255,159,67,0.12); color: #ffd4a3; }
+    .t-hint-btn { background: linear-gradient(135deg, #00c6ff, #7b2cbf); border: none; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 11px; border-radius: 11px; cursor: pointer; box-shadow: 0 3px 10px rgba(0,198,255,0.22); }
+    .t-hint-btn:active { transform: scale(0.95); }
+    .t-hint-btn:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
 
     /* Карточки апгрейдов и площадок */
     .upg-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 14px; margin-bottom: 9px; }
@@ -162,7 +166,7 @@
     .m-badge-ico { width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 17px; background: rgba(255,255,255,0.08); }
     .m-badge-name { font-size: 10px; font-weight: 800; }
 
-    /* Витрина боксов и анимация винила */
+    /* Витрина боксов и плавная анимация винила */
     .box-list { display: grid; gap: 10px; }
     .box-row { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: 18px; padding: 12px 14px; border: 1.5px solid rgba(255,255,255,0.1); }
     .box-row.silver { border-color: rgba(207,216,220,0.4); background: linear-gradient(135deg, #1f2330, #13151f); }
@@ -172,19 +176,19 @@
     .mini-album::after { content: ''; position: absolute; right: -8px; top: 5px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle, #ff2e93 18%, #111 22%, #222 45%, #111 70%); z-index: 0; }
     .mini-album span { position: relative; z-index: 1; width: 100%; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 
-    .album-stage { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
-    .album-vinyl { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #1f1f2b 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.5s ease-in, opacity 0.4s ease; opacity: 0; z-index: 1; pointer-events: none; }
-    .vinyl-label { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
+    .album-stage { position: relative; width: 250px; height: 220px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 10px 0 18px; }
+    .album-vinyl { position: absolute; width: 154px; height: 154px; border-radius: 50%; background: repeating-radial-gradient(circle, #14141c 0px, #14141c 3px, #242433 4px, #14141c 6px); border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; transform: translateX(0) rotate(0deg); transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease; opacity: 0; z-index: 1; pointer-events: none; }
+    .vinyl-label { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cyan)); border: 3px solid #111; display: flex; align-items: center; justify-content: center; }
     .vinyl-hole { width: 10px; height: 10px; border-radius: 50%; background: #0b0814; }
-    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.25s var(--spring), opacity 0.3s ease; animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .album-sleeve { position: relative; z-index: 2; width: 180px; height: 180px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.55); transition: transform 0.35s ease; animation: packFloat 3s infinite ease-in-out; background-size: contain; background-repeat: no-repeat; background-position: center; }
     .album-sleeve.no-img.silver { background: linear-gradient(145deg, #3a4052, #1b1e29); border: 2px solid #cfd8dc; border-radius: 18px; }
     .album-sleeve.no-img.gold { background: linear-gradient(145deg, #694c14, #261b0b); border: 2px solid #ffd700; border-radius: 18px; }
     .album-sleeve.no-img.platinum { background: linear-gradient(145deg, #124d66, #23123d); border: 2px solid #00e5ff; border-radius: 18px; }
     @keyframes packFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
-    @keyframes packShake { 0%, 100% { transform: scale(1.05) rotate(0); } 20%, 60% { transform: scale(1.05) rotate(-5deg); } 40%, 80% { transform: scale(1.05) rotate(5deg); } }
-    .album-stage.opening .album-sleeve { animation: packShake 0.4s ease-in-out; }
-    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(85px) rotate(420deg); }
-    .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.15s ease-out; }
+    @keyframes packShake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-18px) rotate(-5deg); } 60% { transform: translateX(-22px) rotate(3deg); } }
+    .album-stage.opening .album-sleeve { animation: packShake 0.45s ease-in-out forwards; }
+    .album-stage.opening .album-vinyl { opacity: 1; transform: translateX(92px) rotate(540deg); box-shadow: 0 0 28px rgba(0,229,255,0.45); }
+    .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.16s ease-out; }
     .flash-overlay.active { opacity: 1; }
 
     .zoom-modal { width: 100%; max-width: 330px; padding: 16px; }
@@ -201,7 +205,7 @@
   document.body.appendChild(flashEl);
   function triggerFlash(cb) {
     flashEl.classList.add('active');
-    setTimeout(() => { if (cb) cb(); flashEl.classList.remove('active'); }, 160);
+    setTimeout(() => { if (cb) cb(); flashEl.classList.remove('active'); }, 180);
   }
 
   const profileOverlay = document.createElement('div');
@@ -695,7 +699,7 @@
     };
   }
 
-  /* ====== МАГАЗИН + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
+  /* ====== МАГАЗИН + ПЛАВНАЯ АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
   window.renderShop = function () {
     syncResources(); initStudioState();
     const screen = document.getElementById('screen-shop');
@@ -781,6 +785,7 @@
       stg.classList.add('opening');
       haptic('heavy'); sfx('tap');
 
+      /* Ждём пока винил полностью выедет и раскрутится (650мс) + короткая пауза -> БУМ! */
       setTimeout(() => {
         triggerFlash(() => {
           const unlockedEras = getUnlockedEras();
@@ -806,11 +811,11 @@
             </div>
             <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
         });
-      }, 380);
+      }, 880);
     };
   };
 
-  /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ ====== */
+  /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ (ПОНЯТНЫЕ ПЛАШКИ + ПОДСКАЗКИ ПО КЛИКУ) ====== */
   const origStartLesson = window.startLesson;
   window.startLesson = function (id) {
     const b = getTeamBonuses();
@@ -829,12 +834,26 @@
     bar.className = 'talent-bar';
     bar.innerHTML = `
       <div style="display:flex;gap:6px">
-        <span class="t-chip" id="tb-shield">🛡️ ${lessonTalents.shields}</span>
-        <span class="t-chip" id="tb-combo">🔥 ×${lessonTalents.combo}</span>
+        <button type="button" class="t-chip ${lessonTalents.shields > 0 ? 'shield-on' : ''}" id="tb-shield">🛡️ Щит: ${lessonTalents.shields}</button>
+        <button type="button" class="t-chip ${lessonTalents.combo > 0 ? 'combo-on' : ''}" id="tb-combo">🔥 Серия: ${lessonTalents.combo}</button>
       </div>
-      <button class="t-hint-btn" id="tb-hint" ${lessonTalents.hints <= 0 ? 'disabled' : ''}>✨ 50/50 (${lessonTalents.hints})</button>
+      <button type="button" class="t-hint-btn" id="tb-hint" ${lessonTalents.hints <= 0 ? 'disabled' : ''}>✨ Подсказка (${lessonTalents.hints})</button>
     `;
     body.prepend(bar);
+
+    /* Пояснения по клику на плашки */
+    document.getElementById('tb-shield').onclick = () => {
+      const vc = st.team.vocal ? CARDS.find(x => x.id === st.team.vocal) : null;
+      alert(vc
+        ? `🛡️ Щит от ошибок (${vc.name.split('•')[0].trim()}):\nСрабатывает сам при неверном ответе. Осталось: ${lessonTalents.shields}`
+        : '🛡️ Щит от ошибок:\nПоставь карту Вокала в состав Студии, чтобы получать защиту в уроках!');
+    };
+    document.getElementById('tb-combo').onclick = () => {
+      const dc = st.team.dance ? CARDS.find(x => x.id === st.team.dance) : null;
+      alert(dc
+        ? `🔥 Серия ответов (${dc.name.split('•')[0].trim()}):\nБонус +${lessonTalents.comboPct}% XP в конце урока за серию без ошибок!`
+        : '🔥 Серия ответов:\nПоставь карту Танцора в состав Студии, чтобы получать бонус XP за комбо!');
+    };
 
     const opts = Array.from(body.querySelectorAll('.opt-btn'));
     document.getElementById('tb-hint').onclick = (e) => {
@@ -843,7 +862,7 @@
       if (wrongBtns.length < 2) return;
       lessonTalents.hints--;
       wrongBtns.sort(() => Math.random() - 0.5).slice(0, 2).forEach(b => { b.disabled = true; b.style.opacity = '0.2'; });
-      e.target.textContent = `✨ 50/50 (${lessonTalents.hints})`;
+      e.target.textContent = `✨ Подсказка (${lessonTalents.hints})`;
       e.target.disabled = true;
       haptic('ok'); sfx('tap');
     };
@@ -858,7 +877,9 @@
           lessonTalents.shields--;
           btn.disabled = true;
           btn.style.opacity = '0.25';
-          document.getElementById('tb-shield').textContent = `🛡️ ${lessonTalents.shields}`;
+          const sh = document.getElementById('tb-shield');
+          sh.textContent = `🛡️ Щит: ${lessonTalents.shields}`;
+          if (lessonTalents.shields <= 0) sh.classList.remove('shield-on');
           haptic('ok'); sfx('tap');
           alert('🛡️ Вокал подстраховал! Ошибка не засчитана — выбери другой вариант.');
         } else {
