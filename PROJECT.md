@@ -3,7 +3,7 @@
 ### 1. Стек и архитектура
 - Чистый HTML/CSS/JS, хостинг на GitHub Pages (`demons0fate.github.io/kpop-lingua`), деплой через GitHub Actions (`.github/workflows/main.yml` с автогенерацией TTS-озвучки, `git pull --rebase` уже добавлен).
 - Основные файлы: `index.html`, `studio.js`, `rules.js` (только UI-логика), `data-loader.js`, `data/*.json`, `js/telegram.js`.
-- **Важно про кэш Telegram:** сейчас в `index.html` подключен `studio.js?v=20`, `data-loader.js?v=2` и `rules.js?v=2`. После каждого изменения скрипта нужно увеличивать цифру `?v=` на +1.
+- **Важно про кэш Telegram:** сейчас в `index.html` подключен `studio.js?v=21`, `data-loader.js?v=2` и `rules.js?v=2`. После каждого изменения скрипта нужно увеличивать цифру `?v=` на +1.
 - Основную новую логику и стили стараемся держать модульно в `studio.js`, не ломая `index.html`.
 
 ### 2. Что уже реализовано и работает
@@ -43,7 +43,7 @@
 ### 4. Текущий статус и история
 - **23.11.2026 — генеральная уборка завершена.** Добавлена безопасная заглушка `js/telegram.js` (приложение не падает вне Telegram), починены дейлики/неделя/очки месяца, экзамены теперь module-scoped, награды сведены в `calcLessonRewards`, возвращены позиции Магазина и обновлён экран «Топ».
 - **Данные и вес.** `lessons.js` и `cards.js` удалены: источник правды — `data/lessons-index.json`, `data/lessons/*.json`, `data/cards.json`, `data/rules.json`, `data/vocab.json`, `data/modules.json`. Добавлены `data-loader.js` (lazy-загрузка шагов урока) и `scripts/export_data.py` (повторная миграция из legacy-файлов). `make_audio.py` теперь собирает фразы из `data/*.json`.
-- **Графика.** Новые рамки из Figma (600×800) пересобраны `scripts/optimize_frames.py` в `img/frames/frame-*.webp` (55–76 КБ, всего ≈267 КБ), старые заглушки `silver/gold/platinum/neon.webp` удалены. В `studio.js` обновлены пути и геометрия окна (padding, `clip-path` для арта, `pointer-events:none`), слоты состава получили те же рамки, Платина перекрашена в мятный из макета, версия скрипта — `v=20`.
+- **Графика.** Новые рамки из Figma (600×800) пересобраны `scripts/optimize_frames.py` в `img/frames/frame-*.webp` (55–76 КБ, всего ≈267 КБ), старые заглушки `silver/gold/platinum/neon.webp` удалены. В `studio.js` обновлены пути и геометрия окна (padding, `clip-path` для арта, `pointer-events:none`), слоты состава получили те же рамки, бейдж ранга снова `position:absolute` (не растягивается во flex), Платина перекрашена в мятный из макета, версия скрипта — `v=21`.
 - **Дальше:** чиби-арты айдолов и графика/анимация виниловых боксов, затем расширять модули уроков (добавлять `moduleId` новым блокам) и готовить Telegram Stars/бэкенд. Перед релизом убрать тестовую кнопку `+500` микрофонов.
 
 

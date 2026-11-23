@@ -235,6 +235,18 @@
       z-index: 1;
     }
 
+    /* Бейдж ранга и метка биаса — не участвуют в flex-потоке карточки,
+       иначе flex растягивает их на всю ширину окна (надпись «съезжает» влево) */
+    .mini-card[class*="tier-"] .pc-rarity,
+    .photocard[class*="tier-"] .pc-rarity,
+    .mini-card[class*="tier-"] .pc-bias-tag,
+    .photocard[class*="tier-"] .pc-bias-tag {
+      position: absolute;
+      align-self: auto;
+      width: auto;
+      flex: 0 0 auto;
+    }
+
     /* «Мои карты»: контент строго в окне рамки (~69% ширины) */
     .mini-card[class*="tier-"] {
       padding: 15% 15.5% 16% !important;
@@ -294,8 +306,10 @@
     .photocard[class*="tier-"] .pc-role { margin-top: 3px; line-height: 1.2; }
     .photocard[class*="tier-"] .pc-bonus { font-size: 10px; line-height: 1.2; margin-top: 4px; }
     .photocard[class*="tier-"] .pc-rarity {
-      top: 21%;
-      right: 18%;
+      top: 13%;
+      left: auto;
+      right: 13%;
+      bottom: auto;
       z-index: 5;
       font-size: 9px;
       padding: 3px 7px;
@@ -316,8 +330,8 @@
     }
 
     /* Точки и маркеры поверх рамки, но уже внутри окна */
-    .mc-dot   { top: 21.5% !important; left: 17.5% !important; z-index: 5 !important; }
-    .mc-craft { top: 20.5% !important; right: 17.5% !important; z-index: 5 !important; }
+    .mc-dot   { top: 21.5% !important; left: 18% !important; z-index: 5 !important; }
+    .mc-craft { top: 20.5% !important; right: 18% !important; z-index: 5 !important; }
 
     /* Новые рамки из Figma */
     .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/frame-silver.webp'); }
