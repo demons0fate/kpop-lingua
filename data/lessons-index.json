@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "lessons": [
+    {
+      "id": 1,
+      "title": "Урок 1. Все 10 базовых гласных",
+      "desc": "От 아 до 유 • Прописи пачками, аудирование, пары, слово 아이유",
+      "coins": 80,
+      "xp": 150,
+      "cardId": 1,
+      "moduleId": "block-1",
+      "steps": 19,
+      "file": "data/lessons/lesson-01.json"
+    },
+    {
+      "id": 2,
+      "title": "Урок 2. Первые 7 согласных и озвончение",
+      "desc": "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ • Прописи пачками, слова 가수 и 드라마",
+      "coins": 90,
+      "xp": 180,
+      "cardId": 2,
+      "moduleId": "block-1",
+      "steps": 18,
+      "file": "data/lessons/lesson-02.json"
+    },
+    {
+      "id": 3,
+      "title": "Урок 3. Звуки ㅈ, ㅎ и придыхательные",
+      "desc": "ㅈ, ㅎ, ㅊ, ㅋ, ㅌ, ㅍ • Прописи пачками, 커피 и 카메라",
+      "coins": 90,
+      "xp": 180,
+      "cardId": 3,
+      "moduleId": "block-1",
+      "steps": 17,
+      "file": "data/lessons/lesson-03.json"
+    },
+    {
+      "id": 4,
+      "title": "Урок 4. Двойные (напряжённые) согласные",
+      "desc": "ㄲ, ㄸ, ㅃ, ㅆ, ㅉ • Прописи пачками, секрет слова 오빠",
+      "coins": 100,
+      "xp": 200,
+      "cardId": 4,
+      "moduleId": "block-1",
+      "steps": 16,
+      "file": "data/lessons/lesson-04.json"
+    },
+    {
+      "id": 5,
+      "title": "Урок 5. Составные гласные (Дифтонги)",
+      "desc": "ㅐ, ㅔ, ㅘ, ㅝ, ㅟ, ㅚ, ㅢ • Прописи дифтонгов, 노래 и 최고",
+      "coins": 110,
+      "xp": 220,
+      "cardId": 6,
+      "moduleId": "block-1",
+      "steps": 18,
+      "file": "data/lessons/lesson-05.json"
+    },
+    {
+      "id": 6,
+      "title": "Урок 6. Патчим (Часть 1): Сонорные звуки",
+      "desc": "ㄴ, ㄹ, ㅁ, ㅇ внизу слога • Прописи патчима, 사랑 и 별",
+      "coins": 110,
+      "xp": 220,
+      "moduleId": "block-1",
+      "steps": 15,
+      "file": "data/lessons/lesson-06.json"
+    },
+    {
+      "id": 7,
+      "title": "Урок 7. Глухой патчим и Перенос звука",
+      "desc": "ㄱ, ㄷ, ㅂ внизу + магия 연음 • Прописи, 음악 и 한국어",
+      "coins": 120,
+      "xp": 240,
+      "moduleId": "block-1",
+      "steps": 15,
+      "file": "data/lessons/lesson-07.json"
+    },
+    {
+      "id": 8,
+      "title": "Урок 8. Живой K-pop: Читаем без транслитерации",
+      "desc": "사랑해, 대박, 고마워, 보고 싶어 • Прописи фраз и финал",
+      "coins": 130,
+      "xp": 260,
+      "moduleId": "block-1",
+      "steps": 14,
+      "file": "data/lessons/lesson-08.json"
+    },
+    {
+      "id": 9,
+      "title": "🏆 Большой экзамен Блока 1",
+      "desc": "Прописи на слух, аудирование, пары и сборка • +250 🎤 и SSR-карта",
+      "coins": 250,
+      "xp": 500,
+      "isExam": true,
+      "cardId": 5,
+      "moduleId": "block-1",
+      "steps": 16,
+      "file": "data/lessons/lesson-09.json"
+    }
+  ]
+}

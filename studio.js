@@ -35,8 +35,8 @@
   const STAGES = [
     { idx: 0, name: "Улица Хондэ",     era: "trainee", reqLessons: 0, reqExam: false, reqFandom: 0,    rateMult: 1.0, ico: "🎸" },
     { idx: 1, name: "Клуб в Сеуле",    era: "debut",   reqLessons: 4, reqExam: false, reqFandom: 500,  rateMult: 1.5, ico: "🎤" },
-    { idx: 2, name: "Музыкальное шоу", era: "neon",    reqLessons: 8, reqExam: true,  reqFandom: 1400, rateMult: 2.2, ico: "📺" },
-    { idx: 3, name: "Мировой стадион", era: "tour",    reqLessons: 9, reqExam: true,  reqFandom: 3000, rateMult: 3.2, ico: "🏟️" }
+    { idx: 2, name: "Музыкальное шоу", era: "neon",    reqLessons: 8, reqExam: true,  reqFandom: 1400, rateMult: 2.2, ico: "📺", reqModule: "block-1" },
+    { idx: 3, name: "Мировой стадион", era: "tour",    reqLessons: 9, reqExam: true,  reqFandom: 3000, rateMult: 3.2, ico: "🏟️", reqModule: "block-1" }
   ];
 
   /* 4 апгрейда студии за микрофоны */
@@ -312,10 +312,10 @@
     .mc-craft { top: 9% !important; right: 10% !important; z-index: 5 !important; }
 
     /* Подключение файлов из твоей папки */
-    .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/silver.png'); }
-    .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/gold.png'); }
-    .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/platinum.png'); }
-    .mini-card.tier-neon::after,     .photocard.tier-neon::after     { background-image: url('img/frames/neon.png'); }
+    .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/silver.webp'); }
+    .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/gold.webp'); }
+    .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/platinum.webp'); }
+    .mini-card.tier-neon::after,     .photocard.tier-neon::after     { background-image: url('img/frames/neon.webp'); }
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
@@ -377,13 +377,20 @@
     if (!st.avatarCardId) st.avatarCardId = cardId;
   }
 
+  function examPassed(stage) {
+    if (!stage || !stage.reqExam) return true;
+    const moduleId = stage.reqModule || 'block-1';
+    if (typeof isModuleExamPassed === 'function') return isModuleExamPassed(moduleId);
+    return (Array.isArray(window.LESSONS) ? window.LESSONS : [])
+      .some(l => l.isExam && st.done.includes(l.id));
+  }
+
   function getCurrentStageIdx() {
     const fandom = getTeamBonuses().power;
     let idx = 0;
     STAGES.forEach(s => {
       const okLessons = st.done.length >= s.reqLessons;
-      const okExam = !s.reqExam || st.done.includes(9);
-      if (okLessons && okExam && fandom >= s.reqFandom) idx = s.idx;
+      if (okLessons && examPassed(s) && fandom >= s.reqFandom) idx = s.idx;
     });
     return idx;
   }
@@ -395,9 +402,12 @@
 
   function renderProfileAvatarHtml(size = 56) {
     const lg = getLeague(st.xp);
-    const c = st.avatarCardId ? CARDS.find(x => x.id === st.avatarCardId && getBestTier(x.id)) : null;
+    const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
+    const c = st.avatarCardId ? cards.find(x => x.id === st.avatarCardId && getBestTier(x.id)) : null;
     const inner = c
-      ? `<div class="av-frame-in" style="background:${c.grad}"><img src="${c.img}" alt="${c.tag}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${c.tag}</span></div>`
+      ? `<div class="av-frame-in" style="background:${c.grad}">${c.img
+        ? `<img src="${escapeHtml(c.img)}" alt="${escapeHtml(c.tag)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${escapeHtml(c.tag)}</span>`
+        : `<span>${escapeHtml(c.tag)}</span>`}</div>`
       : `<div class="av-frame-in" style="background:linear-gradient(135deg,#ff2e93,#7b2cbf)">🎧</div>`;
     return `<div class="av-frame ${lg.cls}" style="width:${size}px;height:${size}px">${inner}<div class="av-league-badge" style="color:${lg.color}">${lg.icon}</div></div>`;
   }
@@ -430,12 +440,15 @@
     if (!st.cases) st.cases = { silver: 0, gold: 0, platinum: 0 };
     if (!st.upgrades) st.upgrades = { practice: 0, sound: 0, pr: 0, cafe: 0 };
     if (!st.lastCashTs) st.lastCashTs = Date.now();
-    if (!st.monthlyBadges) st.monthlyBadges = [];
+    if (!Array.isArray(st.monthlyBadges)) st.monthlyBadges = [];
     if (!st.fusionsCount) st.fusionsCount = 0;
+    if (!Array.isArray(st.cards)) st.cards = [];
+    if (!Array.isArray(st.done)) st.done = [];
 
+    const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
     st.cards.forEach(id => {
       if (!st.inv[id]) {
-        const c = CARDS.find(x => x.id === id);
+        const c = cards.find(x => x.id === id);
         const defTier = c && c.r === 'SSR' ? 'platinum' : (c && c.r === 'SR' ? 'gold' : 'silver');
         st.inv[id] = { silver: 0, gold: 0, platinum: 0, neon: 0 };
         st.inv[id][defTier] = 1;
@@ -451,12 +464,82 @@
       st.streak.count = (st.streak.lastDate === yKey) ? st.streak.count + 1 : 1;
       st.streak.lastDate = today;
     }
-    if (!st.daily || st.daily.date !== today) st.daily = { date: today, lessons: 0, dict: 0, cards: 0, p1: false, p2: false, p3: false, claimed: false };
-    if (!st.weekly || st.weekly.week !== wk) st.weekly = { week: wk, days: [today], claimed: false };
-    else if (!st.weekly.days.includes(today)) st.weekly.days.push(today);
+
+    if (!st.daily || st.daily.date !== today) {
+      st.daily = {
+        date: today, lessons: 0, dict: 0, cards: 0,
+        dictSeen: [], cardSeen: [],
+        p1: false, p2: false, p3: false, claimed: false
+      };
+    } else {
+      if (typeof st.daily.lessons !== 'number') st.daily.lessons = 0;
+      if (typeof st.daily.dict !== 'number') st.daily.dict = 0;
+      if (typeof st.daily.cards !== 'number') st.daily.cards = 0;
+      if (!Array.isArray(st.daily.dictSeen)) st.daily.dictSeen = [];
+      if (!Array.isArray(st.daily.cardSeen)) st.daily.cardSeen = [];
+    }
+
+    if (!st.weekly || st.weekly.week !== wk) st.weekly = { week: wk, days: [], claimed: false };
+    if (!Array.isArray(st.weekly.days)) st.weekly.days = [];
     if (!st.monthly || st.monthly.key !== mk) st.monthly = { key: mk, pts: 0, claimed: false };
+    if (typeof st.monthly.pts !== 'number') st.monthly.pts = 0;
     save(false);
   }
+
+  /* ====== КВЕСТЫ: ДЕЙЛИКИ, НЕДЕЛЯ И ОЧКИ МЕСЯЦА ====== */
+  function dailyDoneCount() {
+    const d = st.daily;
+    return (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
+  }
+
+  function syncQuestProgress() {
+    const d = st.daily, m = st.monthly;
+    const goals = { p1: d.lessons >= 1, p2: d.dict >= 2, p3: d.cards >= 3 };
+    let gained = 0;
+    Object.keys(goals).forEach(key => {
+      if (goals[key] && !d[key]) { d[key] = true; gained++; }
+    });
+    if (gained) m.pts += gained;
+
+    let badgeAwarded = false;
+    if (m.pts >= MONTHLY_GOAL) {
+      const now = new Date();
+      const badgeKey = `${now.getFullYear()}-${now.getMonth()}`;
+      if (!st.monthlyBadges.includes(badgeKey)) {
+        st.monthlyBadges.push(badgeKey);
+        badgeAwarded = true;
+        setTimeout(() => alert('🏅 Квест месяца закрыт! Бейдж добавлен в архив.'), 500);
+      }
+    }
+    if (gained || badgeAwarded) save(false);
+    return gained;
+  }
+
+  window.trackQuest = function (type, value) {
+    initStudioState();
+    const d = st.daily;
+    if (type === 'lesson') {
+      d.lessons++;
+      const td = todayKey();
+      if (!st.weekly.days.includes(td)) st.weekly.days.push(td);
+    } else if (type === 'dict') {
+      if (value == null || !d.dictSeen.includes(value)) {
+        if (value != null) d.dictSeen.push(value);
+        d.dict++;
+      }
+    } else if (type === 'card') {
+      if (value == null || !d.cardSeen.includes(value)) {
+        if (value != null) d.cardSeen.push(value);
+        d.cards++;
+      }
+    }
+    syncQuestProgress();
+    save(false);
+  };
+
+  window.getLessonComboPct = function () {
+    return lessonTalents.comboPct || 0;
+  };
 
   window.getTeamBonuses = function () {
     let power = ((st.upgrades && st.upgrades.practice) || 0) * 80;
@@ -493,13 +576,13 @@
     haptic('light');
     initStudioState();
     const lg = getLeague(st.xp);
-    const owned = CARDS.filter(c => getBestTier(c.id));
+    const owned = (Array.isArray(window.CARDS) ? window.CARDS : []).filter(c => getBestTier(c.id));
 
     profileOverlay.innerHTML = `
       <div class="ov-header">
         <div>
           <div style="font-size:16px;font-weight:900">Профиль и Лиги</div>
-          <div style="font-size:11px;color:var(--muted)">ID: ${st.producerId} • ${st.xp} XP</div>
+          <div style="font-size:11px;color:var(--muted)">ID: ${escapeHtml(st.producerId)} • ${st.xp} XP</div>
         </div>
         <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('profile-overlay').classList.remove('open')">✕</button>
       </div>
@@ -508,14 +591,14 @@
           <div style="display:flex;justify-content:center;margin-bottom:10px">${renderProfileAvatarHtml(76)}</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Название твоей студии</div>
           <div style="display:flex;gap:8px;margin-bottom:12px">
-            <input id="prof-name-in" class="onb-input" style="margin:0;padding:9px 12px;font-size:14px;text-align:left" maxlength="22" value="${st.agencyName}">
+            <input id="prof-name-in" class="onb-input" style="margin:0;padding:9px 12px;font-size:14px;text-align:left" maxlength="22" value="${escapeHtml(st.agencyName)}">
             <button class="btn cyan" id="prof-name-save" style="padding:0 14px">Ок</button>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-align:left">Аватарка агентства (выбери выбитого артиста):</div>
           <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
             ${owned.length ? owned.map(c => `
               <div data-pick-av="${c.id}" style="width:46px;height:46px;border-radius:12px;flex-shrink:0;overflow:hidden;border:2px solid ${st.avatarCardId === c.id ? 'var(--cyan)' : 'rgba(255,255,255,0.15)'};background:${c.grad};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;cursor:pointer">
-                <img src="${c.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${c.tag}</span>
+                ${c.img ? `<img src="${escapeHtml(c.img)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${escapeHtml(c.tag)}</span>` : `<span>${escapeHtml(c.tag)}</span>`}
               </div>`).join('') : '<div style="font-size:11px;color:var(--muted)">Открой первый бокс, чтобы поставить артиста на аватарку</div>'}
           </div>
         </div>
@@ -548,11 +631,18 @@
   };
 
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
-  window.setShopSubTab = function (t) { haptic('light'); shopSubTab = t; renderShop(); };
+  window.setShopSubTab = function (t) {
+    haptic('light');
+    const y = window.scrollY || 0;
+    shopSubTab = t;
+    renderShop();
+    const raf = window.requestAnimationFrame || function (cb) { setTimeout(cb, 0); };
+    raf(() => window.scrollTo(0, y));
+  };
 
   /* ====== ЭКРАН СТУДИИ (3 ВКЛАДКИ: ГРУППА | СТУДИЯ | КВЕСТЫ) ====== */
   window.renderBinder = function () {
-    if (typeof CARDS === 'undefined') return;
+    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
     initStudioState();
     const screen = document.getElementById('screen-binder');
     const b = getTeamBonuses();
@@ -566,7 +656,7 @@
         <div class="agency-head">
           ${renderProfileAvatarHtml(56)}
           <div style="flex:1;min-width:0">
-            <div class="agency-name">${st.agencyName}</div>
+            <div class="agency-name">${escapeHtml(st.agencyName)}</div>
             <div class="agency-id">${STAGES[getCurrentStageIdx()].ico} ${STAGES[getCurrentStageIdx()].name} • Серия ${st.streak.count} дн.</div>
             <div class="league-pill" style="color:${lg.color}">${lg.icon} ${lg.name} • ${st.xp} XP</div>
           </div>
@@ -629,7 +719,7 @@
       });
 
       const erasWrap = document.getElementById('eras-cards-wrap');
-      ERAS.forEach(era => {
+      (Array.isArray(ERAS) ? ERAS : []).forEach(era => {
         const isUnlocked = unlockedEras.includes(era.id);
         const eraCards = CARDS.filter(c => c.album === era.id);
         const ownedInEra = eraCards.filter(c => getBestTier(c.id));
@@ -688,7 +778,7 @@
           <div style="font-size:12px;color:#d8cce8">Множитель кассы: <b>×${curStg.rateMult}</b></div>
           ${nextStg ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:var(--muted)">
             Следующая: <b style="color:#fff">${nextStg.ico} ${nextStg.name}</b><br>
-            Нужно: Уроков ${st.done.length}/${nextStg.reqLessons}${nextStg.reqExam ? (st.done.includes(9) ? ' • Экзамен ✓' : ' • Сдать Экзамен') : ''} • Фандом ${b.power}/${nextStg.reqFandom}
+            Нужно: Уроков ${st.done.length}/${nextStg.reqLessons}${nextStg.reqExam ? (examPassed(nextStg) ? ' • Экзамен ✓' : ' • Сдать Экзамен') : ''} • Фандом ${b.power}/${nextStg.reqFandom}
           </div>` : `<div style="margin-top:8px;font-size:12px;color:var(--gold);font-weight:800">★ Максимальная площадка открыта!</div>`}
         </div>
 
@@ -724,8 +814,11 @@
     }
 
     if (studioSubTab === 'quests') {
-      const d = st.daily, m = st.monthly;
-      const dCnt = (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
+      const d = st.daily, m = st.monthly, w = st.weekly;
+      // На случай старых сохранений, где счётчики уже заполнены, а флаги ещё нет.
+      syncQuestProgress();
+      const dCnt = dailyDoneCount();
+      const wCnt = Math.min(w.days.length, 5);
       const curMonthIdx = new Date().getMonth(), curYear = new Date().getFullYear();
 
       sub.innerHTML = `
@@ -738,6 +831,14 @@
           ${dCnt === 3 && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / 3) * 100)}%"></div></div>`)}
         </div>
 
+        <div class="quest-sec"><span>Еженедельный челлендж</span><span style="color:var(--cyan)">${wCnt}/5 дней</span></div>
+        <div class="daily-prize">
+          <div style="font-size:12px;font-weight:800;margin-bottom:6px">5 дней с уроками → Золотой бокс</div>
+          ${w.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено на этой неделе</div>`
+            : (wCnt >= 5 ? `<button class="btn gold full" id="claim-weekly">Забрать Золотой бокс!</button>`
+              : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((wCnt / 5) * 100)}%"></div></div>`)}
+        </div>
+
         <div class="quest-sec"><span>Бейджи ${curYear} (Квест месяца: ${Math.min(m.pts, MONTHLY_GOAL)}/${MONTHLY_GOAL})</span><span>${st.monthlyBadges.length}/12</span></div>
         <div class="badges-grid">
           ${MONTHS.map(mo => {
@@ -747,13 +848,27 @@
         </div>`;
 
       const cd = document.getElementById('claim-daily');
-      if (cd) cd.onclick = () => { st.daily.claimed = true; st.cases.silver++; st.coins += 25; save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder(); };
+      if (cd) cd.onclick = () => {
+        syncQuestProgress();
+        st.daily.claimed = true;
+        st.cases.silver++;
+        st.coins += 25;
+        save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
+      };
+
+      const cw = document.getElementById('claim-weekly');
+      if (cw) cw.onclick = () => {
+        st.weekly.claimed = true;
+        st.cases.gold++;
+        save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
+      };
     }
   };
 
   /* ====== МОДАЛКИ КАРТЫ И СЛОТА ====== */
   function openSlotPicker(role) {
-    const owned = CARDS.filter(c => getBestTier(c.id) && c.roleKey === role.key);
+    const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
+    const owned = cards.filter(c => getBestTier(c.id) && c.roleKey === role.key);
     const modal = document.getElementById('pack-modal');
     modal.classList.add('open');
     if (!owned.length) {
@@ -844,6 +959,7 @@
 
   /* ====== МАГАЗИН + ПЛАВНАЯ АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
   window.renderShop = function () {
+    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
     syncResources(); initStudioState();
     const screen = document.getElementById('screen-shop');
     const cs = st.cases;
@@ -861,7 +977,7 @@
     const sub = document.getElementById('shop-sub-body');
     if (shopSubTab === 'boxes') {
       sub.innerHTML = `
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Доступно Эр в боксах: <b style="color:var(--cyan)">${getUnlockedEras().length} из ${ERAS.length}</b> (открывай новые площадки в Студии)</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Доступно Эр в боксах: <b style="color:var(--cyan)">${getUnlockedEras().length} из ${(Array.isArray(ERAS) ? ERAS : []).length}</b> (открывай новые площадки в Студии)</div>
         <div class="box-list">
           <div class="box-row silver">
             <div class="mini-album"><span style="background:linear-gradient(145deg,#454c61,#1d202b);color:#cfd8dc;border:1px solid #cfd8dc">AG</span></div>
@@ -885,8 +1001,14 @@
           <div class="res-box"><div class="res-val" style="color:var(--cyan)">${st.energy}/${MAX_ENERGY} Энергия</div><div class="res-sub">${eSub}</div></div>
           <div class="res-box"><div class="res-val" style="color:var(--danger)">${st.hearts}/${MAX_HEARTS} Попытки</div><div class="res-sub">${hSub}</div></div>
         </div>
-        <div class="shop-item"><div><div class="l-title">Батарейка (+1 ⚡)</div><div class="l-meta">Мгновенный заряд</div></div><button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button></div>
-        <div class="shop-item"><div><div class="l-title">Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит сердечко</div></div><button class="btn" onclick="buyHeart(1, 40)">40 🎤</button></div>`;
+        <div class="shop-sec">Пополнение за микрофоны</div>
+        <div class="shop-item"><div><div class="l-title">Батарейка лайтстика (+1 ⚡)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div><button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button></div>
+        <div class="shop-item"><div><div class="l-title">Полный заряд (5/5 ⚡)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div><button class="btn cyan" onclick="buyEnergy(5, 100)">100 🎤</button></div>
+        <div class="shop-item"><div><div class="l-title">Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит одно сердечко</div></div><button class="btn" onclick="buyHeart(1, 40)">40 🎤</button></div>
+        <div class="shop-sec">Премиум и наборы (Telegram Stars)</div>
+        <div class="shop-item vip"><div><div class="l-title">VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит энергии и попыток, ×2 награды</div></div><button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ★</button></div>
+        <div class="shop-item"><div><div class="l-title">Энергопак (Безлимит 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div><button class="btn gold" onclick="alert('Болванка под Telegram Stars')">35 ★</button></div>
+        <div class="shop-item"><div><div class="l-title">Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div><button class="btn" onclick="alert('Болванка под Telegram Stars')">75 ★</button></div>`;
     }
   };
 
@@ -933,6 +1055,7 @@
         triggerFlash(() => {
           const unlockedEras = getUnlockedEras();
           const pool = CARDS.filter(c => unlockedEras.includes(c.album));
+          if (!pool.length) return alert('Для этой Эры пока нет карт. Открой новую площадку в Студии.');
           const c = pool[Math.floor(Math.random() * pool.length)];
           const r = Math.random();
           const tier = type === 'platinum' ? 'platinum' : (type === 'gold' ? (r < 0.25 ? 'platinum' : 'gold') : (r < 0.2 ? 'gold' : 'silver'));
@@ -956,6 +1079,58 @@
         });
       }, 880);
     };
+  };
+
+  /* ====== ТОП: ЛИГА, ПРИЗОВЫЕ БОКСЫ И ЖИВОЙ РЕЙТИНГ ====== */
+  window.renderRank = function () {
+    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
+    initStudioState();
+    const screen = document.getElementById('screen-rank');
+    if (!screen) return;
+
+    const lg = getLeague(st.xp);
+    const nextLg = LEAGUES.find(x => x.minXp > st.xp);
+    const pct = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
+    const today = new Date().getDay();
+    const daysLeft = (7 - today) % 7;
+    const prizes = [
+      { place: 1, name: 'Платиновый бокс', cls: 'platinum', color: '#00e5ff', tag: 'P1' },
+      { place: 2, name: 'Золотой бокс', cls: 'gold', color: '#ffd700', tag: 'P2' },
+      { place: 3, name: 'Серебряный бокс', cls: 'silver', color: '#cfd8dc', tag: 'P3' }
+    ];
+    const players = [
+      { name: 'Minji_Seoul', xp: 620 },
+      { name: 'Kpop_Sora', xp: 480 },
+      { name: 'V_Army95', xp: 340 },
+      { name: `Ты • ${lg.name}`, xp: st.xp, me: true }
+    ].sort((a, b) => b.xp - a.xp);
+
+    screen.innerHTML = `
+      <div class="league-card">
+        <div class="module-tag">Недельный зачёт • ${escapeHtml(lg.name)}</div>
+        <h3 style="margin:6px 0">${lg.icon} ${escapeHtml(lg.name)}</h3>
+        <div style="font-size:13px;color:#c9bedf;margin-bottom:10px">${st.xp} XP${nextLg ? ` • до «${escapeHtml(nextLg.name)}» ещё ${nextLg.minXp - st.xp} XP` : ' • максимальная лига!'}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">Обновление рейтинга в воскресенье${daysLeft === 0 ? ' — сегодня!' : ` • через ${daysLeft} дн.`}</div>
+      </div>
+
+      <div class="quest-sec"><span>Призы Топ-3</span><span>Неделя</span></div>
+      <div class="box-list" style="margin-bottom:16px">
+        ${prizes.map(p => `<div class="box-row ${p.cls}">
+          <div class="mini-album"><span style="background:rgba(0,0,0,0.35);color:${p.color};border:1px solid ${p.color}">${p.tag}</span></div>
+          <div style="flex:1"><div class="l-title" style="color:${p.color}">${p.place} место</div><div class="l-meta">${p.name}</div></div>
+          <div style="font-weight:900;color:${p.color}">🏆</div>
+        </div>`).join('')}
+      </div>
+
+      <div class="quest-sec"><span>Рейтинг недели</span><span>${players.length} участника</span></div>
+      <div id="rank-list">
+        ${players.map((p, i) => `<div class="rank-row ${p.me ? 'me' : ''}">
+          <div style="width:28px;font-weight:800;color:${i < 3 ? 'var(--gold)' : 'var(--muted)'}">#${i + 1}</div>
+          <div style="flex:1;font-weight:700">${escapeHtml(p.name)}</div>
+          <div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div>
+        </div>`).join('')}
+      </div>`;
   };
 
   /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ (ПОНЯТНЫЕ ПЛАШКИ + ПОДСКАЗКИ ПО КЛИКУ) ====== */
@@ -1004,7 +1179,7 @@
       const wrongBtns = opts.filter((b, idx) => idx !== s.correct && !b.disabled);
       if (wrongBtns.length < 2) return;
       lessonTalents.hints--;
-      wrongBtns.sort(() => Math.random() - 0.5).slice(0, 2).forEach(b => { b.disabled = true; b.style.opacity = '0.2'; });
+      shuffle(wrongBtns).slice(0, 2).forEach(b => { b.disabled = true; b.style.opacity = '0.2'; });
       e.target.textContent = `✨ Подсказка (${lessonTalents.hints})`;
       e.target.disabled = true;
       haptic('ok'); sfx('tap');
@@ -1035,36 +1210,33 @@
 
   const origFinishLesson = window.finishLesson;
   window.finishLesson = function () {
-    const passed = !(curL && curL.isExam && mistakes > 4);
-    const wasDone = curL && st.done.includes(curL.id);
+    if (!curL) return origFinishLesson();
+    const passed = !(curL.isExam && mistakes > 4);
+    const wasDone = st.done.includes(curL.id);
+
+    // Награды (XP, микрофоны, хайп, комбо) считает единая функция в index.html.
     origFinishLesson();
-    if (!passed || !curL) return;
+    if (!passed) return;
 
     initStudioState();
-    st.daily.lessons++;
-    const b = getTeamBonuses();
+    window.trackQuest('lesson');
 
     if (!wasDone) {
-      let extraXp = Math.round(curL.xp * (lessonTalents.comboPct / 100));
-      let extraCoins = Math.round(curL.coins * (b.coinsPct / 100));
-      if (lessonTalents.hypePct > 0 && Math.random() * 100 < lessonTalents.hypePct) {
-        extraCoins += curL.coins;
-        setTimeout(() => alert(`⚡ ХАЙП ЗАЛА! Рэпер удвоил микрофоны (+${curL.coins} 🎤)!`), 450);
-      }
-      st.xp += extraXp;
-      st.coins += extraCoins;
       if (curL.isExam) st.cases.platinum++;
       else if (curL.id % 4 === 0) st.cases.gold++;
-    } else {
-      const repCoins = Math.max(5, Math.round(curL.coins * 0.1));
-      st.coins += repCoins;
     }
+    syncResources();
     save();
   };
 
   const navBinder = document.getElementById('nav-binder');
   if (navBinder && navBinder.lastChild) navBinder.lastChild.textContent = 'Студия';
 
-  initStudioState();
-  renderLessons();
+  function bootStudio() {
+    initStudioState();
+    renderLessons();
+  }
+
+  if (window.AppData) window.AppData.whenReady(bootStudio);
+  else bootStudio();
 })();
