@@ -11,7 +11,7 @@
   const TIER_META = {
     silver:   { name: "Серебро", mult: 1.0, power: 100, color: "#cfd8dc", shields: 1, hints: 1, comboPct: 15, hypePct: 15 },
     gold:     { name: "Золото",  mult: 1.5, power: 220, color: "#ffd700", shields: 1, hints: 2, comboPct: 25, hypePct: 25 },
-    platinum: { name: "Платина", mult: 2.2, power: 400, color: "#00e5ff", shields: 2, hints: 2, comboPct: 35, hypePct: 35 },
+    platinum: { name: "Платина", mult: 2.2, power: 400, color: "#6ed9b2", shields: 2, hints: 2, comboPct: 35, hypePct: 35 },
     neon:     { name: "Неон",    mult: 3.0, power: 700, color: "#ff2e93", shields: 3, hints: 3, comboPct: 50, hypePct: 50 }
   };
 
@@ -120,12 +120,7 @@
     .mc-dot { position: absolute; top: 5px; left: 5px; z-index: 3; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
     .mc-craft { position: absolute; top: 4px; right: 4px; z-index: 3; background: var(--success); color: #05170c; font-size: 8px; font-weight: 900; padding: 2px 5px; border-radius: 6px; }
 
-    /* Рамки редкости */
-    .tier-silver { border: 1.5px solid #b0bec5; }
-    .tier-gold { border: 2px solid #ffd700; box-shadow: 0 0 12px rgba(255,215,0,0.28); }
-    .tier-platinum { border: 2px solid #00e5ff; box-shadow: 0 0 16px rgba(0,229,255,0.35); }
-    .tier-neon { border: 2px solid #ff2e93; box-shadow: 0 0 18px rgba(255,46,147,0.55); animation: neonPulse 2s infinite alternate; }
-    @keyframes neonPulse { from { box-shadow: 0 0 12px rgba(255,46,147,0.4); } to { box-shadow: 0 0 22px rgba(0,229,255,0.75); } }
+    /* Рамки карт теперь графические — см. блок «РАМКИ КАРТ ИЗ FIGMA» ниже */
 
     /* Панель талантов внутри урока (понятные плашки) */
     .talent-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 12px; }
@@ -207,83 +202,86 @@
     .t-pill b { display: block; font-size: 14px; margin-top: 2px; }
     .app-toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(18px); background: rgba(20, 14, 34, 0.96); border: 1.5px solid rgba(0, 229, 255, 0.45); color: #fff; font-size: 13px; font-weight: 700; text-align: center; padding: 11px 16px; border-radius: 14px; max-width: calc(100vw - 32px); width: max-content; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.22s ease; white-space: pre-line; backdrop-filter: blur(8px); }
     .app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-        /* === ТЕСТ РАМОК КАРТ (Адаптировано под рамку из Figma) === */
-    .mini-card[class*="tier-"] {
+    /* === РАМКИ КАРТ ИЗ FIGMA (600×800, окно по центру) === */
+    .mini-card[class*="tier-"],
+    .photocard[class*="tier-"] {
       position: relative;
       box-sizing: border-box;
       aspect-ratio: 3 / 4;
       display: flex;
       flex-direction: column;
-      /* Отступы: сверху и снизу побольше под эквалайзеры, по бокам под скосы */
-      padding: 16% 12% 16% 12% !important;
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
       animation: none !important;
       overflow: visible !important;
+      isolation: isolate;
     }
-    .mini-card[class*="tier-"]::before {
+
+    /* Тёмная подложка строго под окном рамки — текст и арт читаются на любом фоне */
+    .mini-card[class*="tier-"]::before,
+    .photocard[class*="tier-"]::before {
       content: "";
       position: absolute;
-      /* Внутренний фон подкладываем строго под рамку */
-      inset: 8% 7%;
+      inset: 9% 15% 8.5%;
       background: #120d21;
-      border-radius: 12px;
+      border-radius: 8px;
       z-index: 0;
     }
-    .mini-card[class*="tier-"] > * {
+
+    .mini-card[class*="tier-"] > *,
+    .photocard[class*="tier-"] > * {
       position: relative;
       z-index: 1;
+    }
+
+    /* «Мои карты»: контент строго в окне рамки (~69% ширины) */
+    .mini-card[class*="tier-"] {
+      padding: 15% 15.5% 16% !important;
     }
     .mini-card[class*="tier-"] .pc-art {
       flex: 1;
       height: auto !important;
       min-height: 0;
-      border-radius: 8px;
+      border-radius: 7px;
       margin-bottom: 4px;
-      object-fit: cover;
     }
-    .mini-card[class*="tier-"] .mc-name { 
-      font-size: 10px; 
+    /* Верх окна у рамки скошен — подрезаем арт по той же диагонали */
+    .mini-card[class*="tier-"] .pc-art,
+    .photocard[class*="tier-"] .pc-art {
+      -webkit-clip-path: polygon(18.5% 0, 81.5% 0, 99.6% 17%, 99.6% 100%, 0.4% 100%, 0.4% 17%);
+      clip-path: polygon(18.5% 0, 81.5% 0, 99.6% 17%, 99.6% 100%, 0.4% 100%, 0.4% 17%);
+    }
+    .mini-card[class*="tier-"] .pc-art img,
+    .photocard[class*="tier-"] .pc-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .mini-card[class*="tier-"] .pc-monogram { font-size: 22px; }
+    .mini-card[class*="tier-"] .mc-name {
+      font-size: 10px;
       font-weight: 800;
-      line-height: 1.15; 
+      line-height: 1.15;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .mini-card[class*="tier-"] .mc-sub { 
-      font-size: 8px; 
+    .mini-card[class*="tier-"] .mc-sub {
+      font-size: 8px;
       font-weight: 700;
-      line-height: 1.15; 
+      line-height: 1.15;
     }
 
-    /* Специфика для больших карт (в модалках и при открытии) */
+    /* Большая карта: модалка просмотра, выпадение из бокса, слияние */
     .photocard[class*="tier-"] {
-      position: relative;
-      box-sizing: border-box;
-      aspect-ratio: 3 / 4;
       width: 100%;
       max-width: 280px;
       margin: 0 auto;
-      padding: 42px 32px 42px 32px !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      animation: none !important;
-      overflow: visible !important;
-    }
-    .photocard[class*="tier-"]::before {
-      content: "";
-      position: absolute;
-      inset: 22px 18px;
-      background: #120d21;
-      border-radius: 16px;
-      z-index: 0;
-    }
-    .photocard[class*="tier-"] > * {
-      position: relative;
-      z-index: 1;
+      /* px, а не %: у большой карты padding не должен зависеть от ширины модалки */
+      padding: 42px 46px 56px !important;
     }
     .photocard[class*="tier-"] .pc-art {
       flex: 1;
@@ -292,13 +290,23 @@
       border-radius: 10px;
       margin-bottom: 8px;
     }
+    .photocard[class*="tier-"] .pc-name { font-size: 15px; line-height: 1.15; }
+    .photocard[class*="tier-"] .pc-role { margin-top: 3px; line-height: 1.2; }
+    .photocard[class*="tier-"] .pc-bonus { font-size: 10px; line-height: 1.2; margin-top: 4px; }
+    .photocard[class*="tier-"] .pc-rarity {
+      top: 21%;
+      right: 18%;
+      z-index: 5;
+      font-size: 9px;
+      padding: 3px 7px;
+    }
 
-    /* Наложение самой рамки поверх всего */
+    /* Сама рамка — поверх контента, клики не перехватывает */
     .mini-card[class*="tier-"]::after,
     .photocard[class*="tier-"]::after {
       content: "";
       position: absolute;
-      /* Растягиваем рамку на всю площадь */
+      /* Растягиваем рамку на всю площадь карточки 3:4 */
       inset: 0;
       background-position: center;
       background-repeat: no-repeat;
@@ -307,15 +315,45 @@
       z-index: 4;
     }
 
-    /* Точки и маркеры поверх рамки */
-    .mc-dot   { top: 10% !important; left: 10% !important; z-index: 5 !important; }
-    .mc-craft { top: 9% !important; right: 10% !important; z-index: 5 !important; }
+    /* Точки и маркеры поверх рамки, но уже внутри окна */
+    .mc-dot   { top: 21.5% !important; left: 17.5% !important; z-index: 5 !important; }
+    .mc-craft { top: 20.5% !important; right: 17.5% !important; z-index: 5 !important; }
 
-    /* Подключение файлов из твоей папки */
-    .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/silver.webp'); }
-    .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/gold.webp'); }
-    .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/platinum.webp'); }
-    .mini-card.tier-neon::after,     .photocard.tier-neon::after     { background-image: url('img/frames/neon.webp'); }
+    /* Новые рамки из Figma */
+    .mini-card.tier-silver::after,   .photocard.tier-silver::after   { background-image: url('img/frames/frame-silver.webp'); }
+    .mini-card.tier-gold::after,     .photocard.tier-gold::after     { background-image: url('img/frames/frame-gold.webp'); }
+    .mini-card.tier-platinum::after, .photocard.tier-platinum::after { background-image: url('img/frames/frame-platinum.webp'); }
+    .mini-card.tier-neon::after,     .photocard.tier-neon::after     { background-image: url('img/frames/frame-neon.webp'); }
+
+    /* Слоты состава группы: заполненные показывают ту же рамку ранга */
+    .team-slot[class*="tier-"] {
+      aspect-ratio: 3 / 4;
+      min-height: 0;
+      padding: 17% 15.5% !important;
+      border: none;
+      border-radius: 12px;
+      background-color: #120d21;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% 100%;
+    }
+    .team-slot[class*="tier-"] .slot-role { font-size: 8px; }
+    .team-slot[class*="tier-"] .slot-tag { font-size: 12px; margin: 1px 0; }
+    .team-slot[class*="tier-"] .slot-tier { font-size: 8px; }
+    .team-slot.tier-silver   { background-image: url('img/frames/frame-silver.webp'); }
+    .team-slot.tier-gold     { background-image: url('img/frames/frame-gold.webp'); }
+    .team-slot.tier-platinum { background-image: url('img/frames/frame-platinum.webp'); }
+    .team-slot.tier-neon     { background-image: url('img/frames/frame-neon.webp'); }
+
+    /* Свечение — только у большой карты, чтобы сетка «Мои карты» оставалась спокойной */
+    .photocard.tier-silver::after   { filter: drop-shadow(0 0 5px rgba(222,228,236,0.25)); }
+    .photocard.tier-gold::after     { filter: drop-shadow(0 0 6px rgba(246,195,69,0.35)); }
+    .photocard.tier-platinum::after { filter: drop-shadow(0 0 7px rgba(110,217,178,0.4)); }
+    .photocard.tier-neon::after     { filter: drop-shadow(0 0 8px rgba(255,46,147,0.45)); animation: frameNeonPulse 2.6s ease-in-out infinite alternate; }
+    @keyframes frameNeonPulse {
+      from { filter: drop-shadow(0 0 4px rgba(255,46,147,0.28)) drop-shadow(0 0 2px rgba(49,230,252,0.2)); }
+      to   { filter: drop-shadow(0 0 11px rgba(255,46,147,0.55)) drop-shadow(0 0 6px rgba(49,230,252,0.45)); }
+    }
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
@@ -706,10 +744,9 @@
         const cid = st.team[r.key], tier = cid ? getBestTier(cid) : null;
         const c = tier ? CARDS.find(x => x.id === cid) : null;
         const el = document.createElement('div');
-        el.className = 'team-slot' + (c ? ' filled' : '');
+        el.className = 'team-slot' + (c ? ` filled tier-${tier}` : '');
         if (c) {
           const tm = TIER_META[tier];
-          el.style.borderColor = tm.color;
           el.innerHTML = `<div class="slot-role">${r.ico} ${r.title}</div><div class="slot-tag">${c.tag}</div><div class="slot-tier" style="color:${tm.color}">${tm.name}</div>`;
         } else {
           el.innerHTML = `<div class="slot-role">${r.ico} ${r.title}</div><div style="font-size:18px;opacity:0.35;margin-top:4px">+</div>`;
