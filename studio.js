@@ -57,6 +57,21 @@
   ];
 
   const MONTHLY_GOAL = 50;
+
+  /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ====== */
+  const WEEKLY_LEAGUES = [
+    { name: "Трейни",           icon: "🎧", color: "#cd9b6a", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
+    { name: "Инди",             icon: "🎸", color: "#cfd8dc", promoteBox: "Золотой бокс",    promoteCoins: 400, midCoins: 100 },
+    { name: "Восходящая группа", icon: "🎤", color: "#00e5ff", promoteBox: "Платиновый бокс", promoteCoins: 500, midCoins: 100 },
+    { name: "Топ-лейбл",        icon: "★",  color: "#ffd700", promoteBox: "Платиновый бокс", promoteCoins: 600, midCoins: 100 },
+    { name: "Мировой чарт",     icon: "✦",  color: "#ff2e93", promoteBox: "Платиновый бокс", promoteCoins: 800, midCoins: 100 }
+  ];
+  const WEEKLY_SIZE = 30;          // 30 студий в турнирной комнате
+  const ZONE_PROMOTE = 7;          // места 1–7 — зона повышения
+  const ZONE_DROP_FROM = 23;       // места 23–30 — зона вылета (кроме 1-й лиги)
+  const STREAK_FREEZE_MAX = 2;
+  const STREAK_FREEZE_PRICE = 250;
+
   const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
   let studioSubTab = 'group'; // 'group' | 'studio' | 'quests'
   let shopSubTab = 'boxes';   // 'boxes' | 'vip'
@@ -368,6 +383,36 @@
       from { filter: drop-shadow(0 0 4px rgba(255,46,147,0.28)) drop-shadow(0 0 2px rgba(49,230,252,0.2)); }
       to   { filter: drop-shadow(0 0 11px rgba(255,46,147,0.55)) drop-shadow(0 0 6px rgba(49,230,252,0.45)); }
     }
+    /* Ежедневные квесты (5 фиксированных), стрик с заморозкой и недельный турнир */
+    .daily-prize-items { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; font-size: 11px; font-weight: 800; color: #ffe9a8; }
+    .c-rew { font-size: 11px; color: #ff9ad6; font-weight: 800; white-space: nowrap; }
+    .freeze-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9px; border: 1px solid rgba(0,229,255,0.45); background: rgba(0,229,255,0.12); color: #bdf7ff; margin-left: 4px; vertical-align: middle; cursor: pointer; }
+    .freeze-pill.empty { border-color: rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); color: var(--muted); }
+
+    .wr-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .wr-place { font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 4px; cursor: pointer; }
+    .wr-liga { font-size: 20px; font-weight: 900; line-height: 1.15; }
+    .wr-timer { text-align: right; font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .wr-timer b { display: block; font-size: 15px; letter-spacing: 0; margin-top: 2px; }
+    .zone-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 6px; padding: 6px 9px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+    .zone-head.zone-promote { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.45); color: #a9ffd0; }
+    .zone-head.zone-hold { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); color: var(--muted); }
+    .zone-head.zone-drop { background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.4); color: #ffb3ba; }
+    .zone-head small { font-size: 9px; font-weight: 800; text-transform: none; letter-spacing: 0; opacity: 0.85; }
+    .wr-row { display: flex; align-items: center; gap: 9px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 13px; padding: 8px 10px; margin-bottom: 6px; }
+    .wr-row.me { border: 1.5px solid var(--accent); background: rgba(255,46,147,0.14); box-shadow: 0 0 14px rgba(255,46,147,0.18); }
+    .wr-pos { width: 26px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
+    .wr-row.top .wr-pos { color: var(--gold); }
+    .wr-ava { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .wr-name { flex: 1; min-width: 0; }
+    .wr-name b { font-size: 12px; font-weight: 800; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wr-name span { font-size: 9px; color: var(--muted); font-weight: 700; }
+    .wr-score { font-size: 12px; font-weight: 900; color: #ff85cb; white-space: nowrap; }
+
+    .wr-result-box { text-align: center; max-width: 330px; width: 100%; padding: 20px 16px; }
+    .wr-result-box .wr-big { font-size: 22px; font-weight: 900; margin: 6px 0; }
+    .wr-result-box .wr-sub { font-size: 12px; color: #d8cce8; line-height: 1.45; margin: 6px 0 12px; }
+
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
@@ -390,13 +435,20 @@
   toastEl.className = 'app-toast';
   toastEl.onclick = () => toastEl.classList.remove('show');
   document.body.appendChild(toastEl);
-  window.alert = function (msg) {
+  function showToast(msg, ms = 2600) {
     toastEl.textContent = String(msg);
     toastEl.classList.add('show');
-    if (typeof haptic === 'function') haptic('light');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+  }
+  window.alert = function (msg) {
+    showToast(msg);
+    if (typeof haptic === 'function') haptic('light');
   };
+
+  let pendingFreezeToast = false;   // сработала заморозка ❄️ — показать тост
+  let pendingWeeklyResult = false;  // ждём итогов недели — показать модалку
+  let weeklyTickTimer = null;       // живой таймер «Топ»
 
   function todayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
   function weekKey() { const d = new Date(), s = new Date(d.getFullYear(), 0, 1); return `${d.getFullYear()}-W${Math.ceil((((d - s) / 86400000) + s.getDay() + 1) / 7)}`; }
@@ -509,48 +561,111 @@
     if (!st.avatarCardId && st.cards.length) st.avatarCardId = st.cards[0];
 
     const today = todayKey(), wk = weekKey(), mk = monthKey();
-    if (!st.streak) st.streak = { count: 1, lastDate: today };
-    else if (st.streak.lastDate !== today) {
-      const yest = new Date(Date.now() - 86400000);
-      const yKey = `${yest.getFullYear()}-${yest.getMonth() + 1}-${yest.getDate()}`;
-      st.streak.count = (st.streak.lastDate === yKey) ? st.streak.count + 1 : 1;
+    if (typeof st.streakFreeze !== 'number' || !isFinite(st.streakFreeze)) st.streakFreeze = 0;
+    st.streakFreeze = Math.max(0, Math.min(STREAK_FREEZE_MAX, Math.floor(st.streakFreeze)));
+
+    if (!st.streak || typeof st.streak !== 'object') st.streak = { count: 1, lastDate: today };
+    if (typeof st.streak.count !== 'number' || !isFinite(st.streak.count) || st.streak.count < 1) st.streak.count = 1;
+    if (!st.streak.lastDate) st.streak.lastDate = today;
+    if (st.streak.lastDate !== today) {
+      // Сколько календарных дней прошло с последнего входа (1 — вчера, 2 — пропущен ровно 1 день).
+      const gap = dayDiff(st.streak.lastDate, today);
+      if (gap === 1) {
+        st.streak.count += 1;
+      } else if (gap === 2 && st.streakFreeze > 0) {
+        st.streakFreeze -= 1;
+        pendingFreezeToast = true;   // серия сохранена за счёт заморозки ❄️
+      } else {
+        st.streak.count = 1;
+      }
       st.streak.lastDate = today;
     }
 
     if (!st.daily || st.daily.date !== today) {
       st.daily = {
-        date: today, lessons: 0, dict: 0, cards: 0,
+        date: today, lessons: 0, dict: 0, cards: 0, combo: 0,
         dictSeen: [], cardSeen: [],
-        p1: false, p2: false, p3: false, claimed: false
+        p1: false, p2: false, p3: false, p4: false, p5: false, claimed: false
       };
     } else {
       if (typeof st.daily.lessons !== 'number') st.daily.lessons = 0;
       if (typeof st.daily.dict !== 'number') st.daily.dict = 0;
       if (typeof st.daily.cards !== 'number') st.daily.cards = 0;
+      if (typeof st.daily.combo !== 'number') st.daily.combo = 0;
       if (!Array.isArray(st.daily.dictSeen)) st.daily.dictSeen = [];
       if (!Array.isArray(st.daily.cardSeen)) st.daily.cardSeen = [];
+      ['p1', 'p2', 'p3', 'p4', 'p5'].forEach(k => { if (typeof st.daily[k] !== 'boolean') st.daily[k] = false; });
+      if (typeof st.daily.claimed !== 'boolean') st.daily.claimed = false;
     }
 
     if (!st.weekly || st.weekly.week !== wk) st.weekly = { week: wk, days: [], claimed: false };
     if (!Array.isArray(st.weekly.days)) st.weekly.days = [];
     if (!st.monthly || st.monthly.key !== mk) st.monthly = { key: mk, pts: 0, claimed: false };
     if (typeof st.monthly.pts !== 'number') st.monthly.pts = 0;
+
+    // Недельный турнир: очки, лига и комната на 29 соперников.
+    if (typeof st.weeklyLeague !== 'number' || !isFinite(st.weeklyLeague)) st.weeklyLeague = 0; // миграция: старт с 1-й лиги
+    st.weeklyLeague = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, Math.floor(st.weeklyLeague)));
+    if (typeof st.weeklyHype !== 'number' || !isFinite(st.weeklyHype)) st.weeklyHype = 0;
+    if (!st.lastWeekKey) st.lastWeekKey = weekKeyOf(Date.now());
+    ensureWeeklyRoom();      // добивает соперников, если сохранение старое
+    settleWeeklyLeague();    // итоги недели при первом входе после понедельника
     save(false);
   }
 
+
+  /* ====== СТРИК: РАЗНИЦА ДНЕЙ И ЗАМОРОЗКА ❄️ ====== */
+  function dayDiff(fromKey, toKey) {
+    const parse = (k) => String(k).split('-').map(Number);
+    const a = parse(fromKey), b = parse(toKey);
+    if (!a[0] || !b[0]) return 1;
+    // Считаем по календарю (UTC): переход на летнее время не ломает серию.
+    return Math.round((Date.UTC(b[0], b[1] - 1, b[2]) - Date.UTC(a[0], a[1] - 1, a[2])) / 86400000);
+  }
+
+  window.buyStreakFreeze = function () {
+    initStudioState();
+    if (st.streakFreeze >= STREAK_FREEZE_MAX) return alert(`Максимум ${STREAK_FREEZE_MAX}/${STREAK_FREEZE_MAX} заморозок в запасе.`);
+    if (st.coins < STREAK_FREEZE_PRICE) return alert(`Нужно ${STREAK_FREEZE_PRICE} микрофонов.`);
+    st.coins -= STREAK_FREEZE_PRICE;
+    st.streakFreeze = Math.min(STREAK_FREEZE_MAX, st.streakFreeze + 1);
+    save(); haptic('ok'); sfx('win');
+    alert(`❄️ Заморозка куплена! В запасе: ${st.streakFreeze}/${STREAK_FREEZE_MAX}`);
+    if (typeof window.renderShop === 'function') window.renderShop();
+  };
+
+  window.showStreakInfo = function () {
+    initStudioState();
+    alert(`🔥 Серия входов: ${st.streak.count} дн.\n❄️ Заморозки: ${st.streakFreeze}/${STREAK_FREEZE_MAX}\n\nЕсли пропустить ровно один день, заморозка сохранит серию. Купить её можно в Магазине.`);
+  };
+
   /* ====== КВЕСТЫ: ДЕЙЛИКИ, НЕДЕЛЯ И ОЧКИ МЕСЯЦА ====== */
-  function dailyDoneCount() {
+  /* 5 фиксированных дейликов. Каждый даёт микрофоны и Недельный Хайп. */
+  const DAILY_QUESTS = [
+    { id: 'quest_lesson_1',  title: 'Первый шаг',      desc: 'Завершить 1 урок',                    coins: 20, hype: 30, goal: 1, flag: 'p1', val: d => d.lessons },
+    { id: 'quest_combo',     title: 'Чистый бит',      desc: 'Комбо 3+ верных ответа подряд',       coins: 15, hype: 25, goal: 3, flag: 'p2', val: d => d.combo },
+    { id: 'quest_vocab',     title: 'Словарный запас', desc: 'Перевернуть 5 карточек в Словаре',    coins: 15, hype: 20, goal: 5, flag: 'p3', val: d => d.cards },
+    { id: 'quest_dictation', title: 'Идеальный слух',  desc: 'Завершить шаг с диктантом или аудио', coins: 15, hype: 25, goal: 1, flag: 'p4', val: d => d.dict },
+    { id: 'quest_lesson_2',  title: 'Двойной камбэк',  desc: 'Завершить второй урок за день',       coins: 25, hype: 40, goal: 2, flag: 'p5', val: d => d.lessons }
+  ];
+  const DAILY_ALL_BONUS_COINS = 50;   // бонус за все 5 дейликов (+ Серебряный бокс)
+
+  function isQuestDone(q) {
     const d = st.daily;
-    return (d.lessons >= 1 ? 1 : 0) + (d.dict >= 2 ? 1 : 0) + (d.cards >= 3 ? 1 : 0);
+    return !!d[q.flag] || q.val(d) >= q.goal;
+  }
+
+  function dailyDoneCount() {
+    return DAILY_QUESTS.filter(isQuestDone).length;
   }
 
   function syncQuestProgress() {
     const d = st.daily, m = st.monthly;
-    const goals = { p1: d.lessons >= 1, p2: d.dict >= 2, p3: d.cards >= 3 };
     let gained = 0;
-    Object.keys(goals).forEach(key => {
-      if (goals[key] && !d[key]) { d[key] = true; gained++; }
+    DAILY_QUESTS.forEach(q => {
+      if (isQuestDone(q) && !d[q.flag]) { d[q.flag] = true; gained++; }
     });
+    // За каждое закрытое задание — +1 балл в квест месяца.
     if (gained) m.pts += gained;
 
     let badgeAwarded = false;
@@ -567,6 +682,26 @@
     return gained;
   }
 
+  /* Награды за закрытые дейлики. Выдаются один раз за день — при показе
+     экрана квестов, чтобы очки не терялись между рендерами. */
+  function grantDailyQuestRewards() {
+    const d = st.daily;
+    let coins = 0, hype = 0, count = 0;
+    if (!d.rewarded) {
+      DAILY_QUESTS.forEach(q => {
+        if (isQuestDone(q)) { coins += q.coins; hype += q.hype; count++; }
+      });
+      if (count > 0) {
+        st.coins += coins;
+        if (typeof window.addWeeklyHype === 'function') window.addWeeklyHype(hype);
+        else st.weeklyHype = (st.weeklyHype || 0) + hype;
+        d.rewarded = true;
+        save(false);
+      }
+    }
+    return { coins, hype, count };
+  }
+
   window.trackQuest = function (type, value) {
     initStudioState();
     const d = st.daily;
@@ -575,6 +710,7 @@
       const td = todayKey();
       if (!st.weekly.days.includes(td)) st.weekly.days.push(td);
     } else if (type === 'dict') {
+      // Диктант: засчитываем только новые слова (без дублей за день).
       if (value == null || !d.dictSeen.includes(value)) {
         if (value != null) d.dictSeen.push(value);
         d.dict++;
@@ -584,14 +720,212 @@
         if (value != null) d.cardSeen.push(value);
         d.cards++;
       }
+    } else if (type === 'combo') {
+      // Максимальная серия верных ответов в уроке (дейлик «Чистый бит»).
+      d.combo = Math.max(d.combo || 0, Number(value) || 0);
     }
     syncQuestProgress();
     save(false);
   };
 
+  /* ====== НЕДЕЛЬНЫЙ ТУРНИР: 30 СТУДИЙ И ТРИ ЗОНЫ ====== */
+  /* Понедельник 00:00 локального времени — начало текущей недели. */
+  function weekStartTs(date) {
+    const d = date ? new Date(date) : new Date();
+    const offset = (d.getDay() + 6) % 7;           // пн = 0 … вс = 6
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() - offset).getTime();
+  }
+
+  function weekKeyOf(ts) { return 'W-' + weekStartTs(new Date(ts)); }
+
+  function fmtWeekLeft(ms) {
+    const total = Math.max(0, Math.floor(ms / 60000));
+    const days = Math.floor(total / 1440), hours = Math.floor((total % 1440) / 60);
+    return `${days}д ${hours}ч`;
+  }
+
+  /* Псевдослучайное число 0..1 из сида: боты растут детерминированно,
+     поэтому очки не «скачут» при каждом открытии вкладки «Топ». */
+  function hash01(n) {
+    let x = (Math.floor(n) ^ 0x9e3779b9) >>> 0;
+    x = Math.imul(x ^ (x >>> 16), 0x21f0aaad) >>> 0;
+    x = Math.imul(x ^ (x >>> 15), 0x735a2d97) >>> 0;
+    x = (x ^ (x >>> 15)) >>> 0;
+    return x / 4294967296;
+  }
+
+  const BOT_NAMES = [
+    'Starlit', 'Neon', 'Lunar', 'Hana', 'Mint', 'Velvet', 'Seoul', 'Cherry', 'Echo', 'Aurora',
+    'Foxy', 'Blossom', 'Cobalt', 'Pinky', 'Solar', 'Chaos', 'Glow', 'Haneul', 'Onyx', 'Daisy',
+    'Prime', 'Rookie', 'Lumi', 'Tiger', 'Nabi', 'Bunny', 'Rocket', 'Juno', 'Candy', 'Alpha'
+  ];
+  const BOT_SUFFIX = [
+    'Ent.', 'Studio', 'Label', 'Records', 'Agency', 'Sound', 'Wave', 'Crew', 'Pack', 'House',
+    'Project', 'Company', 'Works', 'Unit', 'Club'
+  ];
+  const BOT_GRADS = [
+    'linear-gradient(135deg,#ff2e93,#7b2cbf)', 'linear-gradient(135deg,#00e5ff,#0072ff)',
+    'linear-gradient(135deg,#ffd700,#ff6b00)', 'linear-gradient(135deg,#00e676,#00b0ff)',
+    'linear-gradient(135deg,#b46eff,#ff2e93)', 'linear-gradient(135deg,#ff9f43,#ff4757)'
+  ];
+
+  /* 29 соперников: у каждого свой потолок очков за неделю и коэффициент активности.
+     Топ-1 к концу недели ≈ 850–1100 Хайпа, середина — 300–550, низ — 0–150. */
+  function buildWeeklyBots(seed) {
+    const bots = [];
+    for (let i = 0; i < WEEKLY_SIZE - 1; i++) {
+      const r1 = hash01(seed + i * 7 + 1), r2 = hash01(seed + i * 13 + 5);
+      const cap = 60 + Math.round(r1 * 1040);
+      const rate = 0.45 + r2 * 1.6;
+      const name = BOT_NAMES[Math.floor(hash01(seed + i * 31 + 3) * BOT_NAMES.length) % BOT_NAMES.length];
+      const suffix = BOT_SUFFIX[Math.floor(hash01(seed + i * 17 + 9) * BOT_SUFFIX.length) % BOT_SUFFIX.length];
+      bots.push({
+        id: 'bot-' + (i + 1),
+        name: `${name} ${suffix}`,
+        initials: (name[0] + (suffix ? suffix[0] : '')).toUpperCase(),
+        grad: BOT_GRADS[Math.floor(hash01(seed + i * 23 + 11) * BOT_GRADS.length) % BOT_GRADS.length],
+        cap, rate
+      });
+    }
+    return bots;
+  }
+
+  /* Очки бота по времени с начала недели: растут неровно, но только вперёд. */
+  function botHype(bot, weekStart) {
+    const elapsed = Math.max(0, Date.now() - weekStart);
+    const p = Math.min(1, elapsed / (7 * 86400000));
+    const prog = Math.min(1, Math.max(0, p * bot.rate + 0.03 * Math.sin(p * Math.PI * 4 + bot.cap)));
+    return Math.round(bot.cap * Math.pow(prog, 0.9));
+  }
+
+  function ensureWeeklyRoom() {
+    const wk = weekKeyOf(Date.now());
+    const w = st.weeklyRoom;
+    if (w && w.week === wk && Array.isArray(w.bots) && w.bots.length === WEEKLY_SIZE - 1) return w;
+    const seed = (w && w.seed) || st.weeklyRoomSeed || Math.floor(Math.random() * 2e9);
+    st.weeklyRoomSeed = seed;
+    st.weeklyRoom = { week: wk, seed, bots: buildWeeklyBots(seed) };
+    return st.weeklyRoom;
+  }
+
+  function weeklyBoard() {
+    const weekStart = weekStartTs();
+    const room = ensureWeeklyRoom();
+    const rows = room.bots.map(b => ({
+      id: b.id, name: b.name, initials: b.initials, grad: b.grad,
+      hype: botHype(b, weekStart), sub: 'Студия-соперник'
+    }));
+    rows.push({
+      id: 'me', me: true,
+      name: st.agencyName || 'Твоя студия', initials: '🎤',
+      grad: 'linear-gradient(135deg,#ff2e93,#00e5ff)',
+      hype: Math.max(0, Math.round(st.weeklyHype || 0)), sub: 'Твоя студия'
+    });
+    rows.sort((a, b) => (b.hype - a.hype) || (a.me ? -1 : b.me ? 1 : 0));
+    rows.forEach((r, i) => { r.pos = i + 1; });
+    return rows;
+  }
+
+  function zoneInfo(pos) {
+    const leagueIdx = st.weeklyLeague || 0;
+    const topLeague = leagueIdx === WEEKLY_LEAGUES.length - 1;
+    if (pos <= ZONE_PROMOTE) {
+      return {
+        cls: 'zone-promote', icon: '⬆️', label: 'Зона повышения',
+        note: topLeague ? 'Топ-7 элиты' : `Переход в лигу «${WEEKLY_LEAGUES[leagueIdx + 1].name}»`
+      };
+    }
+    if (pos >= ZONE_DROP_FROM && leagueIdx > 0) {
+      return { cls: 'zone-drop', icon: '⬇️', label: 'Зона вылета', note: 'Понижение лиги' };
+    }
+    return { cls: 'zone-hold', icon: '⚪', label: 'Зона удержания', note: 'Сохранение текущей лиги' };
+  }
+
   window.getLessonComboPct = function () {
     return lessonTalents.comboPct || 0;
   };
+
+  /* ====== ИТОГИ НЕДЕЛИ (первый вход после понедельника 00:00) ====== */
+  function settleWeeklyLeague() {
+    const curKey = weekKeyOf(Date.now());
+    const prev = st.lastWeekKey;
+    st.lastWeekKey = curKey;
+    if (!prev || prev === curKey) return null;   // новая установка / всё ещё та же неделя
+    if (typeof st.weeklyHype !== 'number') st.weeklyHype = 0;
+    if (typeof st.weeklyLeague !== 'number') st.weeklyLeague = 0;
+
+    const leagueIdx = st.weeklyLeague;
+    // Итог прошлой недели: у ботов прошлой комнаты уже финальный потолок.
+    const oldRoom = st.weeklyRoom;
+    const bots = (oldRoom && Array.isArray(oldRoom.bots) && oldRoom.bots.length === WEEKLY_SIZE - 1)
+      ? oldRoom.bots : buildWeeklyBots(st.weeklyRoomSeed || 1);
+    const myHype = Math.max(0, Math.round(st.weeklyHype));
+    const pos = 1 + bots.filter(b => b.cap > myHype).length;
+
+    const L = WEEKLY_LEAGUES[leagueIdx];
+    const nextIdx = Math.min(WEEKLY_LEAGUES.length - 1, leagueIdx + 1);
+    const prevIdx = Math.max(0, leagueIdx - 1);
+    const isLast = leagueIdx === WEEKLY_LEAGUES.length - 1;
+    const res = { leagueIdx, pos, hype: myHype, prevName: L.name, out: 'hold', bonusCoins: 0, bonusBox: null, title: '', text: '' };
+
+    if (pos <= ZONE_PROMOTE) {
+      st.weeklyLeague = nextIdx;
+      const boxKey = L.promoteBox === 'Платиновый бокс' ? 'platinum' : 'gold';
+      st.cases[boxKey] = (st.cases[boxKey] || 0) + 1;
+      st.coins += L.promoteCoins;
+      res.out = 'promote';
+      res.bonusCoins = L.promoteCoins;
+      res.bonusBox = L.promoteBox;
+      res.title = isLast ? 'Ты в топ-7 элиты!' : `Повышение: лига «${WEEKLY_LEAGUES[nextIdx].name}»`;
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Награда: ${L.promoteBox} и +${L.promoteCoins} 🎤.`;
+    } else if (pos >= ZONE_DROP_FROM && leagueIdx > 0) {
+      st.weeklyLeague = prevIdx;
+      st.coins += L.midCoins;
+      res.out = 'drop';
+      res.bonusCoins = L.midCoins;
+      res.title = 'Понижение лиги';
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Возвращаешься в лигу «${WEEKLY_LEAGUES[prevIdx].name}». Утешение: +${L.midCoins} 🎤.`;
+    } else {
+      st.coins += L.midCoins;
+      res.out = 'hold';
+      res.bonusCoins = L.midCoins;
+      res.title = 'Лига сохранена';
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Остаёшься в лиге «${L.name}». Утешительный бонус: +${L.midCoins} 🎤.`;
+    }
+
+    // Новая неделя: сбрасываем Хайп и генерируем 29 новых соперников.
+    st.weeklyHype = 0;
+    delete st.weeklyRoom;
+    ensureWeeklyRoom();
+    window.__weeklyLastResult = res;
+    pendingWeeklyResult = true;
+    save(false);
+    return res;
+  }
+
+  window.showWeeklyResult = function (res) {
+    res = res || window.__weeklyLastResult;
+    if (!res) return;
+    const modal = document.getElementById('pack-modal');
+    if (!modal) return;
+    const icon = res.out === 'promote' ? '🎉' : (res.out === 'drop' ? '⬇️' : '⚪');
+    const color = res.out === 'promote' ? 'var(--success)' : (res.out === 'drop' ? 'var(--danger)' : 'var(--cyan)');
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box wr-result-box">
+        <div style="font-size:34px">${icon}</div>
+        <div class="wr-big" style="color:${color}">${escapeHtml(res.title)}</div>
+        <div style="font-size:12px;color:var(--cyan);font-weight:800">Итог недели в лиге «${escapeHtml(res.prevName)}»</div>
+        <div class="wr-sub">${escapeHtml(res.text)}</div>
+        <div style="font-size:12px;color:var(--muted)">Твой Хайп за неделю: <b style="color:#fff">${res.hype}</b></div>
+        <button class="btn full" style="margin-top:12px" onclick="document.getElementById('pack-modal').classList.remove('open');switchTab('rank')">К турниру</button>
+      </div>`;
+    window.__weeklyLastResult = null;
+    if (typeof haptic === 'function') haptic(res.out === 'drop' ? 'err' : 'ok');
+    if (res.out === 'promote' && typeof sfx === 'function') sfx('win');
+  };
+
+  window.getLastWeeklyResult = function () { return window.__weeklyLastResult || null; };
 
   window.getTeamBonuses = function () {
     let power = ((st.upgrades && st.upgrades.practice) || 0) * 80;
@@ -694,7 +1028,7 @@
 
   /* ====== ЭКРАН СТУДИИ (3 ВКЛАДКИ: ГРУППА | СТУДИЯ | КВЕСТЫ) ====== */
   window.renderBinder = function () {
-    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
+    if (!Array.isArray(window.CARDS)) return;
     initStudioState();
     const screen = document.getElementById('screen-binder');
     const b = getTeamBonuses();
@@ -709,7 +1043,7 @@
           ${renderProfileAvatarHtml(56)}
           <div style="flex:1;min-width:0">
             <div class="agency-name">${escapeHtml(st.agencyName)}</div>
-            <div class="agency-id">${STAGES[getCurrentStageIdx()].ico} ${STAGES[getCurrentStageIdx()].name} • Серия ${st.streak.count} дн.</div>
+            <div class="agency-id">${STAGES[getCurrentStageIdx()].ico} ${STAGES[getCurrentStageIdx()].name} • Серия ${st.streak.count} дн.<span class="freeze-pill ${st.streakFreeze > 0 ? '' : 'empty'}" onclick="event.stopPropagation();showStreakInfo()">❄️ ${st.streakFreeze}/${STREAK_FREEZE_MAX}</span></div>
             <div class="league-pill" style="color:${lg.color}">${lg.icon} ${lg.name} • ${st.xp} XP</div>
           </div>
           <div style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:900">›</div>
@@ -868,18 +1202,36 @@
       const d = st.daily, m = st.monthly, w = st.weekly;
       // На случай старых сохранений, где счётчики уже заполнены, а флаги ещё нет.
       syncQuestProgress();
+      grantDailyQuestRewards();   // каждого закрытого дейлика — своя награда
       const dCnt = dailyDoneCount();
       const wCnt = Math.min(w.days.length, 5);
       const curMonthIdx = new Date().getMonth(), curYear = new Date().getFullYear();
+      const weekLeft = fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
+      const myVk = weekKeyOf(Date.now()).slice(2);
+      const doneQ = DAILY_QUESTS.filter(isQuestDone);
+      const allHype = doneQ.reduce((a, q) => a + q.hype, 0);
+      const allCoins = doneQ.reduce((a, q) => a + q.coins, 0);
 
       sub.innerHTML = `
-        <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания</span><span style="color:var(--cyan)">${dCnt}/3</span></div>
-        <div class="contract-row ${d.lessons >= 1 ? 'done' : ''}"><div><div class="c-title">Пройти 1 урок или повтор</div></div><div class="c-prog">${Math.min(d.lessons, 1)}/1</div></div>
-        <div class="contract-row ${d.dict >= 2 ? 'done' : ''}"><div><div class="c-title">Написать 2 слова в Диктанте</div></div><div class="c-prog">${Math.min(d.dict, 2)}/2</div></div>
-        <div class="contract-row ${d.cards >= 3 ? 'done' : ''}"><div><div class="c-title">Перевернуть 3 карточки</div></div><div class="c-prog">${Math.min(d.cards, 3)}/3</div></div>
+        <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания • ${dCnt}/5</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} за неделю</span></div>
+        ${DAILY_QUESTS.map(q => {
+          const rep = `<div class="c-rew">+${q.coins} 🎤 • +${q.hype} 🔥</div>`;
+          return `<div class="contract-row ${isQuestDone(q) ? 'done' : ''}">
+            <div style="flex:1"><div class="c-title">${isQuestDone(q) ? '✓ ' : ''}${escapeHtml(q.title)}</div><div style="font-size:10px;color:var(--muted)">${escapeHtml(q.desc)}</div>${rep}</div>
+            <div class="c-prog">${Math.min(q.val(d), q.goal)}/${q.goal}</div>
+          </div>`;
+        }).join('')}
         <div class="daily-prize">
-          <div style="font-size:12px;font-weight:800;margin-bottom:6px">Бонус дня: Серебряный бокс + 25 🎤</div>
-          ${dCnt === 3 && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / 3) * 100)}%"></div></div>`)}
+          <div style="font-size:12px;font-weight:800;margin-bottom:6px">Бонус за все 5 заданий: Серебряный бокс + ${DAILY_ALL_BONUS_COINS} 🎤</div>
+          <div class="daily-prize-items"><span>Дейлики: +${allCoins} 🎤</span><span>Хайп: +${allHype} 🔥</span></div>
+          ${dCnt === DAILY_QUESTS.length && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / DAILY_QUESTS.length) * 100)}%"></div></div>`)}
+        </div>
+
+        <div class="quest-sec"><span>Недельная лига ${myVk}</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} Хайпа</span></div>
+        <div class="daily-prize" style="border-color:rgba(255,46,147,0.45)">
+          <div style="font-size:12px;font-weight:800">${WEEKLY_LEAGUES[st.weeklyLeague || 0].icon} ${escapeHtml(WEEKLY_LEAGUES[st.weeklyLeague || 0].name)} • до конца ${weekLeft}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">+15 🔥 за урок, +5 🔥 за повтор и тренировку в словаре/диктанте</div>
+          <button class="btn cyan full" style="margin-top:10px" onclick="switchTab('rank')">Открыть турнир</button>
         </div>
 
         <div class="quest-sec"><span>Еженедельный челлендж</span><span style="color:var(--cyan)">${wCnt}/5 дней</span></div>
@@ -902,8 +1254,8 @@
       if (cd) cd.onclick = () => {
         syncQuestProgress();
         st.daily.claimed = true;
-        st.cases.silver++;
-        st.coins += 25;
+        st.cases.silver = (st.cases.silver || 0) + 1;
+        st.coins += DAILY_ALL_BONUS_COINS;
         save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
       };
 
@@ -1010,7 +1362,7 @@
 
   /* ====== МАГАЗИН + ПЛАВНАЯ АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
   window.renderShop = function () {
-    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
+    if (!Array.isArray(window.CARDS)) return;
     syncResources(); initStudioState();
     const screen = document.getElementById('screen-shop');
     const cs = st.cases;
@@ -1056,6 +1408,9 @@
         <div class="shop-item"><div><div class="l-title">Батарейка лайтстика (+1 ⚡)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div><button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button></div>
         <div class="shop-item"><div><div class="l-title">Полный заряд (5/5 ⚡)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div><button class="btn cyan" onclick="buyEnergy(5, 100)">100 🎤</button></div>
         <div class="shop-item"><div><div class="l-title">Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит одно сердечко</div></div><button class="btn" onclick="buyHeart(1, 40)">40 🎤</button></div>
+        <div class="shop-item"><div><div class="l-title">Заморозка стрика ❄️</div><div class="l-meta">Пропустил день — серия 🔥 не сгорает • в запасе ${st.streakFreeze}/${STREAK_FREEZE_MAX}</div></div>
+          <button class="btn ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'ghost' : 'cyan'}" ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'disabled' : ''} onclick="buyStreakFreeze()">${st.streakFreeze >= STREAK_FREEZE_MAX ? `Максимум ${STREAK_FREEZE_MAX}/${STREAK_FREEZE_MAX}` : `${STREAK_FREEZE_PRICE} 🎤`}</button>
+        </div>
         <div class="shop-sec">Премиум и наборы (Telegram Stars)</div>
         <div class="shop-item vip"><div><div class="l-title">VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит энергии и попыток, ×2 награды</div></div><button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ★</button></div>
         <div class="shop-item"><div><div class="l-title">Энергопак (Безлимит 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div><button class="btn gold" onclick="alert('Болванка под Telegram Stars')">35 ★</button></div>
@@ -1132,56 +1487,82 @@
     };
   };
 
-  /* ====== ТОП: ЛИГА, ПРИЗОВЫЕ БОКСЫ И ЖИВОЙ РЕЙТИНГ ====== */
+  /* ====== ТОП: НЕДЕЛЬНЫЙ ТУРНИР ИЗ 30 СТУДИЙ (3 ЗОНЫ) ====== */
+  function renderRankRows(rows) {
+    let html = '', lastZone = null;
+    rows.forEach(r => {
+      const z = zoneInfo(r.pos);
+      if (z.cls !== lastZone) {
+        lastZone = z.cls;
+        const range = z.cls === 'zone-promote' ? 'Места 1–7'
+          : (z.cls === 'zone-drop' ? 'Места 23–30' : (st.weeklyLeague > 0 ? 'Места 8–22' : 'Места 8–30'));
+        html += `<div class="zone-head ${z.cls}"><span>${z.icon} ${z.label} • ${range}</span><small>${escapeHtml(z.note)}</small></div>`;
+      }
+      html += `<div class="wr-row ${r.me ? 'me' : ''} ${r.pos <= 3 ? 'top' : ''}">
+        <div class="wr-pos">#${r.pos}</div>
+        <div class="wr-ava" style="background:${r.grad}">${escapeHtml(r.initials)}</div>
+        <div class="wr-name"><b>${escapeHtml(r.name)}${r.me ? ' • ты' : ''}</b><span>${escapeHtml(r.sub)}</span></div>
+        <div class="wr-score">${r.hype} 🔥</div>
+      </div>`;
+    });
+    return html;
+  }
+
   window.renderRank = function () {
-    if (!Array.isArray(window.CARDS) || !window.CARDS.length) return;
+    if (!Array.isArray(window.CARDS)) return;
     initStudioState();
     const screen = document.getElementById('screen-rank');
     if (!screen) return;
 
-    const lg = getLeague(st.xp);
-    const nextLg = LEAGUES.find(x => x.minXp > st.xp);
-    const pct = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
-    const today = new Date().getDay();
-    const daysLeft = (7 - today) % 7;
-    const prizes = [
-      { place: 1, name: 'Платиновый бокс', cls: 'platinum', color: '#00e5ff', tag: 'P1' },
-      { place: 2, name: 'Золотой бокс', cls: 'gold', color: '#ffd700', tag: 'P2' },
-      { place: 3, name: 'Серебряный бокс', cls: 'silver', color: '#cfd8dc', tag: 'P3' }
-    ];
-    const players = [
-      { name: 'Minji_Seoul', xp: 620 },
-      { name: 'Kpop_Sora', xp: 480 },
-      { name: 'V_Army95', xp: 340 },
-      { name: `Ты • ${lg.name}`, xp: st.xp, me: true }
-    ].sort((a, b) => b.xp - a.xp);
+    st.weeklyHype = Math.max(0, Math.round(st.weeklyHype || 0));
+    const leagueIdx = st.weeklyLeague || 0;
+    const league = WEEKLY_LEAGUES[leagueIdx];
+    const nextLeague = WEEKLY_LEAGUES[leagueIdx + 1] || null;
+    const rows = weeklyBoard();
+    const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, hype: st.weeklyHype };
+    const myZone = zoneInfo(me.pos);
+    const left = weekStartTs() + 7 * 86400000 - Date.now();
+    const nextPromo = st.weeklyLeague < WEEKLY_LEAGUES.length - 1 ? WEEKLY_LEAGUES[leagueIdx + 1] : null;
+    const promoPrize = `${league.promoteBox} + ${league.promoteCoins} 🎤`;
 
     screen.innerHTML = `
       <div class="league-card">
-        <div class="module-tag">Недельный зачёт • ${escapeHtml(lg.name)}</div>
-        <h3 style="margin:6px 0">${lg.icon} ${escapeHtml(lg.name)}</h3>
-        <div style="font-size:13px;color:#c9bedf;margin-bottom:10px">${st.xp} XP${nextLg ? ` • до «${escapeHtml(nextLg.name)}» ещё ${nextLg.minXp - st.xp} XP` : ' • максимальная лига!'}</div>
-        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Обновление рейтинга в воскресенье${daysLeft === 0 ? ' — сегодня!' : ` • через ${daysLeft} дн.`}</div>
+        <div class="module-tag">${league.icon} Недельная лига • 30 студий</div>
+        <div class="wr-head" style="margin-top:8px">
+          <div style="text-align:left">
+            <div class="wr-liga">${escapeHtml(league.name)}</div>
+            <div class="wr-place" onclick="switchTab('binder')">Место <b style="color:#fff">#${me.pos} из ${WEEKLY_SIZE}</b> • ${me.hype} 🔥</div>
+          </div>
+          <div class="wr-timer">До конца лиги<b id="wr-timer">${fmtWeekLeft(left)}</b></div>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${Math.max(2, Math.round((1 - me.pos / WEEKLY_SIZE) * 100))}%"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">
+          ⬆️ 1–7${nextPromo ? ' → ' + escapeHtml(nextPromo.name) : ' • Топ-7 элиты'} • ⚪ 8–${leagueIdx > 0 ? 22 : 30} • ${leagueIdx > 0 ? '⬇️ 23–30' : 'без вылета'}
+        </div>
       </div>
 
-      <div class="quest-sec"><span>Призы Топ-3</span><span>Неделя</span></div>
-      <div class="box-list" style="margin-bottom:16px">
-        ${prizes.map(p => `<div class="box-row ${p.cls}">
-          <div class="mini-album"><span style="background:rgba(0,0,0,0.35);color:${p.color};border:1px solid ${p.color}">${p.tag}</span></div>
-          <div style="flex:1"><div class="l-title" style="color:${p.color}">${p.place} место</div><div class="l-meta">${p.name}</div></div>
-          <div style="font-weight:900;color:${p.color}">🏆</div>
-        </div>`).join('')}
+      <div class="quest-sec"><span>Награда за повышение</span><span>1–7 место</span></div>
+      <div class="box-list" style="margin-bottom:8px">
+        <div class="box-row ${league.promoteBox === 'Платиновый бокс' ? 'platinum' : 'gold'}">
+          <div class="mini-album"><span style="background:rgba(0,0,0,0.35);color:var(--gold);border:1px solid var(--gold)">TOP</span></div>
+          <div style="flex:1"><div class="l-title" style="color:var(--gold)">🏆 ${escapeHtml(promoPrize)}</div><div class="l-meta">Удержание (8–${leagueIdx > 0 ? 22 : 30}): +${league.midCoins} 🎤</div></div>
+        </div>
       </div>
 
-      <div class="quest-sec"><span>Рейтинг недели</span><span>${players.length} участника</span></div>
-      <div id="rank-list">
-        ${players.map((p, i) => `<div class="rank-row ${p.me ? 'me' : ''}">
-          <div style="width:28px;font-weight:800;color:${i < 3 ? 'var(--gold)' : 'var(--muted)'}">#${i + 1}</div>
-          <div style="flex:1;font-weight:700">${escapeHtml(p.name)}</div>
-          <div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div>
-        </div>`).join('')}
-      </div>`;
+      <div class="quest-sec"><span>Турнирная комната</span><span>Твоя зона: ${myZone.icon} ${escapeHtml(myZone.note)}</span></div>
+      <div id="rank-list">${renderRankRows(rows)}</div>`;
+
+    // Живой таймер и пересчёт очков ботов (по времени с начала недели).
+    if (weeklyTickTimer) clearInterval(weeklyTickTimer);
+    weeklyTickTimer = setInterval(() => {
+      const t = document.getElementById('wr-timer');
+      if (!t || !document.getElementById('screen-rank')?.classList.contains('active')) {
+        clearInterval(weeklyTickTimer);
+        weeklyTickTimer = null;
+        return;
+      }
+      t.textContent = fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
+    }, 30000);
   };
 
   /* ====== ЖИВЫЕ ТАЛАНТЫ ВНУТРИ УРОКОВ (ПОНЯТНЫЕ ПЛАШКИ + ПОДСКАЗКИ ПО КЛИКУ) ====== */
@@ -1197,6 +1578,16 @@
     origRenderStep();
     const body = document.getElementById('study-body');
     const s = queue[qIdx];
+
+    // Успешный шаг диктанта/аудио → дейлик «Идеальный слух» и +5 недельного Хайпа.
+    if (body && s && (s.type === 'draw' || s.type === 'listen' || s.type === 'listen_build')) {
+      body.querySelectorAll('.feedback-bar.ok').forEach(fb => {
+        if (fb.dataset.dictTracked) return;
+        fb.dataset.dictTracked = '1';
+        if (typeof window.awardDictationStep === 'function') window.awardDictationStep();
+      });
+    }
+
     if (!body || !s || (s.type !== 'choice' && s.type !== 'listen')) return;
 
     const bar = document.createElement('div');
@@ -1271,6 +1662,8 @@
 
     initStudioState();
     window.trackQuest('lesson');
+    // Дейлик «Чистый бит»: за урок накопилось комбо 3+ верных ответов подряд.
+    if ((lessonTalents.combo || 0) > 0) window.trackQuest('combo', lessonTalents.combo);
 
     if (!wasDone) {
       if (curL.isExam) st.cases.platinum++;
@@ -1286,6 +1679,16 @@
   function bootStudio() {
     initStudioState();
     renderLessons();
+    // Сработала заморозка ❄️ — короткое уведомление.
+    if (pendingFreezeToast) {
+      pendingFreezeToast = false;
+      showToast(`❄️ Заморозка спасла серию 🔥 ${st.streak.count} дн.! Осталось: ${st.streakFreeze}/${STREAK_FREEZE_MAX}`, 3200);
+    }
+    // Первый вход после понедельника — показываем итоги недели.
+    if (pendingWeeklyResult || window.__weeklyLastResult) {
+      pendingWeeklyResult = false;
+      setTimeout(() => { if (!document.querySelector('.modal-bg.open')) window.showWeeklyResult(); }, 700);
+    }
   }
 
   if (window.AppData) window.AppData.whenReady(bootStudio);

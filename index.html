@@ -315,11 +315,10 @@ svg { display: block; flex-shrink: 0; }
 <!-- RANK -->
 <div id="screen-rank" class="screen">
   <div class="league-card">
-    <div class="module-tag">Недельный зачёт • Лига Трейни</div>
-    <h3 style="margin:6px 0 6px">Топ-3 получают SSR-карту!</h3>
-    <div style="font-size:13px;color:#c9bedf">Обновление рейтинга в воскресенье</div>
+    <div class="module-tag">Недельный турнир • 30 студий</div>
+    <h3 style="margin:6px 0 6px">Лиги за недельный Хайп</h3>
+    <div style="font-size:13px;color:#c9bedf">Топ-7 идут выше, места 23–30 вылетают</div>
   </div>
-  <div id="rank-list"></div>
 </div>
 
 <!-- PACK MODAL -->
@@ -700,28 +699,8 @@ function setAlbum(a, btn) {
   btn.classList.add('active'); renderBinder();
 }
 
-function renderBinder() {
-  if (!Array.isArray(CARDS) || !CARDS.length) return;
-  const bWrap = document.getElementById('bias-banner-wrap');
-  bWrap.innerHTML = `<div class="bias-banner"><div style="font-size:12px;color:#d8cce8">Состав группы, слияние карт и награды теперь живут в <b>Студии</b>. Здесь — общая витрина коллекции.</div></div>`;
-
-  const g = document.getElementById('binder-grid'); g.innerHTML = '';
-  (curAlbum === 'all' ? CARDS : CARDS.filter(c => c.album === curAlbum)).forEach(c => {
-    const has = st.cards.includes(c.id);
-    const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
-    const el = document.createElement('div');
-    el.className = `photocard ${has ? rc : 'locked'}`;
-    el.innerHTML = `
-      <div class="pc-rarity">${escapeHtml(c.r)}</div>
-      ${has ? cardArtHtml(c) : '<div class="pc-art" style="background:#181326"><div class="pc-monogram" style="opacity:0.25">?</div></div>'}
-      <div class="pc-name">${has ? escapeHtml(c.name) : 'Скрытая карта'}</div>
-      <div class="pc-role">${has ? escapeHtml(c.role) : 'Пройди урок или открой пак'}</div>
-      ${has ? `<div class="pc-bonus">${escapeHtml(c.bonusText)}</div>` : ''}
-    `;
-    if (has) el.onclick = () => { haptic('light'); switchTab('binder'); };
-    g.appendChild(el);
-  });
-}
+/* Базовая витрина альбомов перекрыта версией из studio.js (подвкладки
+   «Группа / Студия / Квесты»), поэтому пустой renderBinder здесь не нужен. */
 
 function rollCard() {
   const r = Math.random();
@@ -1266,12 +1245,37 @@ function renderStep() {
 
 function nextStep() { haptic('light'); qIdx++; renderStep(); }
 
-/* Единый расчёт наград за урок: база + таланты группы (studio.js) + комбо. */
+/* ====== НЕДЕЛЬНЫЙ ХАЙП (основа недельного турнира во вкладке «Топ») ====== */
+const WEEKLY_HYPE_LESSON = 15;    // новый урок (+15)
+const WEEKLY_HYPE_TRAINING = 5;   // повтор урока, тренировка в словаре/диктанте (+5)
+
+function addWeeklyHype(amount) {
+  const n = Math.max(0, Math.round(Number(amount) || 0));
+  if (!n) return 0;
+  if (typeof st.weeklyHype !== 'number' || !isFinite(st.weeklyHype)) st.weeklyHype = 0;
+  st.weeklyHype += n;
+  return n;
+}
+window.addWeeklyHype = addWeeklyHype;
+
+/* Успешный шаг диктанта/аудио: +5 Хайпа, засчитывается в дейлик и квест месяца. */
+function awardDictationStep() {
+  const amount = addWeeklyHype(WEEKLY_HYPE_TRAINING);
+  if (typeof window.trackQuest === 'function') window.trackQuest('dict');
+  save();
+  return amount;
+}
+window.awardDictationStep = awardDictationStep;
+
+/* Единый расчёт наград за урок: база + таланты группы (studio.js) + комбо + недельный Хайп. */
 function calcLessonRewards(lesson, replay) {
   const baseCoins = Number(lesson.coins) || 0;
   const baseXp = Number(lesson.xp) || 0;
   if (replay) {
-    return { coins: Math.max(5, Math.round(baseCoins * 0.1)), xp: 0, hype: false, comboPct: 0 };
+    return {
+      coins: Math.max(5, Math.round(baseCoins * 0.1)), xp: 0, hype: false, comboPct: 0,
+      weeklyHype: WEEKLY_HYPE_TRAINING
+    };
   }
   const team = typeof window.getTeamBonuses === 'function'
     ? window.getTeamBonuses()
@@ -1283,7 +1287,7 @@ function calcLessonRewards(lesson, replay) {
   let coins = Math.round(baseCoins * (1 + Math.max(0, team.coinsPct || 0) / 100));
   const hype = (team.hypePct || 0) > 0 && Math.random() * 100 < team.hypePct;
   if (hype) coins += baseCoins;
-  return { coins, xp, hype, comboPct };
+  return { coins, xp, hype, comboPct, weeklyHype: WEEKLY_HYPE_LESSON };
 }
 
 function finishLesson() {
@@ -1319,6 +1323,7 @@ function finishLesson() {
   }
   st.coins += rewards.coins;
   st.xp += rewards.xp;
+  const weeklyHype = addWeeklyHype(rewards.weeklyHype);
   save();
 
   const stars = mistakes === 0 ? 'Идеально (0 ошибок)!' : (mistakes <= 2 ? 'Отлично!' : 'Засчитано (ошибок: ' + mistakes + ')');
@@ -1330,6 +1335,7 @@ function finishLesson() {
       <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
       <div style="color:var(--cyan);font-weight:700;margin-bottom:10px">${stars}</div>
       <p>${rewardLine}</p>
+      ${weeklyHype ? `<p style="color:#ff85cb;font-weight:800">🔥 Недельный Хайп: +${weeklyHype}</p>` : ''}
       ${rewards.hype ? '<p style="color:var(--gold);font-weight:800">⚡ Хайп зала: рэпер удвоил микрофоны!</p>' : ''}
       ${vocabHtml}${cardHtml}
     </div>
@@ -1337,19 +1343,7 @@ function finishLesson() {
     <button class="btn ghost full" onclick="switchTab('vocab')">Открыть Словарь</button>`;
 }
 
-function renderRank() {
-  const bots = [
-    { name: "Minji_Seoul", xp: 620 },
-    { name: "Kpop_Sora", xp: 480 },
-    { name: "V_Army95", xp: 340 },
-    { name: "Ты (Трейни)", xp: st.xp, me: true }
-  ].sort((a, b) => b.xp - a.xp);
-  const list = document.getElementById('rank-list');
-  if (!list) return;
-  list.innerHTML = bots.map((p, i) =>
-    `<div class="rank-row ${p.me ? 'me' : ''}"><div style="width:28px;font-weight:800;color:${i < 3 ? 'var(--gold)' : 'var(--muted)'}">#${i + 1}</div><div style="flex:1;font-weight:700">${escapeHtml(p.name)}</div><div style="font-weight:800;color:var(--cyan)">${p.xp} XP</div></div>`
-  ).join('');
-}
+function renderRank() {}
 
 /* Стартуем после загрузки JSON-данных, чтобы уроки и карты уже были на месте. */
 function bootKpopLingua() {
@@ -1372,7 +1366,7 @@ document.addEventListener('app:data-ready', function () {
 
 setInterval(syncResources, 30000);
 </script>
-  <script src="studio.js?v=21"></script>
+  <script src="studio.js?v=22"></script>
   <script src="rules.js?v=2"></script>
 </body>
 </html>
