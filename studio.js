@@ -738,6 +738,13 @@
 
   function weekKeyOf(ts) { return 'W-' + weekStartTs(new Date(ts)); }
 
+  /* Номер недели в формате «Неделя 47» (тот же счёт, что у еженедельного челленджа). */
+  function weekNumOf(ts) {
+    const d = new Date(ts);
+    const start = new Date(d.getFullYear(), 0, 1);
+    return Math.ceil((((d - start) / 86400000) + start.getDay() + 1) / 7);
+  }
+
   function fmtWeekLeft(ms) {
     const total = Math.max(0, Math.floor(ms / 60000));
     const days = Math.floor(total / 1440), hours = Math.floor((total % 1440) / 60);
@@ -933,11 +940,15 @@
     let coinsPct = ((st.upgrades && st.upgrades.sound) || 0) * 5;
     let shields = 0, hints = 0, comboPct = 0, hypePct = 0, count = 0;
     const albums = [];
+    // getEnergyRegenMs зовётся ещё до initStudioState (при загрузке данных),
+    // поэтому состав может быть не создан — не падаем.
+    const team = (st && st.team) || {};
+    const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
 
     ROLES.forEach(r => {
-      const cid = st.team[r.key], tier = cid ? getBestTier(cid) : null;
+      const cid = team[r.key], tier = cid ? getBestTier(cid) : null;
       if (!tier) return;
-      const c = CARDS.find(x => x.id === cid); if (!c) return;
+      const c = cards.find(x => x.id === cid); if (!c) return;
       const tm = TIER_META[tier];
       count++;
       power += tm.power;
@@ -1044,7 +1055,7 @@
           <div style="flex:1;min-width:0">
             <div class="agency-name">${escapeHtml(st.agencyName)}</div>
             <div class="agency-id">${STAGES[getCurrentStageIdx()].ico} ${STAGES[getCurrentStageIdx()].name} • Серия ${st.streak.count} дн.<span class="freeze-pill ${st.streakFreeze > 0 ? '' : 'empty'}" onclick="event.stopPropagation();showStreakInfo()">❄️ ${st.streakFreeze}/${STREAK_FREEZE_MAX}</span></div>
-            <div class="league-pill" style="color:${lg.color}">${lg.icon} ${lg.name} • ${st.xp} XP</div>
+            <div class="league-pill" style="color:${lg.color}" onclick="event.stopPropagation();switchTab('rank')">${lg.icon} ${lg.name} • ${st.xp} XP • 🔥 ${st.weeklyHype || 0}</div>
           </div>
           <div style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:900">›</div>
         </div>
@@ -1207,7 +1218,7 @@
       const wCnt = Math.min(w.days.length, 5);
       const curMonthIdx = new Date().getMonth(), curYear = new Date().getFullYear();
       const weekLeft = fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
-      const myVk = weekKeyOf(Date.now()).slice(2);
+      const myVk = weekNumOf(weekStartTs());
       const doneQ = DAILY_QUESTS.filter(isQuestDone);
       const allHype = doneQ.reduce((a, q) => a + q.hype, 0);
       const allCoins = doneQ.reduce((a, q) => a + q.coins, 0);
@@ -1227,7 +1238,7 @@
           ${dCnt === DAILY_QUESTS.length && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / DAILY_QUESTS.length) * 100)}%"></div></div>`)}
         </div>
 
-        <div class="quest-sec"><span>Недельная лига ${myVk}</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} Хайпа</span></div>
+        <div class="quest-sec"><span>Недельная лига • неделя ${myVk}</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} Хайпа</span></div>
         <div class="daily-prize" style="border-color:rgba(255,46,147,0.45)">
           <div style="font-size:12px;font-weight:800">${WEEKLY_LEAGUES[st.weeklyLeague || 0].icon} ${escapeHtml(WEEKLY_LEAGUES[st.weeklyLeague || 0].name)} • до конца ${weekLeft}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:6px">+15 🔥 за урок, +5 🔥 за повтор и тренировку в словаре/диктанте</div>
