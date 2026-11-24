@@ -15,20 +15,21 @@
     neon:     { name: "Неон",    mult: 3.0, power: 700, color: "#ff2e93", shields: 3, hints: 3, comboPct: 50, hypePct: 50 }
   };
 
-  /* 12 ступеней Лиг: задают рамку профиля и потолок апгрейдов студии */
-  const LEAGUES = [
-    { id: "bronze1", name: "Трейни I",        minXp: 0,    icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 2 },
-    { id: "bronze2", name: "Трейни II",       minXp: 100,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 3 },
-    { id: "bronze3", name: "Трейни III",      minXp: 220,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 4 },
-    { id: "silver1", name: "Инди-лейбл I",    minXp: 360,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
-    { id: "silver2", name: "Инди-лейбл II",   minXp: 520,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
-    { id: "silver3", name: "Инди-лейбл III",  minXp: 700,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 6 },
-    { id: "gold1",   name: "Топ-лейбл I",     minXp: 900,  icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 7 },
-    { id: "gold2",   name: "Топ-лейбл II",    minXp: 1150, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
-    { id: "gold3",   name: "Топ-лейбл III",   minXp: 1450, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
-    { id: "neon1",   name: "Мировой чарт I",  minXp: 1800, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 9 },
-    { id: "neon2",   name: "Мировой чарт II", minXp: 2200, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 },
-    { id: "neon3",   name: "Мировой чарт III",minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 }
+  /* 12 постоянных Рангов агентства (по XP): задают рамку профиля и потолок апгрейдов студии.
+     Названия не пересекаются с недельными лигами турнира (WEEKLY_LEAGUES) — это разные системы. */
+  const XP_RANKS = [
+    { id: "bronze1", name: "Стажёр I",      minXp: 0,    icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 2 },
+    { id: "bronze2", name: "Стажёр II",     minXp: 100,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 3 },
+    { id: "bronze3", name: "Стажёр III",    minXp: 220,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 4 },
+    { id: "silver1", name: "Продюсер I",    minXp: 360,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
+    { id: "silver2", name: "Продюсер II",   minXp: 520,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
+    { id: "silver3", name: "Продюсер III",  minXp: 700,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 6 },
+    { id: "gold1",   name: "Хитмейкер I",   minXp: 900,  icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 7 },
+    { id: "gold2",   name: "Хитмейкер II",  minXp: 1150, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
+    { id: "gold3",   name: "Хитмейкер III", minXp: 1450, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
+    { id: "neon1",   name: "Магнат I",      minXp: 1800, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 9 },
+    { id: "neon2",   name: "Магнат II",     minXp: 2200, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 },
+    { id: "neon3",   name: "Магнат III",    minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 }
   ];
 
   /* Площадки карьеры: открывают новые Эры карт */
@@ -60,7 +61,8 @@
 
   const MONTHLY_GOAL = 50;
 
-  /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ====== */
+  /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ======
+     Это единственное место, где живёт слово «лига»: ступени еженедельного турнира на Хайпе 🔥. */
   /* tint — акцентный цвет лиги для рамок/градиентов, grad — фон карточки в «Топе» */
   const WEEKLY_LEAGUES = [
     { name: "Трейни",           icon: "🎧", color: "#cd9b6a", tint: "#e8b785", grad: "linear-gradient(135deg, #3a2719 0%, #221427 62%, #17111a 100%)", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
@@ -502,9 +504,10 @@
   function weekKey() { const d = new Date(), s = new Date(d.getFullYear(), 0, 1); return `${d.getFullYear()}-W${Math.ceil((((d - s) / 86400000) + s.getDay() + 1) / 7)}`; }
   function monthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()}`; }
 
-  function getLeague(xp) {
-    let cur = LEAGUES[0];
-    LEAGUES.forEach(l => { if (xp >= l.minXp) cur = l; });
+  /* Постоянный ранг агентства по накопленному XP (не связан с недельным турниром). */
+  function getRank(xp) {
+    let cur = XP_RANKS[0];
+    XP_RANKS.forEach(l => { if (xp >= l.minXp) cur = l; });
     return cur;
   }
 
@@ -553,7 +556,7 @@
   }
 
   function renderProfileAvatarHtml(size = 56) {
-    const lg = getLeague(st.xp);
+    const lg = getRank(st.xp);
     const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
     const c = st.avatarCardId ? cards.find(x => x.id === st.avatarCardId && getBestTier(x.id)) : null;
     const inner = c
@@ -1009,17 +1012,17 @@
     return Math.max(30 * 60 * 1000, BASE_ENERGY_MS - (getTeamBonuses().energyMin || 0) * 60 * 1000);
   };
 
-  /* ====== ПРОФИЛЬ, ВЫБОР АВАТАРКИ ИЗ КАРТ И 12 ЛИГ ====== */
+  /* ====== ПРОФИЛЬ, ВЫБОР АВАТАРКИ ИЗ КАРТ И 12 РАНГОВ АГЕНТСТВА ====== */
   window.openProfileModal = function () {
     haptic('light');
     initStudioState();
-    const lg = getLeague(st.xp);
+    const lg = getRank(st.xp);
     const owned = (Array.isArray(window.CARDS) ? window.CARDS : []).filter(c => getBestTier(c.id));
 
     profileOverlay.innerHTML = `
       <div class="ov-header">
         <div>
-          <div style="font-size:16px;font-weight:900">Профиль и Лиги</div>
+          <div style="font-size:16px;font-weight:900">Профиль агентства</div>
           <div style="font-size:11px;color:var(--muted)">ID: ${escapeHtml(st.producerId)} • ${st.xp} XP</div>
         </div>
         <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('profile-overlay').classList.remove('open')">✕</button>
@@ -1041,8 +1044,8 @@
           </div>
         </div>
 
-        <div class="quest-sec"><span>Лестница лиг (открывают рамки и апгрейды)</span><span style="color:${lg.color}">${lg.name}</span></div>
-        ${LEAGUES.map(l => {
+        <div class="quest-sec"><span>Ранги агентства (открывают рамки и апгрейды)</span><span style="color:${lg.color}">${lg.name}</span></div>
+        ${XP_RANKS.map(l => {
           const isCur = l.id === lg.id, reached = st.xp >= l.minXp;
           return `<div class="rank-step ${isCur ? 'current' : (reached ? 'reached' : '')}" style="${isCur ? `border-color:${l.color}` : ''}">
             <div class="rs-ico" style="color:${l.color}">${l.icon}</div>
@@ -1084,8 +1087,8 @@
     initStudioState();
     const screen = document.getElementById('screen-binder');
     const b = getTeamBonuses();
-    const lg = getLeague(st.xp);
-    const nextLg = LEAGUES.find(x => x.minXp > st.xp);
+    const lg = getRank(st.xp);
+    const nextLg = XP_RANKS.find(x => x.minXp > st.xp);
     const pctNext = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
     const cb = calcCashbox();
 
@@ -1096,7 +1099,7 @@
           <div style="flex:1;min-width:0">
             <div class="agency-name">${escapeHtml(st.agencyName)}</div>
             <div class="agency-id">${STAGES[getCurrentStageIdx()].ico} ${STAGES[getCurrentStageIdx()].name} • Серия ${st.streak.count} дн.<span class="freeze-pill ${st.streakFreeze > 0 ? '' : 'empty'}" onclick="event.stopPropagation();showStreakInfo()">❄️ ${st.streakFreeze}/${STREAK_FREEZE_MAX}</span></div>
-            <div class="league-pill" style="color:${lg.color}" onclick="event.stopPropagation();switchTab('rank')">${lg.icon} ${lg.name} • ${st.xp} XP • 🔥 ${st.weeklyHype || 0}</div>
+            <div class="league-pill" style="color:${lg.color}" onclick="event.stopPropagation();switchTab('rank')">${lg.icon} ${lg.name} • ${st.xp} XP</div>
           </div>
           <div style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:900">›</div>
         </div>
@@ -1219,7 +1222,7 @@
           </div>` : `<div style="margin-top:8px;font-size:12px;color:var(--gold);font-weight:800">★ Максимальная площадка открыта!</div>`}
         </div>
 
-        <div class="quest-sec"><span>Улучшения студии</span><span>Лимит Лиги: ур. ${lg.maxUpg}</span></div>
+        <div class="quest-sec"><span>Улучшения студии</span><span>Лимит ранга: ур. ${lg.maxUpg}</span></div>
         ${UPGRADES.map(u => {
           const lv = st.upgrades[u.key] || 0;
           const cost = Math.round(u.baseCost * Math.pow(1.65, lv));
@@ -1240,7 +1243,7 @@
           const key = btn.getAttribute('data-upg');
           const u = UPGRADES.find(x => x.key === key);
           const lv = st.upgrades[key] || 0;
-          if (lv >= lg.maxUpg) return alert(`Подними Лигу по XP, чтобы качать выше ${lg.maxUpg} ур.!`);
+          if (lv >= lg.maxUpg) return alert(`Подними Ранг агентства (XP), чтобы качать выше ${lg.maxUpg} ур.!`);
           const cost = Math.round(u.baseCost * Math.pow(1.65, lv));
           if (st.coins < cost) return alert(`Нужно ${cost} микрофонов!`);
           st.coins -= cost;
