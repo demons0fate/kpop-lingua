@@ -56,15 +56,18 @@
     { m: 10, name: "Ноя", icon: "💿", col: "#00e5ff" }, { m: 11, name: "Дек", icon: "👑", col: "#ffd700" }
   ];
 
+  const MONTH_NAMES = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
   const MONTHLY_GOAL = 50;
 
   /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ====== */
+  /* tint — акцентный цвет лиги для рамок/градиентов, grad — фон карточки в «Топе» */
   const WEEKLY_LEAGUES = [
-    { name: "Трейни",           icon: "🎧", color: "#cd9b6a", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
-    { name: "Инди",             icon: "🎸", color: "#cfd8dc", promoteBox: "Золотой бокс",    promoteCoins: 400, midCoins: 100 },
-    { name: "Восходящая группа", icon: "🎤", color: "#00e5ff", promoteBox: "Платиновый бокс", promoteCoins: 500, midCoins: 100 },
-    { name: "Топ-лейбл",        icon: "★",  color: "#ffd700", promoteBox: "Платиновый бокс", promoteCoins: 600, midCoins: 100 },
-    { name: "Мировой чарт",     icon: "✦",  color: "#ff2e93", promoteBox: "Платиновый бокс", promoteCoins: 800, midCoins: 100 }
+    { name: "Трейни",           icon: "🎧", color: "#cd9b6a", tint: "#e8b785", grad: "linear-gradient(135deg, #3a2719 0%, #221427 62%, #17111a 100%)", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
+    { name: "Инди",             icon: "🎸", color: "#cfd8dc", tint: "#dfe7ec", grad: "linear-gradient(135deg, #2c3444 0%, #1d1a30 62%, #141224 100%)", promoteBox: "Золотой бокс",    promoteCoins: 400, midCoins: 100 },
+    { name: "Восходящая группа", icon: "💿", color: "#00e5ff", tint: "#4deaff", grad: "linear-gradient(135deg, #0d3240 0%, #17223f 62%, #121026 100%)", promoteBox: "Платиновый бокс", promoteCoins: 500, midCoins: 100 },
+    { name: "Топ-лейбл",        icon: "👑", color: "#ffd700", tint: "#ffd700", grad: "linear-gradient(135deg, #3d2c0c 0%, #2a1a2c 62%, #1a1226 100%)", promoteBox: "Платиновый бокс", promoteCoins: 600, midCoins: 100 },
+    { name: "Мировой чарт",     icon: "💎", color: "#ff2e93", tint: "#ff4fa9", grad: "linear-gradient(135deg, #3f1240 0%, #241a4a 62%, #121a30 100%)", promoteBox: "Платиновый бокс", promoteCoins: 800, midCoins: 100 }
   ];
   const WEEKLY_SIZE = 30;          // 30 студий в турнирной комнате
   const ZONE_PROMOTE = 7;          // места 1–7 — зона повышения
@@ -169,6 +172,21 @@
     .c-title { font-size: 13px; font-weight: 700; }
     .c-prog { font-size: 12px; color: var(--cyan); font-weight: 800; }
     .daily-prize { background: linear-gradient(135deg, rgba(255,184,0,0.14), rgba(255,46,147,0.14)); border: 1px solid rgba(255,215,0,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+    .daily-prize-count { font-size: 11px; font-weight: 900; color: #ffe9a8; text-align: right; margin-top: 5px; }
+
+    /* Квест месяца: карточка активного месяца с диском и прогрессом */
+    .month-quest { position: relative; overflow: hidden; border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(255,46,147,0.1)); border: 1px solid var(--mq, var(--cyan)); }
+    .month-quest::after { content: ''; position: absolute; right: -34px; bottom: -40px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, var(--mq, var(--cyan)) 0%, transparent 70%); opacity: 0.18; pointer-events: none; }
+    .mq-head { display: flex; align-items: center; gap: 11px; position: relative; z-index: 1; }
+    .mq-disc { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; background: radial-gradient(circle, var(--mq, var(--cyan)) 16%, #13111f 22%, #242236 52%, #13111f 78%); box-shadow: 0 0 14px -2px var(--mq, var(--cyan)); animation: mqSpin 6s linear infinite; }
+    @keyframes mqSpin { to { transform: rotate(360deg); } }
+    .mq-title { font-size: 13px; font-weight: 900; color: #fff; }
+    .mq-sub { font-size: 11px; line-height: 1.35; color: #d8cce8; margin-top: 3px; }
+    .mq-ico { font-size: 20px; line-height: 1; flex-shrink: 0; }
+    .mq-bar { position: relative; z-index: 1; height: 8px; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.42); margin-top: 10px; }
+    .mq-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--mq, var(--cyan)), #fff); transition: width 0.45s var(--spring); }
+    .mq-btn-done { margin-top: 9px; font-size: 12px; font-weight: 800; color: var(--success); }
+
     .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
     .m-badge { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 8px 4px; text-align: center; opacity: 0.35; filter: grayscale(1); }
     .m-badge.cur { opacity: 0.95; filter: none; border-style: dashed; border-color: var(--cyan); }
@@ -384,17 +402,21 @@
       to   { filter: drop-shadow(0 0 11px rgba(255,46,147,0.55)) drop-shadow(0 0 6px rgba(49,230,252,0.45)); }
     }
     /* Ежедневные квесты (5 фиксированных), стрик с заморозкой и недельный турнир */
-    .daily-prize-items { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; font-size: 11px; font-weight: 800; color: #ffe9a8; }
     .c-rew { font-size: 11px; color: #ff9ad6; font-weight: 800; white-space: nowrap; }
     .freeze-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9px; border: 1px solid rgba(0,229,255,0.45); background: rgba(0,229,255,0.12); color: #bdf7ff; margin-left: 4px; vertical-align: middle; cursor: pointer; }
     .freeze-pill.empty { border-color: rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); color: var(--muted); }
 
-    /* Топ: компактная шапка лиги (название, место и кнопки справа) */
-    .wr-card { padding: 13px 14px; text-align: left; }
+    /* Топ: выразительная карточка текущей лиги (эмблема + градиент под цвет лиги) */
+    .wr-card { padding: 14px; text-align: left; position: relative; overflow: hidden; border-radius: 20px; }
+    .wr-card::after { content: ''; position: absolute; right: -46px; top: -56px; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, var(--lg-tint, #ff2e93) 0%, transparent 68%); opacity: 0.22; pointer-events: none; }
+    .wr-top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+    .wr-emblem { width: 54px; height: 54px; border-radius: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; line-height: 1; background: rgba(0,0,0,0.32); border: 1.5px solid var(--lg-tint, #ff2e93); box-shadow: 0 0 16px -2px var(--lg-tint, #ff2e93), inset 0 0 12px rgba(255,255,255,0.08); }
     .wr-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
     .wr-place { font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 3px; }
-    .wr-liga { font-size: 22px; font-weight: 900; line-height: 1.1; }
-    .wr-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .wr-liga { font-size: 21px; font-weight: 900; line-height: 1.1; }
+    .wr-hint { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; color: #d9f7e3; background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.35); }
+    .wr-hint.wr-hint-gap { color: #ffe9a8; background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.32); }
+    .wr-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
     .wr-timer { font-size: 12px; font-weight: 900; color: #fff; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); padding: 5px 9px; border-radius: 12px; white-space: nowrap; }
     .wr-prizes { font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.45); background: rgba(255,215,0,0.12); color: #ffe9a8; cursor: pointer; white-space: nowrap; transition: transform 0.18s var(--spring); }
     .wr-prizes:active { transform: scale(0.93); }
@@ -416,9 +438,16 @@
 
     /* Модалка наград лиги */
     .wr-prize-box { width: 100%; max-width: 340px; padding: 18px 16px; }
-    .wr-prize-chain { display: flex; align-items: center; gap: 3px; margin: 10px 0 12px; }
-    .wr-prize-chain .ch-step { flex: 1; min-width: 0; text-align: center; font-size: 9px; font-weight: 800; padding: 5px 2px; border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .wr-prize-chain .ch-step.cur { background: rgba(255,46,147,0.2); border: 1px solid var(--accent); color: #fff; box-shadow: 0 0 10px rgba(255,46,147,0.3); }
+    .wr-prize-chain { margin: 10px 0 12px; }
+    .wr-prize-chain .ch-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 6px; }
+    .wr-prize-chain .ch-row { display: flex; align-items: center; gap: 9px; padding: 6px 9px; margin-bottom: 4px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid transparent; }
+    .wr-prize-chain .ch-row .ch-ico { font-size: 14px; line-height: 1; flex-shrink: 0; }
+    .wr-prize-chain .ch-row .ch-name { flex: 1; min-width: 0; font-size: 12px; font-weight: 800; color: #cfc6e6; }
+    .wr-prize-chain .ch-row .ch-tag { font-size: 9px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+    .wr-prize-chain .ch-row.cur { background: rgba(255,46,147,0.16); border-color: var(--accent); box-shadow: 0 0 10px rgba(255,46,147,0.25); }
+    .wr-prize-chain .ch-row.cur .ch-name { color: #fff; }
+    .wr-prize-chain .ch-row.cur .ch-tag { color: #ff9ad6; }
+    .wr-prize-chain .ch-row.past { opacity: 0.45; }
     .wr-prize-card { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; text-align: left; }
     .wr-prize-card.p-promote { border-color: rgba(0,230,118,0.5); background: rgba(0,230,118,0.1); }
     .wr-prize-card.p-hold { border-color: rgba(255,255,255,0.14); }
@@ -756,13 +785,6 @@
   }
 
   function weekKeyOf(ts) { return 'W-' + weekStartTs(new Date(ts)); }
-
-  /* Номер недели в формате «Неделя 47» (тот же счёт, что у еженедельного челленджа). */
-  function weekNumOf(ts) {
-    const d = new Date(ts);
-    const start = new Date(d.getFullYear(), 0, 1);
-    return Math.ceil((((d - start) / 86400000) + start.getDay() + 1) / 7);
-  }
 
   function fmtWeekLeft(ms) {
     const total = Math.max(0, Math.floor(ms / 60000));
@@ -1227,7 +1249,6 @@
         };
       });
     }
-
     if (studioSubTab === 'quests') {
       const d = st.daily, m = st.monthly, w = st.weekly;
       // На случай старых сохранений, где счётчики уже заполнены, а флаги ещё нет.
@@ -1236,11 +1257,9 @@
       const dCnt = dailyDoneCount();
       const wCnt = Math.min(w.days.length, 5);
       const curMonthIdx = new Date().getMonth(), curYear = new Date().getFullYear();
-      const weekLeft = fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
-      const myVk = weekNumOf(weekStartTs());
-      const doneQ = DAILY_QUESTS.filter(isQuestDone);
-      const allHype = doneQ.reduce((a, q) => a + q.hype, 0);
-      const allCoins = doneQ.reduce((a, q) => a + q.coins, 0);
+      const moCur = MONTHS[curMonthIdx];
+      const monthPts = Math.min(m.pts, MONTHLY_GOAL);
+      const monthGot = st.monthlyBadges.includes(`${curYear}-${curMonthIdx}`);
 
       sub.innerHTML = `
         <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания • ${dCnt}/5</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} за неделю</span></div>
@@ -1252,16 +1271,9 @@
           </div>`;
         }).join('')}
         <div class="daily-prize">
-          <div style="font-size:12px;font-weight:800;margin-bottom:6px">Бонус за все 5 заданий: Серебряный бокс + ${DAILY_ALL_BONUS_COINS} 🎤</div>
-          <div class="daily-prize-items"><span>Дейлики: +${allCoins} 🎤</span><span>Хайп: +${allHype} 🔥</span></div>
+          <div style="font-size:12px;font-weight:800;margin-bottom:8px">Бонус за все 5 заданий: Серебряный бокс + ${DAILY_ALL_BONUS_COINS} 🎤</div>
           ${dCnt === DAILY_QUESTS.length && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / DAILY_QUESTS.length) * 100)}%"></div></div>`)}
-        </div>
-
-        <div class="quest-sec"><span>Недельная лига • неделя ${myVk}</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} Хайпа</span></div>
-        <div class="daily-prize" style="border-color:rgba(255,46,147,0.45)">
-          <div style="font-size:12px;font-weight:800">${WEEKLY_LEAGUES[st.weeklyLeague || 0].icon} ${escapeHtml(WEEKLY_LEAGUES[st.weeklyLeague || 0].name)} • до конца ${weekLeft}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:6px">+15 🔥 за урок, +5 🔥 за повтор и тренировку в словаре/диктанте</div>
-          <button class="btn cyan full" style="margin-top:10px" onclick="switchTab('rank')">Открыть турнир</button>
+          <div class="daily-prize-count">${dCnt}/5</div>
         </div>
 
         <div class="quest-sec"><span>Еженедельный челлендж</span><span style="color:var(--cyan)">${wCnt}/5 дней</span></div>
@@ -1272,7 +1284,21 @@
               : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((wCnt / 5) * 100)}%"></div></div>`)}
         </div>
 
-        <div class="quest-sec"><span>Бейджи ${curYear} (Квест месяца: ${Math.min(m.pts, MONTHLY_GOAL)}/${MONTHLY_GOAL})</span><span>${st.monthlyBadges.length}/12</span></div>
+        <div class="quest-sec"><span>Квест месяца</span><span>${st.monthlyBadges.length}/12 бейджей</span></div>
+        <div class="month-quest" style="--mq:${moCur.col}">
+          <div class="mq-head">
+            <div class="mq-disc">💿</div>
+            <div style="flex:1;min-width:0">
+              <div class="mq-title">Квест ${MONTH_NAMES[curMonthIdx]} • ${monthPts}/${MONTHLY_GOAL}</div>
+              <div class="mq-sub">${monthGot ? '🏅 Бейдж месяца уже в архиве!' : 'Закрывай ежедневные задания (+1 очко за квест), чтобы получить бейдж месяца и +150 🎤'}</div>
+            </div>
+            <div class="mq-ico">${moCur.icon}</div>
+          </div>
+          <div class="mq-bar"><div class="mq-fill" style="width:${Math.round((monthPts / MONTHLY_GOAL) * 100)}%"></div></div>
+          ${monthGot ? `<div class="mq-btn-done">✓ Получено</div>`
+            : (monthPts >= MONTHLY_GOAL ? `<button class="btn gold full" id="claim-month" style="margin-top:10px">Забрать бейдж ${MONTH_NAMES[curMonthIdx]} + 150 🎤</button>`
+              : '')}
+        </div>
         <div class="badges-grid">
           ${MONTHS.map(mo => {
             const key = `${curYear}-${mo.m}`, got = st.monthlyBadges.includes(key), isCur = mo.m === curMonthIdx;
@@ -1294,6 +1320,16 @@
         st.weekly.claimed = true;
         st.cases.gold++;
         save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
+      };
+
+      /* Бейдж месяца: сразу закрываем цель — квест считается сданным в день получения. */
+      const cm = document.getElementById('claim-month');
+      if (cm) cm.onclick = () => {
+        syncQuestProgress();
+        st.coins += 150;
+        save(); haptic('ok'); sfx('win'); fireConfetti();
+        alert(`🏅 Бейдж «${MONTH_NAMES[new Date().getMonth()]}» получен! +150 🎤`);
+        renderBinder();
       };
     }
   };
@@ -1552,9 +1588,16 @@
     const L = WEEKLY_LEAGUES[leagueIdx];
     const next = WEEKLY_LEAGUES[leagueIdx + 1] || null;
 
-    const chain = WEEKLY_LEAGUES.map((lg, i) =>
-      `<span class="ch-step ${i === leagueIdx ? 'cur' : ''}">${escapeHtml(lg.name.replace(' группа', ''))}</span>`
-    ).join('');
+    /* Компактный вертикальный список из 5 лиг: названия не обрезаются. */
+    const chain = WEEKLY_LEAGUES.map((lg, i) => {
+      const cls = i === leagueIdx ? 'cur' : (i < leagueIdx ? 'past' : '');
+      const tag = i === leagueIdx ? 'сейчас' : (i === leagueIdx + 1 ? 'дальше' : '');
+      return `<div class="ch-row ${cls}">
+        <span class="ch-ico">${lg.icon}</span>
+        <span class="ch-name">${escapeHtml(lg.name)}</span>
+        ${tag ? `<span class="ch-tag">${tag}</span>` : ''}
+      </div>`;
+    }).join('');
     const card = (cls, ico, title, val) =>
       `<div class="wr-prize-card ${cls}"><span style="font-size:15px">${ico}</span><span class="p-title">${title}</span>${val ? `<span class="p-val">${val}</span>` : ''}</div>`;
 
@@ -1563,7 +1606,10 @@
       <div class="card-box wr-prize-box">
         <div style="font-size:16px;font-weight:900">🏆 Награды лиги «${escapeHtml(L.name)}»</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px">Итоги недели подводятся каждый понедельник в 00:00</div>
-        <div class="wr-prize-chain">${chain}</div>
+        <div class="wr-prize-chain">
+          <div class="ch-label">Путь по лигам</div>
+          ${chain}
+        </div>
         ${card('p-promote', '▲',
           next ? `1–7 место • Повышение в «${escapeHtml(next.name)}»` : '1–7 место • Топ элиты',
           `${L.promoteBox} + ${L.promoteCoins} 🎤`)}
@@ -1584,24 +1630,38 @@
     if (!screen) return;
 
     st.weeklyHype = Math.max(0, Math.round(st.weeklyHype || 0));
-    const leagueIdx = st.weeklyLeague || 0;
+    const leagueIdx = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, st.weeklyLeague || 0));
     const league = WEEKLY_LEAGUES[leagueIdx];
     const rows = weeklyBoard();
     const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, hype: st.weeklyHype };
     const left = weekStartTs() + 7 * 86400000 - Date.now();
 
+    /* Подсказка под местом: сколько Хайпа не хватает до зоны повышения (топ-7). */
+    let hint;
+    if (me.pos <= ZONE_PROMOTE) {
+      hint = `<div class="wr-hint">▲ Вы в зоне повышения!</div>`;
+    } else {
+      const seventh = rows.find(r => r.pos === ZONE_PROMOTE);
+      const gap = seventh ? Math.max(0, seventh.hype - me.hype + 1) : 0;
+      hint = `<div class="wr-hint wr-hint-gap">До повышения: +${gap} 🔥</div>`;
+    }
+
     screen.innerHTML = `
-      <div class="league-card wr-card">
-        <div class="wr-head">
-          <div>
-            <div class="wr-liga" style="color:${league.color}">${escapeHtml(league.name)}</div>
-            <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.hype} 🔥</div>
-          </div>
-          <div class="wr-side">
-            <button class="wr-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
-            <div class="wr-timer" id="wr-timer">${fmtWeekLeft(left)}</div>
+      <div class="league-card wr-card" style="--lg-tint:${league.tint || league.color};background:${league.grad};border-color:${league.tint || league.color}">
+        <div class="wr-top">
+          <div class="wr-emblem">${league.icon}</div>
+          <div class="wr-head" style="flex:1">
+            <div>
+              <div class="wr-liga" style="color:${league.color}">${escapeHtml(league.name)}</div>
+              <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.hype} 🔥</div>
+            </div>
+            <div class="wr-side">
+              <button class="wr-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
+              <div class="wr-timer" id="wr-timer">${fmtWeekLeft(left)}</div>
+            </div>
           </div>
         </div>
+        ${hint}
       </div>
 
       <div id="rank-list">${renderRankRows(rows)}</div>`;
