@@ -389,25 +389,44 @@
     .freeze-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9px; border: 1px solid rgba(0,229,255,0.45); background: rgba(0,229,255,0.12); color: #bdf7ff; margin-left: 4px; vertical-align: middle; cursor: pointer; }
     .freeze-pill.empty { border-color: rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); color: var(--muted); }
 
-    .wr-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-    .wr-place { font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 4px; cursor: pointer; }
-    .wr-liga { font-size: 20px; font-weight: 900; line-height: 1.15; }
-    .wr-timer { text-align: right; font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
-    .wr-timer b { display: block; font-size: 15px; letter-spacing: 0; margin-top: 2px; }
-    .zone-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 6px; padding: 6px 9px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
-    .zone-head.zone-promote { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.45); color: #a9ffd0; }
-    .zone-head.zone-hold { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); color: var(--muted); }
-    .zone-head.zone-drop { background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.4); color: #ffb3ba; }
-    .zone-head small { font-size: 9px; font-weight: 800; text-transform: none; letter-spacing: 0; opacity: 0.85; }
-    .wr-row { display: flex; align-items: center; gap: 9px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 13px; padding: 8px 10px; margin-bottom: 6px; }
+    /* Топ: компактная шапка лиги (название, место и кнопки справа) */
+    .wr-card { padding: 13px 14px; text-align: left; }
+    .wr-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .wr-place { font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 3px; }
+    .wr-liga { font-size: 22px; font-weight: 900; line-height: 1.1; }
+    .wr-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .wr-timer { font-size: 12px; font-weight: 900; color: #fff; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); padding: 5px 9px; border-radius: 12px; white-space: nowrap; }
+    .wr-prizes { font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.45); background: rgba(255,215,0,0.12); color: #ffe9a8; cursor: pointer; white-space: nowrap; transition: transform 0.18s var(--spring); }
+    .wr-prizes:active { transform: scale(0.93); }
+
+    /* Топ: лаконичные разделители зон без номеров мест */
+    .zone-head { margin: 14px 0 6px; padding: 0 2px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; }
+    .zone-head.zone-promote { color: #6ee7a0; }
+    .zone-head.zone-hold { color: var(--muted); }
+    .zone-head.zone-drop { color: #ff8a94; }
+
+    /* Топ: строка участника в одну линию */
+    .wr-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 7px 11px; margin-bottom: 5px; }
     .wr-row.me { border: 1.5px solid var(--accent); background: rgba(255,46,147,0.14); box-shadow: 0 0 14px rgba(255,46,147,0.18); }
-    .wr-pos { width: 26px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
+    .wr-pos { width: 24px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
     .wr-row.top .wr-pos { color: var(--gold); }
-    .wr-ava { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; flex-shrink: 0; }
-    .wr-name { flex: 1; min-width: 0; }
-    .wr-name b { font-size: 12px; font-weight: 800; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .wr-name span { font-size: 9px; color: var(--muted); font-weight: 700; }
+    .wr-ava { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .wr-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .wr-score { font-size: 12px; font-weight: 900; color: #ff85cb; white-space: nowrap; }
+
+    /* Модалка наград лиги */
+    .wr-prize-box { width: 100%; max-width: 340px; padding: 18px 16px; }
+    .wr-prize-chain { display: flex; align-items: center; gap: 3px; margin: 10px 0 12px; }
+    .wr-prize-chain .ch-step { flex: 1; min-width: 0; text-align: center; font-size: 9px; font-weight: 800; padding: 5px 2px; border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wr-prize-chain .ch-step.cur { background: rgba(255,46,147,0.2); border: 1px solid var(--accent); color: #fff; box-shadow: 0 0 10px rgba(255,46,147,0.3); }
+    .wr-prize-card { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; text-align: left; }
+    .wr-prize-card.p-promote { border-color: rgba(0,230,118,0.5); background: rgba(0,230,118,0.1); }
+    .wr-prize-card.p-hold { border-color: rgba(255,255,255,0.14); }
+    .wr-prize-card.p-drop { border-color: rgba(255,71,87,0.42); background: rgba(255,71,87,0.09); }
+    .wr-prize-card .p-title { flex: 1; font-size: 12px; font-weight: 800; line-height: 1.3; }
+    .wr-prize-card .p-val { font-size: 11px; font-weight: 900; color: #ffe9a8; white-space: nowrap; text-align: right; }
+    .wr-prize-card.p-drop .p-val { color: #ffb3ba; }
+    .wr-prize-tip { font-size: 11px; line-height: 1.4; color: #ccf7ff; background: rgba(0,229,255,0.08); border-left: 3px solid var(--cyan); border-radius: 8px; padding: 9px 11px; margin: 4px 0 12px; text-align: left; }
 
     .wr-result-box { text-align: center; max-width: 330px; width: 100%; padding: 20px 16px; }
     .wr-result-box .wr-big { font-size: 22px; font-weight: 900; margin: 6px 0; }
@@ -820,13 +839,13 @@
     const room = ensureWeeklyRoom();
     const rows = room.bots.map(b => ({
       id: b.id, name: b.name, initials: b.initials, grad: b.grad,
-      hype: botHype(b, weekStart), sub: 'Студия-соперник'
+      hype: botHype(b, weekStart)
     }));
     rows.push({
       id: 'me', me: true,
       name: st.agencyName || 'Твоя студия', initials: '🎤',
       grad: 'linear-gradient(135deg,#ff2e93,#00e5ff)',
-      hype: Math.max(0, Math.round(st.weeklyHype || 0)), sub: 'Твоя студия'
+      hype: Math.max(0, Math.round(st.weeklyHype || 0))
     });
     rows.sort((a, b) => (b.hype - a.hype) || (a.me ? -1 : b.me ? 1 : 0));
     rows.forEach((r, i) => { r.pos = i + 1; });
@@ -1499,25 +1518,64 @@
   };
 
   /* ====== ТОП: НЕДЕЛЬНЫЙ ТУРНИР ИЗ 30 СТУДИЙ (3 ЗОНЫ) ====== */
+  /* Разделители зон: только короткая плашка, без номеров мест. */
+  function zoneHeadHtml(cls) {
+    if (cls === 'zone-promote') return '<div class="zone-head zone-promote">▲ Зона повышения</div>';
+    if (cls === 'zone-drop') return '<div class="zone-head zone-drop">▼ Зона вылета</div>';
+    return '<div class="zone-head zone-hold">Зона сохранения</div>';
+  }
+
   function renderRankRows(rows) {
     let html = '', lastZone = null;
     rows.forEach(r => {
       const z = zoneInfo(r.pos);
       if (z.cls !== lastZone) {
         lastZone = z.cls;
-        const range = z.cls === 'zone-promote' ? 'Места 1–7'
-          : (z.cls === 'zone-drop' ? 'Места 23–30' : (st.weeklyLeague > 0 ? 'Места 8–22' : 'Места 8–30'));
-        html += `<div class="zone-head ${z.cls}"><span>${z.icon} ${z.label} • ${range}</span><small>${escapeHtml(z.note)}</small></div>`;
+        html += zoneHeadHtml(z.cls);
       }
       html += `<div class="wr-row ${r.me ? 'me' : ''} ${r.pos <= 3 ? 'top' : ''}">
         <div class="wr-pos">#${r.pos}</div>
         <div class="wr-ava" style="background:${r.grad}">${escapeHtml(r.initials)}</div>
-        <div class="wr-name"><b>${escapeHtml(r.name)}${r.me ? ' • ты' : ''}</b><span>${escapeHtml(r.sub)}</span></div>
+        <div class="wr-name">${escapeHtml(r.name)}${r.me ? ' • ты' : ''}</div>
         <div class="wr-score">${r.hype} 🔥</div>
       </div>`;
     });
     return html;
   }
+
+  /* Модалка наград текущей лиги (по кнопке «🏆 Награды»). */
+  window.openLeaguePrizes = function () {
+    initStudioState();
+    const modal = document.getElementById('pack-modal');
+    if (!modal) return;
+    const leagueIdx = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, st.weeklyLeague || 0));
+    const L = WEEKLY_LEAGUES[leagueIdx];
+    const next = WEEKLY_LEAGUES[leagueIdx + 1] || null;
+
+    const chain = WEEKLY_LEAGUES.map((lg, i) =>
+      `<span class="ch-step ${i === leagueIdx ? 'cur' : ''}">${escapeHtml(lg.name.replace(' группа', ''))}</span>`
+    ).join('');
+    const card = (cls, ico, title, val) =>
+      `<div class="wr-prize-card ${cls}"><span style="font-size:15px">${ico}</span><span class="p-title">${title}</span>${val ? `<span class="p-val">${val}</span>` : ''}</div>`;
+
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box wr-prize-box">
+        <div style="font-size:16px;font-weight:900">🏆 Награды лиги «${escapeHtml(L.name)}»</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">Итоги недели подводятся каждый понедельник в 00:00</div>
+        <div class="wr-prize-chain">${chain}</div>
+        ${card('p-promote', '▲',
+          next ? `1–7 место • Повышение в «${escapeHtml(next.name)}»` : '1–7 место • Топ элиты',
+          `${L.promoteBox} + ${L.promoteCoins} 🎤`)}
+        ${leagueIdx > 0
+          ? card('p-hold', '⚪', '8–22 место • Удержание лиги', `+${L.midCoins} 🎤`)
+          : card('p-hold', '⚪', '8 место и ниже • Удержание лиги', `+${L.midCoins} 🎤`)}
+        ${leagueIdx > 0 ? card('p-drop', '▼', '23–30 место • Понижение на 1 лигу', '') : ''}
+        <div class="wr-prize-tip">💡 Очки Хайпа 🔥 начисляются за прохождение уроков, диктантов и ежедневных квестов.</div>
+        <button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button>
+      </div>`;
+    if (typeof haptic === 'function') haptic('light');
+  };
 
   window.renderRank = function () {
     if (!Array.isArray(window.CARDS)) return;
@@ -1528,39 +1586,24 @@
     st.weeklyHype = Math.max(0, Math.round(st.weeklyHype || 0));
     const leagueIdx = st.weeklyLeague || 0;
     const league = WEEKLY_LEAGUES[leagueIdx];
-    const nextLeague = WEEKLY_LEAGUES[leagueIdx + 1] || null;
     const rows = weeklyBoard();
     const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, hype: st.weeklyHype };
-    const myZone = zoneInfo(me.pos);
     const left = weekStartTs() + 7 * 86400000 - Date.now();
-    const nextPromo = st.weeklyLeague < WEEKLY_LEAGUES.length - 1 ? WEEKLY_LEAGUES[leagueIdx + 1] : null;
-    const promoPrize = `${league.promoteBox} + ${league.promoteCoins} 🎤`;
 
     screen.innerHTML = `
-      <div class="league-card">
-        <div class="module-tag">${league.icon} Недельная лига • 30 студий</div>
-        <div class="wr-head" style="margin-top:8px">
-          <div style="text-align:left">
-            <div class="wr-liga">${escapeHtml(league.name)}</div>
-            <div class="wr-place" onclick="switchTab('binder')">Место <b style="color:#fff">#${me.pos} из ${WEEKLY_SIZE}</b> • ${me.hype} 🔥</div>
+      <div class="league-card wr-card">
+        <div class="wr-head">
+          <div>
+            <div class="wr-liga" style="color:${league.color}">${escapeHtml(league.name)}</div>
+            <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.hype} 🔥</div>
           </div>
-          <div class="wr-timer">До конца лиги<b id="wr-timer">${fmtWeekLeft(left)}</b></div>
-        </div>
-        <div class="bar-bg"><div class="bar-fill" style="width:${Math.max(2, Math.round((1 - me.pos / WEEKLY_SIZE) * 100))}%"></div></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">
-          ⬆️ 1–7${nextPromo ? ' → ' + escapeHtml(nextPromo.name) : ' • Топ-7 элиты'} • ⚪ 8–${leagueIdx > 0 ? 22 : 30} • ${leagueIdx > 0 ? '⬇️ 23–30' : 'без вылета'}
-        </div>
-      </div>
-
-      <div class="quest-sec"><span>Награда за повышение</span><span>1–7 место</span></div>
-      <div class="box-list" style="margin-bottom:8px">
-        <div class="box-row ${league.promoteBox === 'Платиновый бокс' ? 'platinum' : 'gold'}">
-          <div class="mini-album"><span style="background:rgba(0,0,0,0.35);color:var(--gold);border:1px solid var(--gold)">TOP</span></div>
-          <div style="flex:1"><div class="l-title" style="color:var(--gold)">🏆 ${escapeHtml(promoPrize)}</div><div class="l-meta">Удержание (8–${leagueIdx > 0 ? 22 : 30}): +${league.midCoins} 🎤</div></div>
+          <div class="wr-side">
+            <button class="wr-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
+            <div class="wr-timer" id="wr-timer">${fmtWeekLeft(left)}</div>
+          </div>
         </div>
       </div>
 
-      <div class="quest-sec"><span>Турнирная комната</span><span>Твоя зона: ${myZone.icon} ${escapeHtml(myZone.note)}</span></div>
       <div id="rank-list">${renderRankRows(rows)}</div>`;
 
     // Живой таймер и пересчёт очков ботов (по времени с начала недели).
