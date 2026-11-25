@@ -410,8 +410,8 @@ try {
   }
 } catch (e) {}
 
-/* Базовая скорость восстановления. studio.js переопределяет её с учётом
-   состава группы, когда данные и студия уже загружены. */
+/* Базовая скорость восстановления: 1 лайтстик каждые 2 часа.
+   studio.js возвращает это же значение (без бонусов состава). */
 function getEnergyRegenMs() {
   return BASE_ENERGY_MS;
 }
@@ -1290,7 +1290,7 @@ document.addEventListener('app:data-ready', function () {
 
 setInterval(syncResources, 30000);
 </script>
-  <script src="studio.js?v=29"></script>
+  <script src="studio.js?v=30"></script>
   <script src="rules.js?v=2"></script>
 </body>
 </html>
