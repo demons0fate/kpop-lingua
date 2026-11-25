@@ -43,21 +43,46 @@ svg { display: block; flex-shrink: 0; }
 .bar-bg { background: rgba(0,0,0,0.4); height: 8px; border-radius: 8px; overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.45s var(--spring); }
 
-.lesson-card { background: var(--surface); border-radius: 18px; padding: 15px 16px; margin-bottom: 11px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.07); gap: 12px; transition: transform 0.2s var(--spring), opacity 0.2s; }
-.lesson-card:active { transform: scale(0.985); }
-.lesson-card.done { border-color: rgba(0,230,118,0.4); }
-.lesson-card.exam { background: linear-gradient(135deg, #24173d, #3a1a3f); border: 1px solid rgba(255,215,0,0.45); }
-.lesson-card.locked { opacity: 0.48; filter: grayscale(0.5); }
-.l-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.l-title { font-weight: 700; font-size: 15px; }
+/* Вертикальная тропа уроков (Duolingo-style) */
+.lesson-path { position: relative; padding: 4px 0 10px; }
+.lesson-path::before { content: ''; position: absolute; top: 12px; bottom: 12px; left: 50%; width: 3px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, rgba(255,255,255,0.12) 0 9px, transparent 9px 19px); border-radius: 3px; z-index: 0; }
+.path-row { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding-top: 28px; margin-bottom: 8px; transform: translateX(var(--ox, 0px)); }
+.path-node { width: 74px; height: 74px; border: none; border-radius: 50%; font-size: 26px; font-weight: 900; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: transform 0.16s var(--spring), box-shadow 0.2s, filter 0.2s; }
+.path-node:active { transform: translateY(4px) scale(0.97); }
+.path-node.exam { width: 86px; height: 86px; font-size: 30px; }
+.path-node.done { background: linear-gradient(160deg, #35d98a, #0e9f5b); box-shadow: 0 6px 0 #076b3c, 0 10px 20px rgba(0,230,118,0.22); }
+.path-node.done.exam { background: linear-gradient(160deg, #ffe27a, #ffb300); color: #3a2200; box-shadow: 0 6px 0 #8a5a00, 0 10px 22px rgba(255,215,0,0.25); }
+.path-node.open { background: linear-gradient(160deg, #3a2a63, #241a3f); color: #c9bff0; box-shadow: 0 6px 0 #120d1e; }
+.path-node.active { background: linear-gradient(160deg, var(--accent), #7a2cff); box-shadow: 0 6px 0 #6a0b46, 0 0 0 4px rgba(255,46,147,0.16), 0 0 24px rgba(255,46,147,0.5); animation: nodePulse 2.2s ease-in-out infinite; }
+.path-node.active.exam { background: linear-gradient(160deg, #ffd54a, #ff8a00); color: #2a1500; box-shadow: 0 6px 0 #8a4a00, 0 0 0 4px rgba(255,215,0,0.18), 0 0 26px rgba(255,184,0,0.55); animation: nodePulseGold 2.2s ease-in-out infinite; }
+@keyframes nodePulse { 0%,100% { box-shadow: 0 6px 0 #6a0b46, 0 0 0 4px rgba(255,46,147,0.16), 0 0 20px rgba(255,46,147,0.42); } 50% { box-shadow: 0 6px 0 #6a0b46, 0 0 0 8px rgba(255,46,147,0.07), 0 0 34px rgba(255,46,147,0.68); } }
+@keyframes nodePulseGold { 0%,100% { box-shadow: 0 6px 0 #8a4a00, 0 0 0 4px rgba(255,215,0,0.16), 0 0 20px rgba(255,184,0,0.45); } 50% { box-shadow: 0 6px 0 #8a4a00, 0 0 0 8px rgba(255,215,0,0.07), 0 0 34px rgba(255,184,0,0.7); } }
+.path-node.locked { background: linear-gradient(160deg, #241d34, #171122); color: #6f6688; font-size: 24px; box-shadow: 0 6px 0 #0d0a16; }
+.path-start-badge { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ff2e93, #8a2be2); color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 1.2px; padding: 5px 12px; border-radius: 10px; box-shadow: 0 4px 0 rgba(106,11,70,0.65), 0 0 18px rgba(255,46,147,0.5); white-space: nowrap; animation: badgeFloat 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes badgeFloat { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -4px); } }
+.path-label { margin-top: 9px; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 0.4px; white-space: nowrap; }
+.path-row.is-active .path-label { color: #fff; }
+.path-popover { position: relative; z-index: 2; background: linear-gradient(160deg, #271c42, #150f24); border: 1px solid rgba(255,46,147,0.45); border-radius: 20px; padding: 14px 15px; margin: 4px 0 18px; box-shadow: 0 14px 30px rgba(0,0,0,0.5); animation: popIn 0.24s var(--spring); }
+.path-popover.exam { border-color: rgba(255,215,0,0.5); }
+@keyframes popIn { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
+.pop-title { font-size: 15px; font-weight: 800; line-height: 1.3; }
+.pop-desc { font-size: 12px; color: var(--muted); margin: 5px 0 10px; line-height: 1.45; }
+.pop-reward { display: inline-block; font-size: 11px; font-weight: 800; color: #ffd48a; background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.25); padding: 5px 10px; border-radius: 10px; margin-bottom: 12px; }
+.path-popover .btn { width: 100%; padding: 13px 12px; font-size: 12.5px; }
 
-.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 11px 16px; border-radius: 13px; font-weight: 700; font-size: 14px; cursor: pointer; flex-shrink: 0; transition: transform 0.18s var(--spring), box-shadow 0.2s; box-shadow: 0 4px 14px rgba(255,46,147,0.25); }
-.btn:active { transform: scale(0.93); }
-.btn:disabled { opacity: 0.5; }
-.btn.full { width: 100%; padding: 15px; font-size: 15px; }
-.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
-.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 14px rgba(0,198,255,0.28); }
-.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; box-shadow: 0 4px 14px rgba(255,184,0,0.3); }
+.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 12px 18px; border-radius: 16px; font-weight: 900; font-size: 14px; cursor: pointer; flex-shrink: 0; letter-spacing: 0.3px; transition: transform 0.12s var(--spring), box-shadow 0.12s, filter 0.18s; box-shadow: 0 4px 0 rgba(120,10,70,0.6), 0 8px 18px rgba(255,46,147,0.18); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(120,10,70,0.6); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+.btn:disabled:active { transform: none; }
+.btn.full { width: 100%; padding: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; }
+.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 0 rgba(0,0,0,0.35); }
+.btn.ghost:active { box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 0 #004e8f, 0 8px 18px rgba(0,198,255,0.2); }
+.btn.cyan:active { box-shadow: 0 1px 0 #004e8f; }
+.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; box-shadow: 0 4px 0 #8a4a00, 0 8px 18px rgba(255,184,0,0.22); }
+.btn.gold:active { box-shadow: 0 1px 0 #8a4a00; }
+.btn.locked-cta { background: var(--surface-2); color: var(--muted); box-shadow: 0 4px 0 rgba(0,0,0,0.35); text-transform: none; letter-spacing: 0.2px; }
+.btn.locked-cta:disabled { opacity: 1; }
 
 .study-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .close-btn { background: var(--surface-2); color: #fff; border: none; width: 36px; height: 36px; border-radius: 12px; font-size: 18px; cursor: pointer; }
@@ -232,7 +257,7 @@ svg { display: block; flex-shrink: 0; }
       <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
     </div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Новый урок или экзамен тратит 1 заряд. Повтор и Словарь — бесплатно.</p>
+    <p>Новый урок или экзамен тратит 1 лайтстик ⚡. Повтор и Словарь — бесплатно.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
@@ -855,6 +880,50 @@ function isLessonUnlocked(l, idx) {
   return idx === 0 || st.done.includes(LESSONS[idx - 1].id);
 }
 
+/* Вертикальная тропа: смещение узлов «змейкой» и открытый поповер. */
+const PATH_OFFSETS = [0, -42, -64, -42, 0, 42, 64, 42, 0];
+let pathOpenId = null, pathInitDone = false;
+
+/* Первый незавершённый урок, который уже открыт (обычно он один). */
+function getActiveLessonId(lessons) {
+  for (let i = 0; i < lessons.length; i++) {
+    const l = lessons[i];
+    if (!st.done.includes(l.id) && isLessonUnlocked(l, i)) return l.id;
+  }
+  return null;
+}
+
+function renderPathPopover(l, done, unlocked) {
+  let action;
+  if (done) {
+    action = `<button class="btn full" data-start-id="${l.id}">ПОВТОРИТЬ • БЕСПЛАТНО</button>`;
+  } else if (unlocked) {
+    action = `<button class="btn full${l.isExam ? ' gold' : ''}" data-start-id="${l.id}">${l.isExam ? 'СДАТЬ ЭКЗАМЕН' : 'УЧИТЬ'} • 1 ⚡</button>`;
+  } else {
+    action = `<button class="btn full locked-cta" disabled>СНАЧАЛА ПРОЙДИ ПРЕДЫДУЩИЙ УРОК</button>`;
+  }
+  return `<div class="path-popover${l.isExam ? ' exam' : ''}">
+    <div class="pop-title">${escapeHtml(l.title)}</div>
+    <div class="pop-desc">${escapeHtml(l.desc || '')}</div>
+    <div class="pop-reward">+${Number(l.coins) || 0} 🎤 • +${Number(l.xp) || 0} XP</div>
+    ${action}
+  </div>`;
+}
+
+function wirePathEvents(root) {
+  root.querySelectorAll('.path-node').forEach(node => {
+    node.addEventListener('click', () => {
+      const id = Number(node.dataset.lessonId);
+      haptic('light'); sfx('tap');
+      pathOpenId = pathOpenId === id ? null : id;
+      renderLessons();
+    });
+  });
+  root.querySelectorAll('[data-start-id]').forEach(btn => {
+    btn.addEventListener('click', () => startLesson(Number(btn.dataset.startId)));
+  });
+}
+
 function renderLessons() {
   const list = document.getElementById('lessons-list');
   if (!list) return;
@@ -881,8 +950,16 @@ function renderLessons() {
     document.getElementById('module-progress').style.width = Math.round((st.done.length / Math.max(1, lessons.length)) * 100) + '%';
   }
 
-  list.innerHTML = '';
-  let lastModuleId = null;
+  const activeId = getActiveLessonId(lessons);
+  if (!pathInitDone) {
+    pathInitDone = true;
+    pathOpenId = activeId;           // при первом рендере сразу раскрываем текущий урок
+  } else if (pathOpenId !== null && st.done.includes(pathOpenId)) {
+    pathOpenId = activeId;           // урок пройден — поповер переезжает к новому
+  }
+
+  const parts = [];
+  let lastModuleId = null, nodeIdx = 0;
   lessons.forEach((l, idx) => {
     if (l.moduleId && l.moduleId !== lastModuleId) {
       lastModuleId = l.moduleId;
@@ -890,29 +967,34 @@ function renderLessons() {
       if (module) {
         const moduleLessons = getModuleLessons(l.moduleId);
         const moduleDone = moduleLessons.filter(x => st.done.includes(x.id)).length;
-        const head = document.createElement('div');
-        head.className = 'era-head';
-        head.innerHTML = `<span>${escapeHtml(module.tag || module.title || l.moduleId)}</span><span>${moduleDone}/${moduleLessons.length}</span>`;
-        list.appendChild(head);
+        parts.push(`<div class="era-head"><span>${escapeHtml(module.tag || module.title || l.moduleId)}</span><span>${moduleDone}/${moduleLessons.length}</span></div>`);
       }
     }
-    const done = st.done.includes(l.id), unlocked = isLessonUnlocked(l, idx);
-    const el = document.createElement('div');
-    el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (!unlocked ? ' locked' : '');
-    const costTag = done ? 'Бесплатный повтор' : 'Цена: 1 заряд';
-    el.innerHTML = `<div><div class="l-title">${done ? '✓ ' : ''}${escapeHtml(l.title)}</div><div class="l-meta">${escapeHtml(l.desc)} • ${costTag} • +${l.xp} XP</div></div>`;
-    const btn = document.createElement('button');
-    if (!unlocked) {
-      btn.className = 'btn ghost'; btn.innerText = 'Закрыто';
-      const peers = getExamPeers(l);
-      btn.onclick = () => { haptic('err'); alert(l.isExam ? `Сначала пройди все ${peers.length} уроков модуля!` : 'Сначала пройди предыдущий урок!'); };
-    } else {
-      btn.className = 'btn' + (l.isExam ? ' gold' : '');
-      btn.innerText = done ? 'Повтор' : (l.isExam ? 'Сдать' : 'Учить');
-      btn.onclick = () => startLesson(l.id);
-    }
-    el.appendChild(btn); list.appendChild(el);
+
+    const done = st.done.includes(l.id);
+    const unlocked = isLessonUnlocked(l, idx);
+    const active = l.id === activeId;
+    const state = done ? 'done' : (active ? 'active' : (unlocked ? 'open' : 'locked'));
+    const ox = PATH_OFFSETS[nodeIdx % PATH_OFFSETS.length];
+    nodeIdx++;
+    const icon = done ? '✓' : (unlocked ? (l.isExam ? '🏆' : '▶') : '🔒');
+    const label = l.isExam ? 'Экзамен' : `Урок ${l.id}`;
+    const badge = active
+      ? `<div class="path-start-badge">${l.isExam ? 'ЭКЗАМЕН' : 'СТАРТ'}</div>`
+      : '';
+
+    parts.push(`
+      <div class="path-row${active ? ' is-active' : ''}" style="--ox:${ox}px">
+        ${badge}
+        <button class="path-node ${state}${l.isExam ? ' exam' : ''}" data-lesson-id="${l.id}" aria-label="${escapeHtml(l.title)}">${icon}</button>
+        <div class="path-label">${label}</div>
+      </div>`);
+
+    if (pathOpenId === l.id) parts.push(renderPathPopover(l, done, unlocked));
   });
+
+  list.innerHTML = `<div class="lesson-path">${parts.join('')}</div>`;
+  wirePathEvents(list);
 }
 
 let curL = null, isReplay = false, queue = [], qIdx = 0, mistakes = 0, stepFailed = false, buildAns = [];
@@ -1261,7 +1343,6 @@ function finishLesson() {
       <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
       <div style="color:var(--cyan);font-weight:700;margin-bottom:10px">${stars}</div>
       <p>${rewardLine}</p>
-      ${rewards.hype ? '<p style="color:var(--gold);font-weight:800">⚡ Хайп зала: рэпер удвоил микрофоны!</p>' : ''}
       ${vocabHtml}${cardHtml}
     </div>
     <button class="btn full" style="margin-bottom:10px" onclick="switchTab('lessons')">К урокам</button>
@@ -1290,7 +1371,7 @@ document.addEventListener('app:data-ready', function () {
 
 setInterval(syncResources, 30000);
 </script>
-  <script src="studio.js?v=30"></script>
+  <script src="studio.js?v=31"></script>
   <script src="rules.js?v=2"></script>
 </body>
 </html>
