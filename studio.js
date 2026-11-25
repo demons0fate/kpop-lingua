@@ -62,7 +62,7 @@
   const MONTHLY_GOAL = 50;
 
   /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ======
-     Это единственное место, где живёт слово «лига»: ступени еженедельного турнира на Хайпе 🔥. */
+     Это единственное место, где живёт слово «лига»: ступени еженедельного турнира на XP ⚡. */
   /* tint — акцентный цвет лиги для рамок/градиентов, grad — фон карточки в «Топе» */
   const WEEKLY_LEAGUES = [
     { name: "Трейни",           icon: "🎧", color: "#cd9b6a", tint: "#e8b785", grad: "linear-gradient(135deg, #3a2719 0%, #221427 62%, #17111a 100%)", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
@@ -79,7 +79,6 @@
 
   const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
   let studioSubTab = 'group'; // 'group' | 'studio' | 'quests'
-  let shopSubTab = 'boxes';   // 'boxes' | 'vip'
   let lessonTalents = { shields: 0, hints: 0, combo: 0, comboPct: 0, hypePct: 0 };
 
   /* ====== СТИЛИ ====== */
@@ -463,6 +462,25 @@
     .wr-result-box .wr-big { font-size: 22px; font-weight: 900; margin: 6px 0; }
     .wr-result-box .wr-sub { font-size: 12px; color: #d8cce8; line-height: 1.45; margin: 6px 0 12px; }
 
+    /* Мини-магазин в модалке (#pack-modal): пополнение и боксы */
+    .quick-shop { width: 100%; max-width: 340px; padding: 16px; text-align: left; }
+    .qs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .qs-head .qs-title { font-size: 16px; font-weight: 900; }
+    .qs-close { width: 30px; height: 30px; border-radius: 10px; border: none; background: var(--surface-2); color: #fff; font-size: 14px; cursor: pointer; flex-shrink: 0; }
+    .qs-status { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .qs-stat { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 9px 10px; }
+    .qs-stat .q-ico { font-size: 17px; line-height: 1; flex-shrink: 0; }
+    .qs-stat b { display: block; font-size: 12px; font-weight: 900; }
+    .qs-stat small { display: block; font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+    .qs-sec { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin: 4px 0 8px; }
+    .qs-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
+    .qs-row .qs-info { flex: 1; min-width: 0; }
+    .qs-item-title { font-size: 13px; font-weight: 800; }
+    .qs-item-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .qs-row .btn { padding: 8px 10px; font-size: 12px; }
+    .qs-box-btn { width: 100%; margin: 2px 0 4px; }
+    .qs-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
@@ -657,7 +675,11 @@
     // Недельный турнир: очки, лига и комната на 29 соперников.
     if (typeof st.weeklyLeague !== 'number' || !isFinite(st.weeklyLeague)) st.weeklyLeague = 0; // миграция: старт с 1-й лиги
     st.weeklyLeague = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, Math.floor(st.weeklyLeague)));
-    if (typeof st.weeklyHype !== 'number' || !isFinite(st.weeklyHype)) st.weeklyHype = 0;
+    // Единый недельный XP (раньше — «Недельный Хайп»). Старые сохранения переносим один раз.
+    if (typeof st.weeklyXp !== 'number' || !isFinite(st.weeklyXp)) {
+      st.weeklyXp = Math.max(0, Math.round(Number(st.weeklyHype) || 0));
+    }
+    st.weeklyXp = Math.max(0, Math.round(st.weeklyXp));
     if (!st.lastWeekKey) st.lastWeekKey = weekKeyOf(Date.now());
     ensureWeeklyRoom();      // добивает соперников, если сохранение старое
     settleWeeklyLeague();    // итоги недели при первом входе после понедельника
@@ -682,22 +704,22 @@
     st.streakFreeze = Math.min(STREAK_FREEZE_MAX, st.streakFreeze + 1);
     save(); haptic('ok'); sfx('win');
     alert(`❄️ Заморозка куплена! В запасе: ${st.streakFreeze}/${STREAK_FREEZE_MAX}`);
-    if (typeof window.renderShop === 'function') window.renderShop();
+    refreshQuickShop();
   };
 
   window.showStreakInfo = function () {
     initStudioState();
-    alert(`🔥 Серия входов: ${st.streak.count} дн.\n❄️ Заморозки: ${st.streakFreeze}/${STREAK_FREEZE_MAX}\n\nЕсли пропустить ровно один день, заморозка сохранит серию. Купить её можно в Магазине.`);
+    alert(`🔥 Серия входов: ${st.streak.count} дн.\n❄️ Заморозки: ${st.streakFreeze}/${STREAK_FREEZE_MAX}\n\nЕсли пропустить ровно один день, заморозка сохранит серию. Купить её можно в мини-магазине (⚡ в шапке).`);
   };
 
   /* ====== КВЕСТЫ: ДЕЙЛИКИ, НЕДЕЛЯ И ОЧКИ МЕСЯЦА ====== */
-  /* 5 фиксированных дейликов. Каждый даёт микрофоны и Недельный Хайп. */
+  /* 5 фиксированных дейликов. Каждый даёт микрофоны и XP в недельную лигу. */
   const DAILY_QUESTS = [
-    { id: 'quest_lesson_1',  title: 'Первый шаг',      desc: 'Завершить 1 урок',                    coins: 20, hype: 30, goal: 1, flag: 'p1', val: d => d.lessons },
-    { id: 'quest_combo',     title: 'Чистый бит',      desc: 'Комбо 3+ верных ответа подряд',       coins: 15, hype: 25, goal: 3, flag: 'p2', val: d => d.combo },
-    { id: 'quest_vocab',     title: 'Словарный запас', desc: 'Перевернуть 5 карточек в Словаре',    coins: 15, hype: 20, goal: 5, flag: 'p3', val: d => d.cards },
-    { id: 'quest_dictation', title: 'Идеальный слух',  desc: 'Завершить шаг с диктантом или аудио', coins: 15, hype: 25, goal: 1, flag: 'p4', val: d => d.dict },
-    { id: 'quest_lesson_2',  title: 'Двойной камбэк',  desc: 'Завершить второй урок за день',       coins: 25, hype: 40, goal: 2, flag: 'p5', val: d => d.lessons }
+    { id: 'quest_lesson_1',  title: 'Первый шаг',      desc: 'Завершить 1 урок',                    coins: 20, xp: 30, goal: 1, flag: 'p1', val: d => d.lessons },
+    { id: 'quest_combo',     title: 'Чистый бит',      desc: 'Комбо 3+ верных ответа подряд',       coins: 15, xp: 25, goal: 3, flag: 'p2', val: d => d.combo },
+    { id: 'quest_vocab',     title: 'Словарный запас', desc: 'Перевернуть 5 карточек в Словаре',    coins: 15, xp: 20, goal: 5, flag: 'p3', val: d => d.cards },
+    { id: 'quest_dictation', title: 'Идеальный слух',  desc: 'Завершить шаг с диктантом или аудио', coins: 15, xp: 25, goal: 1, flag: 'p4', val: d => d.dict },
+    { id: 'quest_lesson_2',  title: 'Двойной камбэк',  desc: 'Завершить второй урок за день',       coins: 25, xp: 40, goal: 2, flag: 'p5', val: d => d.lessons }
   ];
   const DAILY_ALL_BONUS_COINS = 50;   // бонус за все 5 дейликов (+ Серебряный бокс)
 
@@ -737,20 +759,20 @@
      экрана квестов, чтобы очки не терялись между рендерами. */
   function grantDailyQuestRewards() {
     const d = st.daily;
-    let coins = 0, hype = 0, count = 0;
+    let coins = 0, xp = 0, count = 0;
     if (!d.rewarded) {
       DAILY_QUESTS.forEach(q => {
-        if (isQuestDone(q)) { coins += q.coins; hype += q.hype; count++; }
+        if (isQuestDone(q)) { coins += q.coins; xp += q.xp; count++; }
       });
       if (count > 0) {
         st.coins += coins;
-        if (typeof window.addWeeklyHype === 'function') window.addWeeklyHype(hype);
-        else st.weeklyHype = (st.weeklyHype || 0) + hype;
+        if (typeof window.addWeeklyXp === 'function') window.addWeeklyXp(xp);
+        else st.weeklyXp = (st.weeklyXp || 0) + xp;
         d.rewarded = true;
         save(false);
       }
     }
-    return { coins, hype, count };
+    return { coins, xp, count };
   }
 
   window.trackQuest = function (type, value) {
@@ -821,7 +843,7 @@
   ];
 
   /* 29 соперников: у каждого свой потолок очков за неделю и коэффициент активности.
-     Топ-1 к концу недели ≈ 850–1100 Хайпа, середина — 300–550, низ — 0–150. */
+     Топ-1 к концу недели ≈ 850–1100 XP, середина — 300–550, низ — 0–150. */
   function buildWeeklyBots(seed) {
     const bots = [];
     for (let i = 0; i < WEEKLY_SIZE - 1; i++) {
@@ -842,7 +864,7 @@
   }
 
   /* Очки бота по времени с начала недели: растут неровно, но только вперёд. */
-  function botHype(bot, weekStart) {
+  function botXp(bot, weekStart) {
     const elapsed = Math.max(0, Date.now() - weekStart);
     const p = Math.min(1, elapsed / (7 * 86400000));
     const prog = Math.min(1, Math.max(0, p * bot.rate + 0.03 * Math.sin(p * Math.PI * 4 + bot.cap)));
@@ -864,15 +886,15 @@
     const room = ensureWeeklyRoom();
     const rows = room.bots.map(b => ({
       id: b.id, name: b.name, initials: b.initials, grad: b.grad,
-      hype: botHype(b, weekStart)
+      xp: botXp(b, weekStart)
     }));
     rows.push({
       id: 'me', me: true,
       name: st.agencyName || 'Твоя студия', initials: '🎤',
       grad: 'linear-gradient(135deg,#ff2e93,#00e5ff)',
-      hype: Math.max(0, Math.round(st.weeklyHype || 0))
+      xp: Math.max(0, Math.round(st.weeklyXp || 0))
     });
-    rows.sort((a, b) => (b.hype - a.hype) || (a.me ? -1 : b.me ? 1 : 0));
+    rows.sort((a, b) => (b.xp - a.xp) || (a.me ? -1 : b.me ? 1 : 0));
     rows.forEach((r, i) => { r.pos = i + 1; });
     return rows;
   }
@@ -902,7 +924,7 @@
     const prev = st.lastWeekKey;
     st.lastWeekKey = curKey;
     if (!prev || prev === curKey) return null;   // новая установка / всё ещё та же неделя
-    if (typeof st.weeklyHype !== 'number') st.weeklyHype = 0;
+    if (typeof st.weeklyXp !== 'number') st.weeklyXp = 0;
     if (typeof st.weeklyLeague !== 'number') st.weeklyLeague = 0;
 
     const leagueIdx = st.weeklyLeague;
@@ -910,14 +932,14 @@
     const oldRoom = st.weeklyRoom;
     const bots = (oldRoom && Array.isArray(oldRoom.bots) && oldRoom.bots.length === WEEKLY_SIZE - 1)
       ? oldRoom.bots : buildWeeklyBots(st.weeklyRoomSeed || 1);
-    const myHype = Math.max(0, Math.round(st.weeklyHype));
-    const pos = 1 + bots.filter(b => b.cap > myHype).length;
+    const myXp = Math.max(0, Math.round(st.weeklyXp));
+    const pos = 1 + bots.filter(b => b.cap > myXp).length;
 
     const L = WEEKLY_LEAGUES[leagueIdx];
     const nextIdx = Math.min(WEEKLY_LEAGUES.length - 1, leagueIdx + 1);
     const prevIdx = Math.max(0, leagueIdx - 1);
     const isLast = leagueIdx === WEEKLY_LEAGUES.length - 1;
-    const res = { leagueIdx, pos, hype: myHype, prevName: L.name, out: 'hold', bonusCoins: 0, bonusBox: null, title: '', text: '' };
+    const res = { leagueIdx, pos, xp: myXp, prevName: L.name, out: 'hold', bonusCoins: 0, bonusBox: null, title: '', text: '' };
 
     if (pos <= ZONE_PROMOTE) {
       st.weeklyLeague = nextIdx;
@@ -944,8 +966,8 @@
       res.text = `Место #${pos} из ${WEEKLY_SIZE}. Остаёшься в лиге «${L.name}». Утешительный бонус: +${L.midCoins} 🎤.`;
     }
 
-    // Новая неделя: сбрасываем Хайп и генерируем 29 новых соперников.
-    st.weeklyHype = 0;
+    // Новая неделя: сбрасываем недельный XP и генерируем 29 новых соперников.
+    st.weeklyXp = 0;
     delete st.weeklyRoom;
     ensureWeeklyRoom();
     window.__weeklyLastResult = res;
@@ -968,7 +990,7 @@
         <div class="wr-big" style="color:${color}">${escapeHtml(res.title)}</div>
         <div style="font-size:12px;color:var(--cyan);font-weight:800">Итог недели в лиге «${escapeHtml(res.prevName)}»</div>
         <div class="wr-sub">${escapeHtml(res.text)}</div>
-        <div style="font-size:12px;color:var(--muted)">Твой Хайп за неделю: <b style="color:#fff">${res.hype}</b></div>
+        <div style="font-size:12px;color:var(--muted)">Твой XP за неделю: <b style="color:#fff">${res.xp}</b></div>
         <button class="btn full" style="margin-top:12px" onclick="document.getElementById('pack-modal').classList.remove('open');switchTab('rank')">К турниру</button>
       </div>`;
     window.__weeklyLastResult = null;
@@ -1072,14 +1094,6 @@
   };
 
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
-  window.setShopSubTab = function (t) {
-    haptic('light');
-    const y = window.scrollY || 0;
-    shopSubTab = t;
-    renderShop();
-    const raf = window.requestAnimationFrame || function (cb) { setTimeout(cb, 0); };
-    raf(() => window.scrollTo(0, y));
-  };
 
   /* ====== ЭКРАН СТУДИИ (3 ВКЛАДКИ: ГРУППА | СТУДИЯ | КВЕСТЫ) ====== */
   window.renderBinder = function () {
@@ -1265,9 +1279,9 @@
       const monthGot = st.monthlyBadges.includes(`${curYear}-${curMonthIdx}`);
 
       sub.innerHTML = `
-        <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания • ${dCnt}/5</span><span style="color:#ff85cb">🔥 ${st.weeklyHype} за неделю</span></div>
+        <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания • ${dCnt}/5</span><span style="color:#ff85cb">⚡ ${st.weeklyXp} XP за неделю</span></div>
         ${DAILY_QUESTS.map(q => {
-          const rep = `<div class="c-rew">+${q.coins} 🎤 • +${q.hype} 🔥</div>`;
+          const rep = `<div class="c-rew">+${q.coins} 🎤 • +${q.xp} XP</div>`;
           return `<div class="contract-row ${isQuestDone(q) ? 'done' : ''}">
             <div style="flex:1"><div class="c-title">${isQuestDone(q) ? '✓ ' : ''}${escapeHtml(q.title)}</div><div style="font-size:10px;color:var(--muted)">${escapeHtml(q.desc)}</div>${rep}</div>
             <div class="c-prog">${Math.min(q.val(d), q.goal)}/${q.goal}</div>
@@ -1344,7 +1358,7 @@
     const modal = document.getElementById('pack-modal');
     modal.classList.add('open');
     if (!owned.length) {
-      modal.innerHTML = `<div class="card-box" style="max-width:300px;text-align:center"><h3>${role.ico} ${role.title}</h3><p style="color:var(--muted)">Талант «${role.talent}»: ${role.desc}.<br>Выбей артиста этой роли в Магазине!</p><button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button></div>`;
+      modal.innerHTML = `<div class="card-box" style="max-width:300px;text-align:center"><h3>${role.ico} ${role.title}</h3><p style="color:var(--muted)">Талант «${role.talent}»: ${role.desc}.<br>Открой Виниловый бокс в мини-магазине (⚡ в шапке)!</p><button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button></div>`;
       return;
     }
     let html = `<div class="card-box" style="width:100%;max-width:320px"><h3 style="margin-bottom:6px">${role.ico} ${role.title}</h3><div style="font-size:11px;color:var(--cyan);margin-bottom:12px">Талант «${role.talent}»: ${role.desc}</div>`;
@@ -1429,63 +1443,114 @@
     }, 850);
   }
 
-  /* ====== МАГАЗИН + ПЛАВНАЯ АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
-  window.renderShop = function () {
-    if (!Array.isArray(window.CARDS)) return;
-    syncResources(); initStudioState();
-    const screen = document.getElementById('screen-shop');
-    const cs = st.cases;
-    const eSub = st.energy >= MAX_ENERGY ? 'Полный заряд' : `+1 через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}`;
-    const hSub = st.hearts >= MAX_HEARTS ? 'Все попытки есть' : `+1 через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}`;
+  /* ====== МИНИ-МАГАЗИН (модалка пополнения и боксов) + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
+  function energyWaitText() {
+    return st.energy >= MAX_ENERGY
+      ? 'Полный заряд'
+      : `+1 через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}`;
+  }
 
-    screen.innerHTML = `
-      <h3 style="margin:0 0 12px">Магазин агентства</h3>
-      <div class="mode-switch">
-        <button class="mode-btn ${shopSubTab === 'boxes' ? 'active' : ''}" onclick="setShopSubTab('boxes')">Виниловые боксы</button>
-        <button class="mode-btn ${shopSubTab === 'vip' ? 'active' : ''}" onclick="setShopSubTab('vip')">Энергия и VIP</button>
-      </div>
-      <div id="shop-sub-body"></div>`;
+  /* Перерисовывает мини-магазин, только если он сейчас открыт. */
+  function refreshQuickShop() {
+    const modal = document.getElementById('pack-modal');
+    if (!modal || !modal.classList.contains('open')) return;
+    if (!modal.querySelector('.quick-shop')) return;
+    window.openQuickShop();
+  }
 
-    const sub = document.getElementById('shop-sub-body');
-    if (shopSubTab === 'boxes') {
-      sub.innerHTML = `
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Доступно Эр в боксах: <b style="color:var(--cyan)">${getUnlockedEras().length} из ${(Array.isArray(ERAS) ? ERAS : []).length}</b> (открывай новые площадки в Студии)</div>
-        <div class="box-list">
-          <div class="box-row silver">
-            <div class="mini-album"><span style="background:linear-gradient(145deg,#454c61,#1d202b);color:#cfd8dc;border:1px solid #cfd8dc">AG</span></div>
-            <div style="flex:1"><div class="l-title" style="color:#cfd8dc">Серебряный бокс</div><div class="l-meta">Серебро или Золото</div></div>
-            <button class="btn ${cs.silver > 0 ? '' : 'ghost'}" onclick="openCaseModal('silver')">${cs.silver > 0 ? `Открыть (${cs.silver})` : '50 🎤'}</button>
-          </div>
-          <div class="box-row gold">
-            <div class="mini-album"><span style="background:linear-gradient(145deg,#7a5816,#291e0a);color:#ffd700;border:1px solid #ffd700">AU</span></div>
-            <div style="flex:1"><div class="l-title" style="color:#ffd700">Золотой бокс</div><div class="l-meta">Золото или Платина</div></div>
-            <button class="btn ${cs.gold > 0 ? 'gold' : 'ghost'}" onclick="openCaseModal('gold')">${cs.gold > 0 ? `Открыть (${cs.gold})` : '120 🎤'}</button>
-          </div>
-          <div class="box-row platinum">
-            <div class="mini-album"><span style="background:linear-gradient(145deg,#13526e,#23113d);color:#00e5ff;border:1px solid #00e5ff">PT</span></div>
-            <div style="flex:1"><div class="l-title" style="color:#00e5ff">Платиновый бокс</div><div class="l-meta">100% Платина • За Экзамен</div></div>
-            <button class="btn ${cs.platinum > 0 ? 'cyan' : 'ghost'}" onclick="openCaseModal('platinum')">${cs.platinum > 0 ? `Открыть (${cs.platinum})` : 'Экзамен'}</button>
-          </div>
-        </div>`;
-    } else {
-      sub.innerHTML = `
-        <div class="res-status">
-          <div class="res-box"><div class="res-val" style="color:var(--cyan)">${st.energy}/${MAX_ENERGY} Энергия</div><div class="res-sub">${eSub}</div></div>
-          <div class="res-box"><div class="res-val" style="color:var(--danger)">${st.hearts}/${MAX_HEARTS} Попытки</div><div class="res-sub">${hSub}</div></div>
+  window.openQuickShop = function (message) {
+    const modal = document.getElementById('pack-modal');
+    if (!modal) return;
+    initStudioState();
+    syncResources();
+    const cs = st.cases || { silver: 0, gold: 0, platinum: 0 };
+    const eWait = energyWaitText();
+    const hasBonusBoxes = (cs.gold || 0) > 0 || (cs.platinum || 0) > 0;
+
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box quick-shop">
+        <div class="qs-head">
+          <div class="qs-title">⚡ Мини-магазин</div>
+          <button class="qs-close" id="qs-close">✕</button>
         </div>
-        <div class="shop-sec">Пополнение за микрофоны</div>
-        <div class="shop-item"><div><div class="l-title">Батарейка лайтстика (+1 ⚡)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div><button class="btn cyan" onclick="buyEnergy(1, 30)">30 🎤</button></div>
-        <div class="shop-item"><div><div class="l-title">Полный заряд (5/5 ⚡)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div><button class="btn cyan" onclick="buyEnergy(5, 100)">100 🎤</button></div>
-        <div class="shop-item"><div><div class="l-title">Попытка экзамена (+1 ❤️)</div><div class="l-meta">Восстановит одно сердечко</div></div><button class="btn" onclick="buyHeart(1, 40)">40 🎤</button></div>
-        <div class="shop-item"><div><div class="l-title">Заморозка стрика ❄️</div><div class="l-meta">Пропустил день — серия 🔥 не сгорает • в запасе ${st.streakFreeze}/${STREAK_FREEZE_MAX}</div></div>
-          <button class="btn ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'ghost' : 'cyan'}" ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'disabled' : ''} onclick="buyStreakFreeze()">${st.streakFreeze >= STREAK_FREEZE_MAX ? `Максимум ${STREAK_FREEZE_MAX}/${STREAK_FREEZE_MAX}` : `${STREAK_FREEZE_PRICE} 🎤`}</button>
+        <div class="qs-status">
+          <div class="qs-stat"><span class="q-ico">⚡</span><div><b>Лайтстики: ${st.energy}/${MAX_ENERGY}</b><small>${escapeHtml(eWait)}</small></div></div>
+          <div class="qs-stat"><span class="q-ico">❄️</span><div><b>Заморозки стрика: ${st.streakFreeze}/${STREAK_FREEZE_MAX}</b><small>${st.streakFreeze >= STREAK_FREEZE_MAX ? 'Максимум в запасе' : 'Спасают серию 🔥'}</small></div></div>
         </div>
-        <div class="shop-sec">Премиум и наборы (Telegram Stars)</div>
-        <div class="shop-item vip"><div><div class="l-title">VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит энергии и попыток, ×2 награды</div></div><button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ★</button></div>
-        <div class="shop-item"><div><div class="l-title">Энергопак (Безлимит 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div><button class="btn gold" onclick="alert('Болванка под Telegram Stars')">35 ★</button></div>
-        <div class="shop-item"><div><div class="l-title">Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div><button class="btn" onclick="alert('Болванка под Telegram Stars')">75 ★</button></div>`;
-    }
+
+        <div class="qs-sec">Пополнение за микрофоны</div>
+        <div class="qs-row">
+          <div class="qs-info"><div class="qs-item-title">+1 Лайтстик (30 🎤)</div><div class="qs-item-sub">Мгновенно добавит один заряд</div></div>
+          <button class="btn cyan" id="qs-energy1">30 🎤</button>
+        </div>
+        <div class="qs-row">
+          <div class="qs-info"><div class="qs-item-title">Полный заряд 5/5 (100 🎤)</div><div class="qs-item-sub">Заполнит всю шкалу лайтстиков</div></div>
+          <button class="btn cyan" id="qs-energy-full">100 🎤</button>
+        </div>
+        <div class="qs-row">
+          <div class="qs-info"><div class="qs-item-title">Заморозка стрика ❄️ (250 🎤)</div><div class="qs-item-sub">Пропуск дня не сожжёт серию 🔥</div></div>
+          <button class="btn ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'ghost' : 'cyan'}" id="qs-freeze" ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'disabled' : ''}>${st.streakFreeze >= STREAK_FREEZE_MAX ? 'Максимум' : '250 🎤'}</button>
+        </div>
+
+        <div class="qs-sec">Виниловые боксы</div>
+        <button class="btn gold qs-box-btn" id="qs-box">${hasBonusBoxes ? 'Выбрать виниловый бокс' : 'Открыть Виниловый бокс (50 🎤)'}</button>
+        <div class="qs-note">В запасе: ${cs.silver || 0} 🥈 • ${cs.gold || 0} 🥇 • ${cs.platinum || 0} 💿</div>
+      </div>`;
+
+    const close = () => modal.classList.remove('open');
+    const btnClose = document.getElementById('qs-close');
+    if (btnClose) btnClose.onclick = close;
+
+    const b1 = document.getElementById('qs-energy1');
+    if (b1) b1.onclick = () => buyEnergy(1, 30);
+    const bf = document.getElementById('qs-energy-full');
+    if (bf) bf.onclick = () => buyEnergy(5, 100);
+    const fr = document.getElementById('qs-freeze');
+    if (fr) fr.onclick = () => window.buyStreakFreeze();
+
+    const box = document.getElementById('qs-box');
+    if (box) box.onclick = () => {
+      if (hasBonusBoxes) window.openQuickShopBoxes();
+      else window.openCaseModal('silver');
+    };
+
+    if (message) showToast(message);
   };
+
+  /* Выбор боксов: накопленные золотые/платиновые плюс покупка серебряного. */
+  window.openQuickShopBoxes = function () {
+    initStudioState();
+    const modal = document.getElementById('pack-modal');
+    if (!modal) return;
+    const cs = st.cases || { silver: 0, gold: 0, platinum: 0 };
+    const rows = [
+      { type: 'silver', title: 'Серебряный бокс', sub: 'Серебро или Золото', stock: cs.silver || 0, price: 50 },
+      { type: 'gold', title: 'Золотой бокс', sub: 'Золото или Платина', stock: cs.gold || 0, price: 120 },
+      { type: 'platinum', title: 'Платиновый бокс', sub: '100% Платина • за Экзамен', stock: cs.platinum || 0, price: 0 }
+    ];
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box quick-shop">
+        <div class="qs-head">
+          <div class="qs-title">💿 Виниловые боксы</div>
+          <button class="qs-close" id="qs-box-close">✕</button>
+        </div>
+        ${rows.map(r => `<div class="qs-row">
+            <div class="qs-info"><div class="qs-item-title">${r.title}</div><div class="qs-item-sub">${r.sub} • в запасе: ${r.stock}</div></div>
+            <button class="btn ${r.stock > 0 ? (r.type === 'gold' ? 'gold' : r.type === 'platinum' ? 'cyan' : '') : 'ghost'}" data-box="${r.type}">${r.stock > 0 ? `Открыть (${r.stock})` : (r.price ? `${r.price} 🎤` : 'Экзамен')}</button>
+          </div>`).join('')}
+        <button class="btn ghost full" id="qs-box-back" style="margin-top:4px">← Назад в магазин</button>
+      </div>`;
+    document.getElementById('qs-box-close').onclick = () => modal.classList.remove('open');
+    document.getElementById('qs-box-back').onclick = () => window.openQuickShop();
+    modal.querySelectorAll('[data-box]').forEach(btn => {
+      btn.onclick = () => window.openCaseModal(btn.getAttribute('data-box'));
+    });
+  };
+
+  /* Совместимость со старым названием (вызовы из старых сохранений/кода). */
+  window.renderShop = window.openQuickShop;
 
   window.openCaseModal = function (type) {
     initStudioState();
@@ -1496,7 +1561,7 @@
       if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} микрофонов!`);
       st.coins -= prices[type];
     }
-    save(); renderShop(); haptic('medium');
+    save(); haptic('medium');
 
     const titleMap = { silver: "SILVER EDITION", gold: "GOLD EDITION", platinum: "PLATINUM EDITION" };
     const boxUrl = BOX_IMAGES[type];
@@ -1576,7 +1641,7 @@
         <div class="wr-pos">#${r.pos}</div>
         <div class="wr-ava" style="background:${r.grad}">${escapeHtml(r.initials)}</div>
         <div class="wr-name">${escapeHtml(r.name)}${r.me ? ' • ты' : ''}</div>
-        <div class="wr-score">${r.hype} 🔥</div>
+        <div class="wr-score">${r.xp} XP</div>
       </div>`;
     });
     return html;
@@ -1620,7 +1685,7 @@
           ? card('p-hold', '⚪', '8–22 место • Удержание лиги', `+${L.midCoins} 🎤`)
           : card('p-hold', '⚪', '8 место и ниже • Удержание лиги', `+${L.midCoins} 🎤`)}
         ${leagueIdx > 0 ? card('p-drop', '▼', '23–30 место • Понижение на 1 лигу', '') : ''}
-        <div class="wr-prize-tip">💡 Очки Хайпа 🔥 начисляются за прохождение уроков, диктантов и ежедневных квестов.</div>
+        <div class="wr-prize-tip">💡 Очки XP начисляются за уроки, диктанты и задания дня.</div>
         <button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button>
       </div>`;
     if (typeof haptic === 'function') haptic('light');
@@ -1632,21 +1697,21 @@
     const screen = document.getElementById('screen-rank');
     if (!screen) return;
 
-    st.weeklyHype = Math.max(0, Math.round(st.weeklyHype || 0));
+    st.weeklyXp = Math.max(0, Math.round(st.weeklyXp || 0));
     const leagueIdx = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, st.weeklyLeague || 0));
     const league = WEEKLY_LEAGUES[leagueIdx];
     const rows = weeklyBoard();
-    const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, hype: st.weeklyHype };
+    const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, xp: st.weeklyXp };
     const left = weekStartTs() + 7 * 86400000 - Date.now();
 
-    /* Подсказка под местом: сколько Хайпа не хватает до зоны повышения (топ-7). */
+    /* Подсказка под местом: сколько XP не хватает до зоны повышения (топ-7). */
     let hint;
     if (me.pos <= ZONE_PROMOTE) {
       hint = `<div class="wr-hint">▲ Вы в зоне повышения!</div>`;
     } else {
       const seventh = rows.find(r => r.pos === ZONE_PROMOTE);
-      const gap = seventh ? Math.max(0, seventh.hype - me.hype + 1) : 0;
-      hint = `<div class="wr-hint wr-hint-gap">До повышения: +${gap} 🔥</div>`;
+      const gap = seventh ? Math.max(0, seventh.xp - me.xp + 1) : 0;
+      hint = `<div class="wr-hint wr-hint-gap">До повышения: +${gap} XP</div>`;
     }
 
     screen.innerHTML = `
@@ -1656,7 +1721,7 @@
           <div class="wr-head" style="flex:1">
             <div>
               <div class="wr-liga" style="color:${league.color}">${escapeHtml(league.name)}</div>
-              <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.hype} 🔥</div>
+              <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.xp} XP</div>
             </div>
             <div class="wr-side">
               <button class="wr-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
@@ -1696,7 +1761,7 @@
     const body = document.getElementById('study-body');
     const s = queue[qIdx];
 
-    // Успешный шаг диктанта/аудио → дейлик «Идеальный слух» и +5 недельного Хайпа.
+    // Успешный шаг диктанта/аудио → дейлик «Идеальный слух» и +5 недельного XP.
     if (body && s && (s.type === 'draw' || s.type === 'listen' || s.type === 'listen_build')) {
       body.querySelectorAll('.feedback-bar.ok').forEach(fb => {
         if (fb.dataset.dictTracked) return;
@@ -1795,6 +1860,7 @@
 
   function bootStudio() {
     initStudioState();
+    syncResources();   // обновляем шапку (стрик 🔥, микрофоны, лайтстики)
     renderLessons();
     // Сработала заморозка ❄️ — короткое уведомление.
     if (pendingFreezeToast) {

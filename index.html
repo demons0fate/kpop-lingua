@@ -27,7 +27,7 @@ svg { display: block; flex-shrink: 0; }
 .pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 5px 9px; border-radius: 16px; font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: transform 0.2s var(--spring); }
 .pill:active { transform: scale(0.92); }
 .pill.energy { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.1); color: #bdf7ff; }
-.pill.hearts { border-color: rgba(255,71,87,0.4); background: rgba(255,71,87,0.12); color: #ffb3ba; }
+.pill.streak { border-color: rgba(255,184,0,0.45); background: linear-gradient(135deg, rgba(255,120,0,0.2), rgba(255,215,0,0.12)); color: #ffd48a; }
 .pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); color: #ffb3dc; }
 .pill.xp { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); color: #ffe98a; }
 
@@ -212,17 +212,14 @@ svg { display: block; flex-shrink: 0; }
 <div class="header">
   <div class="brand">K-POP LINGUA</div>
   <div class="stats">
-    <div class="pill energy" onclick="showResInfo('energy')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      <span id="energy-val">5/5</span>
-    </div>
-    <div class="pill hearts" onclick="showResInfo('hearts')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4757" stroke="#ff4757" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      <span id="hearts-val">3/3</span>
-    </div>
-    <div class="pill coins" onclick="switchTab('shop')">
+    <div class="pill streak" onclick="showStreakInfo()">🔥 <span id="streak-val">1</span></div>
+    <div class="pill coins" onclick="openQuickShop()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff2e93" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
       <span id="coins-val">50</span>
+    </div>
+    <div class="pill energy" onclick="openQuickShop()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="energy-val">5/5</span>
     </div>
   </div>
 </div>
@@ -235,7 +232,7 @@ svg { display: block; flex-shrink: 0; }
       <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
     </div>
     <h2>Стажировка: Код Хангыля</h2>
-    <p>Новый урок тратит 1 заряд. Повтор и Словарь — бесплатно. Экзамен требует попытку.</p>
+    <p>Новый урок или экзамен тратит 1 заряд. Повтор и Словарь — бесплатно.</p>
     <div class="bar-bg"><div class="bar-fill" id="module-progress" style="width: 0%"></div></div>
   </div>
 
@@ -279,40 +276,6 @@ svg { display: block; flex-shrink: 0; }
   <div class="binder-grid" id="binder-grid"></div>
 </div>
 
-<!-- SHOP -->
-<div id="screen-shop" class="screen">
-  <h3 style="margin:0 0 12px">Магазин агентства</h3>
-  <div class="res-status" id="shop-res-status"></div>
-
-  <div class="shop-sec">Пополнение за микрофоны</div>
-  <div class="shop-item">
-    <div><div class="l-title">Батарейка лайтстика (+1)</div><div class="l-meta">Мгновенно добавит 1 заряд энергии</div></div>
-    <button class="btn cyan" onclick="buyEnergy(1, 30)">30</button>
-  </div>
-  <div class="shop-item">
-    <div><div class="l-title">Полный заряд (5/5)</div><div class="l-meta">Заполнит всю шкалу энергии</div></div>
-    <button class="btn cyan" onclick="buyEnergy(5, 100)">100</button>
-  </div>
-  <div class="shop-item">
-    <div><div class="l-title">Попытка экзамена (+1)</div><div class="l-meta">Восстановит 1 сердечко для сдачи</div></div>
-    <button class="btn" onclick="buyHeart(1, 40)">40</button>
-  </div>
-
-  <div class="shop-sec">Премиум и наборы (Telegram Stars)</div>
-  <div class="shop-item vip">
-    <div><div class="l-title">VIP Trainee Pass (30 дней)</div><div class="l-meta">Безлимит энергии и попыток, ×2 награды</div></div>
-    <button class="btn gold" onclick="alert('Подключим оплату Telegram Stars, когда перейдём к серверу!')">150 ★</button>
-  </div>
-  <div class="shop-item">
-    <div><div class="l-title">Энергопак (Безлимит 24ч)</div><div class="l-meta">Учи уроки без ограничений весь день</div></div>
-    <button class="btn gold" onclick="alert('Болванка под Telegram Stars')">35 ★</button>
-  </div>
-  <div class="shop-item">
-    <div><div class="l-title">Дебютный бокс (3 карты)</div><div class="l-meta">Гарантированная карта SR или SSR</div></div>
-    <button class="btn" onclick="alert('Болванка под Telegram Stars')">75 ★</button>
-  </div>
-</div>
-
 <!-- RANK -->
 <div id="screen-rank" class="screen"></div>
 
@@ -328,17 +291,13 @@ svg { display: block; flex-shrink: 0; }
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="14" x2="13" y2="14"/></svg>
     Словарь
   </div>
-  <div class="nav-item" id="nav-binder" onclick="switchTab('binder')">
-    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="17" rx="2"/><path d="M16 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1"/></svg>
-    Альбомы
-  </div>
-  <div class="nav-item" id="nav-shop" onclick="switchTab('shop')">
-    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    Магазин
-  </div>
   <div class="nav-item" id="nav-rank" onclick="switchTab('rank')">
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-    Топ
+    Лига
+  </div>
+  <div class="nav-item" id="nav-binder" onclick="switchTab('binder')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="17" rx="2"/><path d="M16 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1"/></svg>
+    Студия
   </div>
 </div>
 
@@ -433,15 +392,12 @@ function fireConfetti() {
 
 const MAX_ENERGY = 5;
 const BASE_ENERGY_MS = 2 * 60 * 60 * 1000;
-const MAX_HEARTS = 3;
-const HEART_REGEN_MS = 4 * 60 * 60 * 1000;
 
 /* VOCAB загружается из data/vocab.json через data-loader.js. */
 
 let st = {
   coins: 50, xp: 0, done: [], cards: [], drawn: [],
-  energy: MAX_ENERGY, lastEnergyTs: Date.now(),
-  hearts: MAX_HEARTS, lastHeartTs: Date.now()
+  energy: MAX_ENERGY, lastEnergyTs: Date.now()
 };
 try {
   const s = localStorage.getItem('kp_lingua_v4');
@@ -451,7 +407,6 @@ try {
     if (!Array.isArray(st.cards)) st.cards = [];
     if (!Array.isArray(st.drawn)) st.drawn = [];
     if (typeof st.energy !== 'number') { st.energy = MAX_ENERGY; st.lastEnergyTs = Date.now(); }
-    if (typeof st.hearts !== 'number') { st.hearts = MAX_HEARTS; st.lastHeartTs = Date.now(); }
   }
 } catch (e) {}
 
@@ -472,17 +427,9 @@ function syncResources() {
       changed = true;
     }
   }
-  if (st.hearts < MAX_HEARTS) {
-    const g = Math.floor((now - st.lastHeartTs) / HEART_REGEN_MS);
-    if (g > 0) {
-      st.hearts = Math.min(MAX_HEARTS, st.hearts + g);
-      st.lastHeartTs = st.hearts >= MAX_HEARTS ? now : st.lastHeartTs + g * HEART_REGEN_MS;
-      changed = true;
-    }
-  }
   if (changed) save(false);
   document.getElementById('energy-val').innerText = `${st.energy}/${MAX_ENERGY}`;
-  document.getElementById('hearts-val').innerText = `${st.hearts}/${MAX_HEARTS}`;
+  document.getElementById('streak-val').innerText = (st.streak && st.streak.count) || 1;
   document.getElementById('coins-val').innerText = st.coins;
   document.getElementById('xp-val').innerText = st.xp;
 }
@@ -493,48 +440,21 @@ function fmtWait(ms) {
   return h > 0 ? `${h}ч ${rm}м` : `${rm} мин`;
 }
 
-function showResInfo(type) {
-  haptic('light'); syncResources();
-  if (type === 'energy') {
-    if (st.energy >= MAX_ENERGY) alert('Заряд лайтстика полный (5/5). Новый урок тратит 1 заряд.');
-    else alert(`Энергия: ${st.energy}/${MAX_ENERGY}\n+1 заряд через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}.`);
-  } else {
-    if (st.hearts >= MAX_HEARTS) alert('Попытки экзамена полные (3/3). Тратятся только при провале экзамена.');
-    else alert(`Попытки: ${st.hearts}/${MAX_HEARTS}\n+1 попытка через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}.`);
-  }
-}
-
 function save(doSync = true) {
   try { localStorage.setItem('kp_lingua_v4', JSON.stringify(st)); } catch (e) {}
   if (doSync) syncResources();
 }
 
-function renderShop() {
-  syncResources();
-  const eSub = st.energy >= MAX_ENERGY ? 'Полный заряд' : `+1 через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}`;
-  const hSub = st.hearts >= MAX_HEARTS ? 'Все попытки есть' : `+1 через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}`;
-  document.getElementById('shop-res-status').innerHTML = `
-    <div class="res-box"><div class="res-val" style="color:var(--cyan)">${st.energy}/${MAX_ENERGY} Энергия</div><div class="res-sub">${eSub}</div></div>
-    <div class="res-box"><div class="res-val" style="color:var(--danger)">${st.hearts}/${MAX_HEARTS} Попытки</div><div class="res-sub">${hSub}</div></div>
-  `;
-}
-
+/* Мини-магазин живёт в studio.js (#pack-modal). Здесь только покупка энергии,
+   чтобы inline-скрипт не зависел от порядка загрузки. */
 function buyEnergy(amount, price) {
   syncResources();
   if (st.energy >= MAX_ENERGY) return alert('Энергия уже полная!');
   if (st.coins < price) return alert(`Нужно ${price} микрофонов.`);
   st.coins -= price; st.energy = Math.min(MAX_ENERGY, st.energy + amount);
   if (st.energy >= MAX_ENERGY) st.lastEnergyTs = Date.now();
-  haptic('ok'); sfx('ok'); save(); renderShop();
-}
-
-function buyHeart(amount, price) {
-  syncResources();
-  if (st.hearts >= MAX_HEARTS) return alert('Попытки уже полные!');
-  if (st.coins < price) return alert(`Нужно ${price} микрофонов.`);
-  st.coins -= price; st.hearts = Math.min(MAX_HEARTS, st.hearts + amount);
-  if (st.hearts >= MAX_HEARTS) st.lastHeartTs = Date.now();
-  haptic('ok'); sfx('ok'); save(); renderShop();
+  haptic('ok'); sfx('ok'); save();
+  if (typeof window.openQuickShop === 'function') window.openQuickShop();
 }
 
 let curAudio = null;
@@ -555,15 +475,20 @@ function playAudio(file, text, rate = 1.0) {
 
 function switchTab(t) {
   haptic('light'); syncResources();
+  if (t === 'shop') {
+    if (typeof window.openQuickShop === 'function') window.openQuickShop();
+    return;
+  }
+  const target = document.getElementById('screen-' + t);
+  if (!target) return;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('screen-' + t).classList.add('active');
+  target.classList.add('active');
   const nav = document.getElementById('nav-' + t);
   if (nav) nav.classList.add('active');
   if (t === 'lessons') renderLessons();
   if (t === 'vocab') renderVocab();
   if (t === 'binder') renderBinder();
-  if (t === 'shop') renderShop();
   if (t === 'rank') renderRank();
 }
 
@@ -974,7 +899,7 @@ function renderLessons() {
     const done = st.done.includes(l.id), unlocked = isLessonUnlocked(l, idx);
     const el = document.createElement('div');
     el.className = 'lesson-card' + (done ? ' done' : '') + (l.isExam ? ' exam' : '') + (!unlocked ? ' locked' : '');
-    const costTag = done ? 'Бесплатный повтор' : (l.isExam ? 'Нужна попытка' : 'Цена: 1 заряд');
+    const costTag = done ? 'Бесплатный повтор' : 'Цена: 1 заряд';
     el.innerHTML = `<div><div class="l-title">${done ? '✓ ' : ''}${escapeHtml(l.title)}</div><div class="l-meta">${escapeHtml(l.desc)} • ${costTag} • +${l.xp} XP</div></div>`;
     const btn = document.createElement('button');
     if (!unlocked) {
@@ -1001,13 +926,12 @@ async function startLesson(id) {
   const replay = st.done.includes(meta.id);
 
   if (!replay) {
-    if (meta.isExam) {
-      if (st.hearts <= 0) {
-        if (confirm(`Закончились попытки экзамена!\nНовая через ${fmtWait(HEART_REGEN_MS - (Date.now() - st.lastHeartTs))}.\n\nПерейти в Магазин?`)) switchTab('shop');
-        return;
+    if (st.energy <= 0) {
+      if (typeof window.openQuickShop === 'function') {
+        window.openQuickShop('Закончились лайтстики ⚡!');
+      } else {
+        alert(`Закончились лайтстики ⚡!\n+1 заряд через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}.`);
       }
-    } else if (st.energy <= 0) {
-      if (confirm(`Закончилась энергия!\n+1 заряд через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}.\n\nПерейти в Магазин?`)) switchTab('shop');
       return;
     }
   }
@@ -1030,7 +954,7 @@ async function startLesson(id) {
     return alert('В этом уроке нет заданий. Проверь data/lessons/*.json.');
   }
 
-  if (!replay && !meta.isExam) {
+  if (!replay) {
     if (st.energy <= 0) { lessonLoading = false; return; }
     if (st.energy === MAX_ENERGY) st.lastEnergyTs = Date.now();
     st.energy--; save();
@@ -1245,36 +1169,39 @@ function renderStep() {
 
 function nextStep() { haptic('light'); qIdx++; renderStep(); }
 
-/* ====== НЕДЕЛЬНЫЙ ХАЙП (основа недельного турнира во вкладке «Топ») ====== */
-const WEEKLY_HYPE_LESSON = 15;    // новый урок (+15)
-const WEEKLY_HYPE_TRAINING = 5;   // повтор урока, тренировка в словаре/диктанте (+5)
+/* ====== НЕДЕЛЬНЫЙ XP (основа недельной лиги во вкладке «Лига») ====== */
+const WEEKLY_XP_TRAINING = 5;    // повтор урока и тренировка в словаре/диктанте (+5 XP)
 
-function addWeeklyHype(amount) {
+/* Единый недельный XP: те же очки, что и постоянный XP, но копятся за неделю. */
+function addWeeklyXp(amount) {
   const n = Math.max(0, Math.round(Number(amount) || 0));
   if (!n) return 0;
-  if (typeof st.weeklyHype !== 'number' || !isFinite(st.weeklyHype)) st.weeklyHype = 0;
-  st.weeklyHype += n;
+  if (typeof st.weeklyXp !== 'number' || !isFinite(st.weeklyXp)) {
+    st.weeklyXp = Math.max(0, Math.round(Number(st.weeklyHype) || 0));
+  }
+  st.weeklyXp += n;
   return n;
 }
-window.addWeeklyHype = addWeeklyHype;
+window.addWeeklyXp = addWeeklyXp;
+window.addWeeklyHype = addWeeklyXp;   // обратная совместимость со старыми вызовами
 
-/* Успешный шаг диктанта/аудио: +5 Хайпа, засчитывается в дейлик и квест месяца. */
+/* Успешный шаг диктанта/аудио: +5 XP, засчитывается в дейлик и квест месяца. */
 function awardDictationStep() {
-  const amount = addWeeklyHype(WEEKLY_HYPE_TRAINING);
+  st.xp += WEEKLY_XP_TRAINING;
+  const amount = addWeeklyXp(WEEKLY_XP_TRAINING);
   if (typeof window.trackQuest === 'function') window.trackQuest('dict');
   save();
   return amount;
 }
 window.awardDictationStep = awardDictationStep;
 
-/* Единый расчёт наград за урок: база + таланты группы (studio.js) + комбо + недельный Хайп. */
+/* Единый расчёт наград за урок: база + таланты группы (studio.js) + комбо. */
 function calcLessonRewards(lesson, replay) {
   const baseCoins = Number(lesson.coins) || 0;
   const baseXp = Number(lesson.xp) || 0;
   if (replay) {
     return {
-      coins: Math.max(5, Math.round(baseCoins * 0.1)), xp: 0, hype: false, comboPct: 0,
-      weeklyHype: WEEKLY_HYPE_TRAINING
+      coins: Math.max(5, Math.round(baseCoins * 0.1)), xp: 5, hype: false, comboPct: 0
     };
   }
   const team = typeof window.getTeamBonuses === 'function'
@@ -1287,21 +1214,20 @@ function calcLessonRewards(lesson, replay) {
   let coins = Math.round(baseCoins * (1 + Math.max(0, team.coinsPct || 0) / 100));
   const hype = (team.hypePct || 0) > 0 && Math.random() * 100 < team.hypePct;
   if (hype) coins += baseCoins;
-  return { coins, xp, hype, comboPct, weeklyHype: WEEKLY_HYPE_LESSON };
+  return { coins, xp, hype, comboPct };
 }
 
 function finishLesson() {
   document.getElementById('study-bar').style.width = '100%';
   if (curL.isExam && mistakes > 4) {
     haptic('err'); sfx('err');
-    if (!isReplay) { if (st.hearts === MAX_HEARTS) st.lastHeartTs = Date.now(); st.hearts = Math.max(0, st.hearts - 1); save(); }
     document.getElementById('study-body').innerHTML = `
       <div class="card-box" style="text-align:center;padding:26px 18px">
         <h2 style="margin:0 0 8px;color:var(--danger)">Экзамен не сдан</h2>
         <p>Допущено ошибок: <b>${mistakes}</b> (нужно не больше 4).</p>
-        <p style="color:var(--muted)">Сгорела 1 попытка. Осталось: <b>${st.hearts}/${MAX_HEARTS}</b></p>
+        <p style="color:var(--muted)">Пересдача бесплатная — повтори слова и попробуй снова.</p>
       </div>
-      ${st.hearts > 0 ? `<button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>` : `<button class="btn cyan full" style="margin-bottom:10px" onclick="switchTab('shop')">Пополнить попытки</button>`}
+      <button class="btn gold full" style="margin-bottom:10px" onclick="startLesson(${curL.id})">Пересдать экзамен</button>
       <button class="btn ghost full" onclick="switchTab('vocab')">Повторить слова в Словаре</button>`;
     return;
   }
@@ -1323,19 +1249,18 @@ function finishLesson() {
   }
   st.coins += rewards.coins;
   st.xp += rewards.xp;
-  const weeklyHype = addWeeklyHype(rewards.weeklyHype);
+  addWeeklyXp(rewards.xp);
   save();
 
   const stars = mistakes === 0 ? 'Идеально (0 ошибок)!' : (mistakes <= 2 ? 'Отлично!' : 'Засчитано (ошибок: ' + mistakes + ')');
   const rewardLine = wasFirst
     ? `Награда: <b>+${rewards.coins} микрофонов</b> и <b>+${rewards.xp} XP</b>`
-    : `Повтор: <b>+${rewards.coins} микрофонов</b> (XP за повтор не начисляется)`;
+    : `Повтор: <b>+${rewards.coins} микрофонов</b> и <b>+${rewards.xp} XP</b>`;
   document.getElementById('study-body').innerHTML = `
     <div class="card-box" style="text-align:center;padding:26px 18px">
       <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
       <div style="color:var(--cyan);font-weight:700;margin-bottom:10px">${stars}</div>
       <p>${rewardLine}</p>
-      ${weeklyHype ? `<p style="color:#ff85cb;font-weight:800">🔥 Недельный Хайп: +${weeklyHype}</p>` : ''}
       ${rewards.hype ? '<p style="color:var(--gold);font-weight:800">⚡ Хайп зала: рэпер удвоил микрофоны!</p>' : ''}
       ${vocabHtml}${cardHtml}
     </div>
@@ -1360,13 +1285,12 @@ document.addEventListener('app:data-ready', function () {
   if (active.id === 'screen-lessons') renderLessons();
   if (active.id === 'screen-vocab') renderVocab();
   if (active.id === 'screen-binder') renderBinder();
-  if (active.id === 'screen-shop') renderShop();
   if (active.id === 'screen-rank') renderRank();
 });
 
 setInterval(syncResources, 30000);
 </script>
-  <script src="studio.js?v=28"></script>
+  <script src="studio.js?v=29"></script>
   <script src="rules.js?v=2"></script>
 </body>
 </html>
