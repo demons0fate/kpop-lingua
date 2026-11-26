@@ -1,4 +1,4 @@
-/* ====== СТУДИЯ 2.1: ПРОФИЛЬ, БИАС +15% 🎤, АЛЬБОМ КАРТ И КВЕСТЫ ====== */
+/* ====== СТУДИЯ 2.1: ПРОФИЛЬ, БИАС +15% 🎵, АЛЬБОМ КАРТ И КВЕСТЫ ====== */
 (function () {
   /* Редкости карт: R / SR / SSR. Каждой соответствует своя рамка из Figma. */
   const RARITY = {
@@ -48,13 +48,13 @@
 
   /* ====== НЕДЕЛЬНЫЕ ЛИГИ (5 ступеней) и награды за итог недели ======
      Это единственное место, где живёт слово «лига»: ступени еженедельного турнира на XP ⚡. */
-  /* tint — акцентный цвет лиги для рамок/градиентов, grad — фон карточки в «Топе» */
+  /* tint — акцентный цвет лиги для рамок, grad — мягкий фон шапки, short — подпись в ряду значков */
   const WEEKLY_LEAGUES = [
-    { name: "Трейни",           icon: "🎧", color: "#cd9b6a", tint: "#e8b785", grad: "linear-gradient(135deg, #3a2719 0%, #221427 62%, #17111a 100%)", promoteBox: "Золотой бокс",    promoteCoins: 300, midCoins: 100 },
-    { name: "Инди",             icon: "🎸", color: "#cfd8dc", tint: "#dfe7ec", grad: "linear-gradient(135deg, #2c3444 0%, #1d1a30 62%, #141224 100%)", promoteBox: "Золотой бокс",    promoteCoins: 400, midCoins: 100 },
-    { name: "Восходящая группа", icon: "💿", color: "#00e5ff", tint: "#4deaff", grad: "linear-gradient(135deg, #0d3240 0%, #17223f 62%, #121026 100%)", promoteBox: "Платиновый бокс", promoteCoins: 500, midCoins: 100 },
-    { name: "Топ-лейбл",        icon: "👑", color: "#ffd700", tint: "#ffd700", grad: "linear-gradient(135deg, #3d2c0c 0%, #2a1a2c 62%, #1a1226 100%)", promoteBox: "Платиновый бокс", promoteCoins: 600, midCoins: 100 },
-    { name: "Мировой чарт",     icon: "💎", color: "#ff2e93", tint: "#ff4fa9", grad: "linear-gradient(135deg, #3f1240 0%, #241a4a 62%, #121a30 100%)", promoteBox: "Платиновый бокс", promoteCoins: 800, midCoins: 100 }
+    { name: "Трейни",            short: "Трейни",       icon: "🎧", color: "#cd9b6a", tint: "#e8b785", promoteCoins: 150, midCoins: 40 },
+    { name: "Инди",              short: "Инди",         icon: "🎸", color: "#cfd8dc", tint: "#dfe7ec", promoteCoins: 200, midCoins: 40 },
+    { name: "Восходящая группа", short: "Восходящая",   icon: "💿", color: "#38bdf8", tint: "#7dd3fc", promoteCoins: 280, midCoins: 40 },
+    { name: "Топ-лейбл",         short: "Топ-лейбл",    icon: "👑", color: "#fbbf24", tint: "#fcd34d", promoteCoins: 340, midCoins: 40 },
+    { name: "Мировой чарт",      short: "Мировой чарт", icon: "💎", color: "#ff4b8b", tint: "#ff7aa8", promoteCoins: 400, midCoins: 40 }
   ];
   const WEEKLY_SIZE = 30;          // 30 студий в турнирной комнате
   const ZONE_PROMOTE = 7;          // места 1–7 — зона повышения
@@ -416,7 +416,7 @@
 
     /* Топ: строка участника в одну линию */
     .wr-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 7px 11px; margin-bottom: 5px; }
-    .wr-row.me { border: 1.5px solid var(--accent); background: rgba(255,46,147,0.14); box-shadow: 0 0 14px rgba(255,46,147,0.18); }
+    .wr-row.me { border: 1.5px solid var(--accent); background: rgba(255,75,139,0.12); }
     .wr-pos { width: 24px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
     .wr-row.top .wr-pos { color: var(--gold); }
     .wr-ava { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; }
@@ -467,6 +467,36 @@
     .qs-box-btn { width: 100%; margin: 2px 0 4px; }
     .qs-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
 
+    /* === МАГАЗИН: 4 ПЛОСКИЕ 2D-КАРТОЧКИ === */
+    .shop-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .shop-head-title { font-size: 20px; font-weight: 900; }
+    .shop-balance { font-size: 13px; font-weight: 900; color: #fde68a; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); padding: 5px 10px; border-radius: 12px; }
+    .shop-card { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 18px; padding: 14px; margin-bottom: 10px; }
+    .shop-card.vip { border-color: rgba(251,191,36,0.45); background: var(--surface-2); }
+    .shop-card-ico { width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .shop-info { flex: 1; min-width: 140px; }
+    .shop-title { font-size: 14px; font-weight: 900; }
+    .shop-sub { font-size: 11px; color: var(--muted); line-height: 1.4; margin-top: 3px; }
+    .shop-buy { padding: 9px 12px; font-size: 12px; }
+    .shop-actions { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .shop-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; line-height: 1.4; }
+
+    /* === ЛИГА: РЯД ИЗ 5 ЗНАЧКОВ + КОМПАКТНАЯ ШАПКА === */
+    .lg-strip { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 14px; }
+    .lg-step { flex: 1; min-width: 0; text-align: center; opacity: 0.42; filter: grayscale(1); }
+    .lg-step.past, .lg-step.cur { opacity: 1; filter: none; }
+    .lg-ico { width: 38px; height: 38px; margin: 0 auto 5px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; background: var(--surface-2); border: 2px solid transparent; }
+    .lg-step.past .lg-ico { border-color: rgba(255,255,255,0.16); }
+    .lg-step.cur .lg-ico { width: 48px; height: 48px; font-size: 22px; border-color: var(--c); box-shadow: 0 0 0 4px rgba(255,255,255,0.04); }
+    .lg-nm { font-size: 9px; font-weight: 800; color: var(--muted); line-height: 1.15; }
+    .lg-step.cur .lg-nm { color: #fff; font-size: 10px; }
+    .lg-now { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 10px 12px; margin-bottom: 14px; }
+    .lg-now-name { font-size: 15px; font-weight: 900; min-width: 0; }
+    .lg-now-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .lg-timer { font-size: 11px; font-weight: 900; color: #fff; background: var(--surface-2); padding: 5px 8px; border-radius: 10px; white-space: nowrap; }
+    .lg-prizes { font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 10px; border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.1); color: #fde68a; cursor: pointer; white-space: nowrap; }
+    .lg-prizes:active { transform: scale(0.95); }
+
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
   document.head.appendChild(css);
@@ -501,6 +531,7 @@
   };
 
   let pendingFreezeToast = false;   // сработала заморозка ❄️ — показать тост
+  let pendingStreakReward = 0;      // веха серии: +30 🎵 за 5/10/15 дней
   let pendingWeeklyResult = false;  // ждём итогов недели — показать модалку
   let weeklyTickTimer = null;       // живой таймер «Топ»
 
@@ -595,6 +626,14 @@
       st.streak.lastDate = today;
     }
 
+    /* Вехи серии: каждые 5 дней (5, 10, 15…) — +30 🎵 один раз за веху. */
+    if (typeof st.lastStreakRewardDay !== 'number') st.lastStreakRewardDay = 0;
+    if (st.streak.count % 5 === 0 && st.lastStreakRewardDay !== st.streak.count) {
+      st.lastStreakRewardDay = st.streak.count;
+      st.coins = (Number(st.coins) || 0) + 30;
+      pendingStreakReward = st.streak.count;
+    }
+
     if (!st.daily || st.daily.date !== today) {
       st.daily = {
         date: today, lessons: 0, dict: 0, cards: 0, combo: 0,
@@ -644,7 +683,7 @@
   window.buyStreakFreeze = function () {
     initStudioState();
     if (st.streakFreeze >= STREAK_FREEZE_MAX) return alert(`Максимум ${STREAK_FREEZE_MAX}/${STREAK_FREEZE_MAX} заморозок в запасе.`);
-    if (st.coins < STREAK_FREEZE_PRICE) return alert(`Нужно ${STREAK_FREEZE_PRICE} микрофонов.`);
+    if (st.coins < STREAK_FREEZE_PRICE) return alert(`Нужно ${STREAK_FREEZE_PRICE} 🎵.`);
     st.coins -= STREAK_FREEZE_PRICE;
     st.streakFreeze = Math.min(STREAK_FREEZE_MAX, st.streakFreeze + 1);
     save(); haptic('ok'); sfx('win');
@@ -654,11 +693,11 @@
 
   window.showStreakInfo = function () {
     initStudioState();
-    alert(`🔥 Серия входов: ${st.streak.count} дн.\n❄️ Заморозки: ${st.streakFreeze}/${STREAK_FREEZE_MAX}\n\nЕсли пропустить ровно один день, заморозка сохранит серию. Купить её можно в мини-магазине (⚡ в шапке).`);
+    alert(`🔥 Серия входов: ${st.streak.count} дн.\n❄️ Заморозки: ${st.streakFreeze}/${STREAK_FREEZE_MAX}\n\nЕсли пропустить ровно один день, заморозка сохранит серию. Купить её можно в Магазине (🎵 в шапке).`);
   };
 
   /* ====== КВЕСТЫ: ДЕЙЛИКИ, НЕДЕЛЯ И ОЧКИ МЕСЯЦА ====== */
-  /* 5 фиксированных дейликов. Каждый даёт микрофоны и XP в недельную лигу. */
+  /* 5 фиксированных дейликов. Каждый даёт Ноты 🎵 и XP в недельную лигу. */
   const DAILY_QUESTS = [
     { id: 'quest_lesson_1',  title: 'Первый шаг',      desc: 'Завершить 1 урок',                    coins: 20, xp: 30, goal: 1, flag: 'p1', val: d => d.lessons },
     { id: 'quest_combo',     title: 'Чистый бит',      desc: 'Комбо 3+ верных ответа подряд',       coins: 15, xp: 25, goal: 3, flag: 'p2', val: d => d.combo },
@@ -666,7 +705,8 @@
     { id: 'quest_dictation', title: 'Идеальный слух',  desc: 'Завершить шаг с диктантом или аудио', coins: 15, xp: 25, goal: 1, flag: 'p4', val: d => d.dict },
     { id: 'quest_lesson_2',  title: 'Двойной камбэк',  desc: 'Завершить второй урок за день',       coins: 25, xp: 40, goal: 2, flag: 'p5', val: d => d.lessons }
   ];
-  const DAILY_ALL_BONUS_COINS = 50;   // бонус за все 5 дейликов (+ Серебряный бокс)
+  const DAILY_ALL_BONUS_COINS = 50;   // бонус за все 5 дейликов: +50 🎵
+  const DAILY_ALL_BONUS_XP = 50;      // и +50 XP (в постоянный и недельный XP)
 
   function isQuestDone(q) {
     const d = st.daily;
@@ -835,8 +875,8 @@
     }));
     rows.push({
       id: 'me', me: true,
-      name: st.agencyName || 'Твоя студия', initials: '🎤',
-      grad: 'linear-gradient(135deg,#ff2e93,#00e5ff)',
+      name: st.agencyName || 'Твоя студия', initials: '🎵',
+      grad: 'linear-gradient(135deg,#ff4b8b,#38bdf8)',
       xp: Math.max(0, Math.round(st.weeklyXp || 0))
     });
     rows.sort((a, b) => (b.xp - a.xp) || (a.me ? -1 : b.me ? 1 : 0));
@@ -880,31 +920,28 @@
     const nextIdx = Math.min(WEEKLY_LEAGUES.length - 1, leagueIdx + 1);
     const prevIdx = Math.max(0, leagueIdx - 1);
     const isLast = leagueIdx === WEEKLY_LEAGUES.length - 1;
-    const res = { leagueIdx, pos, xp: myXp, prevName: L.name, out: 'hold', bonusCoins: 0, bonusBox: null, title: '', text: '' };
+    const res = { leagueIdx, pos, xp: myXp, prevName: L.name, out: 'hold', bonusCoins: 0, title: '', text: '' };
 
     if (pos <= ZONE_PROMOTE) {
       st.weeklyLeague = nextIdx;
-      const boxKey = L.promoteBox === 'Платиновый бокс' ? 'platinum' : 'gold';
-      st.cases[boxKey] = (st.cases[boxKey] || 0) + 1;
       st.coins += L.promoteCoins;
       res.out = 'promote';
       res.bonusCoins = L.promoteCoins;
-      res.bonusBox = L.promoteBox;
       res.title = isLast ? 'Ты в топ-7 элиты!' : `Повышение: лига «${WEEKLY_LEAGUES[nextIdx].name}»`;
-      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Награда: ${L.promoteBox} и +${L.promoteCoins} 🎤.`;
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Награда: +${L.promoteCoins} 🎵.`;
     } else if (pos >= ZONE_DROP_FROM && leagueIdx > 0) {
       st.weeklyLeague = prevIdx;
       st.coins += L.midCoins;
       res.out = 'drop';
       res.bonusCoins = L.midCoins;
       res.title = 'Понижение лиги';
-      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Возвращаешься в лигу «${WEEKLY_LEAGUES[prevIdx].name}». Утешение: +${L.midCoins} 🎤.`;
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Возвращаешься в лигу «${WEEKLY_LEAGUES[prevIdx].name}». Утешение: +${L.midCoins} 🎵.`;
     } else {
       st.coins += L.midCoins;
       res.out = 'hold';
       res.bonusCoins = L.midCoins;
       res.title = 'Лига сохранена';
-      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Остаёшься в лиге «${L.name}». Утешительный бонус: +${L.midCoins} 🎤.`;
+      res.text = `Место #${pos} из ${WEEKLY_SIZE}. Остаёшься в лиге «${L.name}». Награда: +${L.midCoins} 🎵.`;
     }
 
     // Новая неделя: сбрасываем недельный XP и генерируем 29 новых соперников.
@@ -941,7 +978,7 @@
 
   window.getLastWeeklyResult = function () { return window.__weeklyLastResult || null; };
 
-  /* Бонус Биаса: если выбрана карта из коллекции — +15% 🎤 за уроки. */
+  /* Бонус Биаса: если выбрана карта из коллекции — +15% 🎵 за уроки. */
   window.getTeamBonuses = function () {
     const activeBias = currentBiasCardId();
     return activeBias != null
@@ -979,7 +1016,7 @@
             <input id="prof-name-in" class="onb-input" style="margin:0;padding:9px 12px;font-size:14px;text-align:left" maxlength="22" value="${escapeHtml(st.agencyName)}">
             <button class="btn cyan" id="prof-name-save" style="padding:0 14px">Ок</button>
           </div>
-          <div style="font-size:11px;color:var(--muted)">${bias ? `Биас: ${escapeHtml(bias.name)} ★ • +15% 🎤` : 'Биас не выбран — открой Альбом и нажми на карту'}</div>
+          <div style="font-size:11px;color:var(--muted)">${bias ? `Биас: ${escapeHtml(bias.name)} ★ • +15% 🎵` : 'Биас не выбран — открой Альбом и нажми на карту'}</div>
         </div>
 
         <div class="quest-sec"><span>Ранги агентства (открывают рамки профиля)</span><span style="color:${lg.color}">${lg.name}</span></div>
@@ -1035,7 +1072,7 @@
         ${nextLg ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${pctNext}%"></div></div>` : ''}
         <div class="agency-buffs" style="flex-direction:column;gap:5px;align-items:flex-start">
           <span>Слов выучено: <b style="color:#fff">${learnedWords}/${vocab.length}</b> • Правил: <b style="color:#fff">${learnedRules}/${rules.length}</b></span>
-          <span style="color:${biasId != null ? 'var(--success)' : 'var(--gold)'};font-weight:800">${biasId != null ? 'Биас: +15% 🎤' : 'Выбери Биаса ниже'}</span>
+          <span style="color:${biasId != null ? 'var(--success)' : 'var(--gold)'};font-weight:800">${biasId != null ? 'Биас: +15% 🎵' : 'Выбери Биаса ниже'}</span>
         </div>
       </div>
 
@@ -1051,15 +1088,15 @@
     if (studioSubTab === 'group') {
       const unlockedEras = getUnlockedEras();
       sub.innerHTML = `
-        <button class="btn gold full" id="album-open-box" style="margin-bottom:12px">${boxStock > 0 ? `Открыть Виниловый бокс • в запасе: ${boxStock}` : 'Открыть Виниловый бокс (50 🎤)'}</button>
+        <button class="btn gold full" id="album-open-box" style="margin-bottom:12px">${boxStock > 0 ? `Открыть Виниловый бокс • в запасе: ${boxStock}` : 'Открыть Виниловый бокс (50 🎵)'}</button>
         <div id="eras-cards-wrap"></div>
       `;
 
       const openBtn = document.getElementById('album-open-box');
       if (openBtn) openBtn.onclick = () => {
         haptic('light');
-        if (boxStock > 0) window.openQuickShopBoxes();
-        else window.openCaseModal('silver');
+        const nextType = (cs.platinum || 0) > 0 ? 'platinum' : ((cs.gold || 0) > 0 ? 'gold' : 'silver');
+        window.openCaseModal(nextType);
       };
 
       const erasWrap = document.getElementById('eras-cards-wrap');
@@ -1122,23 +1159,23 @@
       sub.innerHTML = `
         <div class="quest-sec" style="margin-top:4px"><span>Ежедневные задания • ${dCnt}/5</span><span style="color:#ff85cb">⚡ ${st.weeklyXp} XP за неделю</span></div>
         ${DAILY_QUESTS.map(q => {
-          const rep = `<div class="c-rew">+${q.coins} 🎤 • +${q.xp} XP</div>`;
+          const rep = `<div class="c-rew">+${q.coins} 🎵 • +${q.xp} XP</div>`;
           return `<div class="contract-row ${isQuestDone(q) ? 'done' : ''}">
             <div style="flex:1"><div class="c-title">${isQuestDone(q) ? '✓ ' : ''}${escapeHtml(q.title)}</div><div style="font-size:10px;color:var(--muted)">${escapeHtml(q.desc)}</div>${rep}</div>
             <div class="c-prog">${Math.min(q.val(d), q.goal)}/${q.goal}</div>
           </div>`;
         }).join('')}
         <div class="daily-prize">
-          <div style="font-size:12px;font-weight:800;margin-bottom:8px">Бонус за все 5 заданий: Серебряный бокс + ${DAILY_ALL_BONUS_COINS} 🎤</div>
+          <div style="font-size:12px;font-weight:800;margin-bottom:8px">Бонус за все 5 заданий: +${DAILY_ALL_BONUS_COINS} 🎵 и +${DAILY_ALL_BONUS_XP} XP</div>
           ${dCnt === DAILY_QUESTS.length && !d.claimed ? `<button class="btn gold full" id="claim-daily">Забрать бонус дня!</button>` : (d.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено сегодня</div>` : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((dCnt / DAILY_QUESTS.length) * 100)}%"></div></div>`)}
           <div class="daily-prize-count">${dCnt}/5</div>
         </div>
 
         <div class="quest-sec"><span>Еженедельный челлендж</span><span style="color:var(--cyan)">${wCnt}/5 дней</span></div>
         <div class="daily-prize">
-          <div style="font-size:12px;font-weight:800;margin-bottom:6px">5 дней с уроками → Золотой бокс</div>
+          <div style="font-size:12px;font-weight:800;margin-bottom:6px">5 дней с уроками → +40 🎵</div>
           ${w.claimed ? `<div style="font-size:12px;color:var(--success);font-weight:700">✓ Получено на этой неделе</div>`
-            : (wCnt >= 5 ? `<button class="btn gold full" id="claim-weekly">Забрать Золотой бокс!</button>`
+            : (wCnt >= 5 ? `<button class="btn gold full" id="claim-weekly">Забрать +40 🎵</button>`
               : `<div class="bar-bg"><div class="bar-fill" style="width:${Math.round((wCnt / 5) * 100)}%"></div></div>`)}
         </div>
 
@@ -1148,13 +1185,13 @@
             <div class="mq-disc">💿</div>
             <div style="flex:1;min-width:0">
               <div class="mq-title">Квест ${MONTH_NAMES[curMonthIdx]} • ${monthPts}/${MONTHLY_GOAL}</div>
-              <div class="mq-sub">${monthGot ? '🏅 Бейдж месяца уже в архиве!' : 'Закрывай ежедневные задания (+1 очко за квест), чтобы получить бейдж месяца и +150 🎤'}</div>
+              <div class="mq-sub">${monthGot ? '🏅 Бейдж месяца уже в архиве!' : 'Закрывай ежедневные задания (+1 очко за квест), чтобы получить бейдж месяца и +150 🎵'}</div>
             </div>
             <div class="mq-ico">${moCur.icon}</div>
           </div>
           <div class="mq-bar"><div class="mq-fill" style="width:${Math.round((monthPts / MONTHLY_GOAL) * 100)}%"></div></div>
           ${monthGot ? `<div class="mq-btn-done">✓ Получено</div>`
-            : (monthPts >= MONTHLY_GOAL ? `<button class="btn gold full" id="claim-month" style="margin-top:10px">Забрать бейдж ${MONTH_NAMES[curMonthIdx]} + 150 🎤</button>`
+            : (monthPts >= MONTHLY_GOAL ? `<button class="btn gold full" id="claim-month" style="margin-top:10px">Забрать бейдж ${MONTH_NAMES[curMonthIdx]} + 150 🎵</button>`
               : '')}
         </div>
         <div class="badges-grid">
@@ -1168,16 +1205,22 @@
       if (cd) cd.onclick = () => {
         syncQuestProgress();
         st.daily.claimed = true;
-        st.cases.silver = (st.cases.silver || 0) + 1;
         st.coins += DAILY_ALL_BONUS_COINS;
-        save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
+        st.xp += DAILY_ALL_BONUS_XP;
+        if (typeof window.addWeeklyXp === 'function') window.addWeeklyXp(DAILY_ALL_BONUS_XP);
+        else st.weeklyXp = (st.weeklyXp || 0) + DAILY_ALL_BONUS_XP;
+        save(); haptic('ok'); sfx('win'); fireConfetti();
+        alert(`Бонус дня получен: +${DAILY_ALL_BONUS_COINS} 🎵 и +${DAILY_ALL_BONUS_XP} XP!`);
+        renderBinder();
       };
 
       const cw = document.getElementById('claim-weekly');
       if (cw) cw.onclick = () => {
         st.weekly.claimed = true;
-        st.cases.gold++;
-        save(); haptic('ok'); sfx('win'); fireConfetti(); renderBinder();
+        st.coins += 40;
+        save(); haptic('ok'); sfx('win'); fireConfetti();
+        alert('Челлендж недели закрыт: +40 🎵!');
+        renderBinder();
       };
 
       /* Бейдж месяца: сразу закрываем цель — квест считается сданным в день получения. */
@@ -1186,7 +1229,7 @@
         syncQuestProgress();
         st.coins += 150;
         save(); haptic('ok'); sfx('win'); fireConfetti();
-        alert(`🏅 Бейдж «${MONTH_NAMES[new Date().getMonth()]}» получен! +150 🎤`);
+        alert(`🏅 Бейдж «${MONTH_NAMES[new Date().getMonth()]}» получен! +150 🎵`);
         renderBinder();
       };
     }
@@ -1226,114 +1269,114 @@
     };
   }
 
-  /* ====== МИНИ-МАГАЗИН (модалка пополнения и боксов) + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
+  /* ====== МАГАЗИН (ЭКРАН) + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
+  const XP_BOOST_PRICE = 120;
+  const XP_BOOST_MS = 24 * 60 * 60 * 1000;
+
   function energyWaitText() {
     return st.energy >= MAX_ENERGY
       ? 'Полный заряд'
       : `+1 через ${fmtWait(getEnergyRegenMs() - (Date.now() - st.lastEnergyTs))}`;
   }
 
-  /* Перерисовывает мини-магазин, только если он сейчас открыт. */
-  function refreshQuickShop() {
-    const modal = document.getElementById('pack-modal');
-    if (!modal || !modal.classList.contains('open')) return;
-    if (!modal.querySelector('.quick-shop')) return;
-    window.openQuickShop();
+  function fmtBoostLeft(ms) {
+    const total = Math.max(0, Math.ceil(ms / 60000));
+    const h = Math.floor(total / 60), m = total % 60;
+    return h > 0 ? `${h}ч ${m}м` : `${m}м`;
   }
 
+  /* Перерисовывает магазин, только если он сейчас открыт. */
+  function refreshQuickShop() {
+    const screen = document.getElementById('screen-shop');
+    if (screen && screen.classList.contains('active')) window.renderShop();
+  }
+
+  /* Совместимость со старым именем: открывает 5-ю вкладку «Магазин». */
   window.openQuickShop = function (message) {
-    const modal = document.getElementById('pack-modal');
-    if (!modal) return;
-    initStudioState();
-    syncResources();
-    const cs = st.cases || { silver: 0, gold: 0, platinum: 0 };
-    const eWait = energyWaitText();
-    const hasBonusBoxes = (cs.gold || 0) > 0 || (cs.platinum || 0) > 0;
-
-    modal.classList.add('open');
-    modal.innerHTML = `
-      <div class="card-box quick-shop">
-        <div class="qs-head">
-          <div class="qs-title">⚡ Мини-магазин</div>
-          <button class="qs-close" id="qs-close">✕</button>
-        </div>
-        <div class="qs-status">
-          <div class="qs-stat"><span class="q-ico">⚡</span><div><b>Лайтстики: ${st.energy}/${MAX_ENERGY}</b><small>${escapeHtml(eWait)}</small></div></div>
-          <div class="qs-stat"><span class="q-ico">❄️</span><div><b>Заморозки стрика: ${st.streakFreeze}/${STREAK_FREEZE_MAX}</b><small>${st.streakFreeze >= STREAK_FREEZE_MAX ? 'Максимум в запасе' : 'Спасают серию 🔥'}</small></div></div>
-        </div>
-
-        <div class="qs-sec">Пополнение за микрофоны</div>
-        <div class="qs-row">
-          <div class="qs-info"><div class="qs-item-title">+1 Лайтстик (30 🎤)</div><div class="qs-item-sub">Мгновенно добавит один заряд</div></div>
-          <button class="btn cyan" id="qs-energy1">30 🎤</button>
-        </div>
-        <div class="qs-row">
-          <div class="qs-info"><div class="qs-item-title">Полный заряд 5/5 (100 🎤)</div><div class="qs-item-sub">Заполнит всю шкалу лайтстиков</div></div>
-          <button class="btn cyan" id="qs-energy-full">100 🎤</button>
-        </div>
-        <div class="qs-row">
-          <div class="qs-info"><div class="qs-item-title">Заморозка стрика ❄️ (250 🎤)</div><div class="qs-item-sub">Пропуск дня не сожжёт серию 🔥</div></div>
-          <button class="btn ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'ghost' : 'cyan'}" id="qs-freeze" ${st.streakFreeze >= STREAK_FREEZE_MAX ? 'disabled' : ''}>${st.streakFreeze >= STREAK_FREEZE_MAX ? 'Максимум' : '250 🎤'}</button>
-        </div>
-
-        <div class="qs-sec">Виниловые боксы</div>
-        <button class="btn gold qs-box-btn" id="qs-box">${hasBonusBoxes ? 'Выбрать виниловый бокс' : 'Открыть Виниловый бокс (50 🎤)'}</button>
-        <div class="qs-note">В запасе: ${cs.silver || 0} 🥈 • ${cs.gold || 0} 🥇 • ${cs.platinum || 0} 💿</div>
-      </div>`;
-
-    const close = () => modal.classList.remove('open');
-    const btnClose = document.getElementById('qs-close');
-    if (btnClose) btnClose.onclick = close;
-
-    const b1 = document.getElementById('qs-energy1');
-    if (b1) b1.onclick = () => buyEnergy(1, 30);
-    const bf = document.getElementById('qs-energy-full');
-    if (bf) bf.onclick = () => buyEnergy(5, 100);
-    const fr = document.getElementById('qs-freeze');
-    if (fr) fr.onclick = () => window.buyStreakFreeze();
-
-    const box = document.getElementById('qs-box');
-    if (box) box.onclick = () => {
-      if (hasBonusBoxes) window.openQuickShopBoxes();
-      else window.openCaseModal('silver');
-    };
-
+    if (typeof window.switchTab === 'function') window.switchTab('shop');
     if (message) showToast(message);
   };
 
-  /* Выбор боксов: накопленные золотые/платиновые плюс покупка серебряного. */
-  window.openQuickShopBoxes = function () {
+  window.buyXpBoost = function () {
     initStudioState();
-    const modal = document.getElementById('pack-modal');
-    if (!modal) return;
-    const cs = st.cases || { silver: 0, gold: 0, platinum: 0 };
-    const rows = [
-      { type: 'silver', title: 'Серебряный бокс', sub: 'R / SR, редко SSR', stock: cs.silver || 0, price: 50 },
-      { type: 'gold', title: 'Золотой бокс', sub: 'Повышенный шанс SR и SSR', stock: cs.gold || 0, price: 120 },
-      { type: 'platinum', title: 'Платиновый бокс', sub: 'Лучший шанс SSR • за Экзамен', stock: cs.platinum || 0, price: 0 }
-    ];
-    modal.classList.add('open');
-    modal.innerHTML = `
-      <div class="card-box quick-shop">
-        <div class="qs-head">
-          <div class="qs-title">💿 Виниловые боксы</div>
-          <button class="qs-close" id="qs-box-close">✕</button>
-        </div>
-        ${rows.map(r => `<div class="qs-row">
-            <div class="qs-info"><div class="qs-item-title">${r.title}</div><div class="qs-item-sub">${r.sub} • в запасе: ${r.stock}</div></div>
-            <button class="btn ${r.stock > 0 ? (r.type === 'gold' ? 'gold' : r.type === 'platinum' ? 'cyan' : '') : 'ghost'}" data-box="${r.type}">${r.stock > 0 ? `Открыть (${r.stock})` : (r.price ? `${r.price} 🎤` : 'Экзамен')}</button>
-          </div>`).join('')}
-        <button class="btn ghost full" id="qs-box-back" style="margin-top:4px">← Назад в магазин</button>
-      </div>`;
-    document.getElementById('qs-box-close').onclick = () => modal.classList.remove('open');
-    document.getElementById('qs-box-back').onclick = () => window.openQuickShop();
-    modal.querySelectorAll('[data-box]').forEach(btn => {
-      btn.onclick = () => window.openCaseModal(btn.getAttribute('data-box'));
-    });
+    if (st.xpBoostUntil && Date.now() < st.xpBoostUntil) return alert('Бустер ×2 XP уже работает.');
+    if (st.coins < XP_BOOST_PRICE) return alert(`Нужно ${XP_BOOST_PRICE} 🎵.`);
+    st.coins -= XP_BOOST_PRICE;
+    st.xpBoostUntil = Date.now() + XP_BOOST_MS;
+    save(); haptic('ok'); sfx('win');
+    alert('⚡ Удвоитель XP активирован на 24 часа!');
+    window.renderShop();
   };
 
-  /* Совместимость со старым названием (вызовы из старых сохранений/кода). */
-  window.renderShop = window.openQuickShop;
+  /* Полноценный экран «Магазин»: 4 понятные карточки без гача-боксов. */
+  window.renderShop = function () {
+    const screen = document.getElementById('screen-shop');
+    if (!screen) return;
+    initStudioState();
+    syncResources();
+    const boostActive = !!(st.xpBoostUntil && Date.now() < st.xpBoostUntil);
+    const boostLeft = boostActive ? fmtBoostLeft(st.xpBoostUntil - Date.now()) : '';
+    const freezeFull = st.streakFreeze >= STREAK_FREEZE_MAX;
+    const energyFull = st.energy >= MAX_ENERGY;
+
+    screen.innerHTML = `
+      <div class="shop-head">
+        <div class="shop-head-title">Магазин</div>
+        <div class="shop-balance">🎵 ${st.coins}</div>
+      </div>
+
+      <div class="shop-card vip">
+        <div class="shop-card-ico">👑</div>
+        <div class="shop-info">
+          <div class="shop-title">VIP-статус</div>
+          <div class="shop-sub">Безлимитные лайтстики ⚡ + 2 заморозки стрика ❄️ сразу при покупке</div>
+        </div>
+        <button class="btn ghost shop-buy" id="shop-vip">Скоро • Telegram Stars</button>
+      </div>
+
+      <div class="shop-card">
+        <div class="shop-card-ico">⚡</div>
+        <div class="shop-info">
+          <div class="shop-title">Удвоитель XP (24 часа)</div>
+          <div class="shop-sub">${boostActive ? `Активен ещё ${boostLeft}` : 'Удваивает XP за каждый урок и задание'}</div>
+        </div>
+        <button class="btn shop-buy" id="shop-boost" ${boostActive ? 'disabled' : ''}>${boostActive ? 'Активен' : XP_BOOST_PRICE + ' 🎵'}</button>
+      </div>
+
+      <div class="shop-card">
+        <div class="shop-card-ico">❄️</div>
+        <div class="shop-info">
+          <div class="shop-title">Заморозка стрика</div>
+          <div class="shop-sub">Спасает серию при пропуске 1 дня • в запасе ${st.streakFreeze}/${STREAK_FREEZE_MAX}</div>
+        </div>
+        <button class="btn ${freezeFull ? 'ghost' : ''} shop-buy" id="shop-freeze" ${freezeFull ? 'disabled' : ''}>${freezeFull ? 'Максимум' : STREAK_FREEZE_PRICE + ' 🎵'}</button>
+      </div>
+
+      <div class="shop-card">
+        <div class="shop-card-ico">⚡</div>
+        <div class="shop-info">
+          <div class="shop-title">Лайтстики • ${st.energy}/${MAX_ENERGY}</div>
+          <div class="shop-sub">${escapeHtml(energyWaitText())}</div>
+        </div>
+        <div class="shop-actions">
+          <button class="btn cyan shop-buy" id="shop-energy1" ${energyFull ? 'disabled' : ''}>+1 заряд (30 🎵)</button>
+          <button class="btn ghost shop-buy" id="shop-energy-full" ${energyFull ? 'disabled' : ''}>Полный 5/5 (100 🎵)</button>
+        </div>
+      </div>
+      <div class="shop-note">Покупки списывают Ноты 🎵. Лайтстики восстанавливаются сами: 1 заряд / 2 часа.</div>
+    `;
+
+    const vipBtn = document.getElementById('shop-vip');
+    if (vipBtn) vipBtn.onclick = () => { haptic('light'); showToast('Оплата через Telegram Stars скоро появится!'); };
+    const boostBtn = document.getElementById('shop-boost');
+    if (boostBtn) boostBtn.onclick = () => window.buyXpBoost();
+    const freezeBtn = document.getElementById('shop-freeze');
+    if (freezeBtn) freezeBtn.onclick = () => window.buyStreakFreeze();
+    const e1 = document.getElementById('shop-energy1');
+    if (e1) e1.onclick = () => buyEnergy(1, 30);
+    const ef = document.getElementById('shop-energy-full');
+    if (ef) ef.onclick = () => buyEnergy(5, 100);
+  };
 
   /* Рандом редкости по типу бокса: gold/platinum чаще дают SR и SSR. */
   function rollRarity(type) {
@@ -1350,7 +1393,7 @@
     if (st.cases[type] > 0) st.cases[type]--;
     else {
       if (type === 'platinum') return alert('Платиновый бокс выдаётся за Экзамен!');
-      if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} микрофонов!`);
+      if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} 🎵!`);
       st.coins -= prices[type];
     }
     save(); haptic('medium');
@@ -1399,7 +1442,7 @@
           let message;
           if (st.cards.includes(c.id)) {
             st.coins += rarity.dupeCoins;
-            message = `Повторка • +${rarity.dupeCoins} 🎤`;
+            message = `Повторка • +${rarity.dupeCoins} 🎵`;
           } else {
             st.cards.push(c.id);
             if (currentBiasCardId() == null) {
@@ -1488,10 +1531,10 @@
         </div>
         ${card('p-promote', '▲',
           next ? `1–7 место • Повышение в «${escapeHtml(next.name)}»` : '1–7 место • Топ элиты',
-          `${L.promoteBox} + ${L.promoteCoins} 🎤`)}
+          `+${L.promoteCoins} 🎵`)}
         ${leagueIdx > 0
-          ? card('p-hold', '⚪', '8–22 место • Удержание лиги', `+${L.midCoins} 🎤`)
-          : card('p-hold', '⚪', '8 место и ниже • Удержание лиги', `+${L.midCoins} 🎤`)}
+          ? card('p-hold', '⚪', '8–22 место • Удержание лиги', `+${L.midCoins} 🎵`)
+          : card('p-hold', '⚪', '8 место и ниже • Удержание лиги', `+${L.midCoins} 🎵`)}
         ${leagueIdx > 0 ? card('p-drop', '▼', '23–30 место • Понижение на 1 лигу', '') : ''}
         <div class="wr-prize-tip">💡 Очки XP начисляются за уроки, диктанты и задания дня.</div>
         <button class="btn full" onclick="document.getElementById('pack-modal').classList.remove('open')">Понятно</button>
@@ -1509,35 +1552,25 @@
     const leagueIdx = Math.max(0, Math.min(WEEKLY_LEAGUES.length - 1, st.weeklyLeague || 0));
     const league = WEEKLY_LEAGUES[leagueIdx];
     const rows = weeklyBoard();
-    const me = rows.find(r => r.me) || { pos: WEEKLY_SIZE, xp: st.weeklyXp };
     const left = weekStartTs() + 7 * 86400000 - Date.now();
 
-    /* Подсказка под местом: сколько XP не хватает до зоны повышения (топ-7). */
-    let hint;
-    if (me.pos <= ZONE_PROMOTE) {
-      hint = `<div class="wr-hint">▲ Вы в зоне повышения!</div>`;
-    } else {
-      const seventh = rows.find(r => r.pos === ZONE_PROMOTE);
-      const gap = seventh ? Math.max(0, seventh.xp - me.xp + 1) : 0;
-      hint = `<div class="wr-hint wr-hint-gap">До повышения: +${gap} XP</div>`;
-    }
+    /* Ряд из 5 значков: пройденные и текущая — цветные, будущие — серые. */
+    const strip = WEEKLY_LEAGUES.map((lg, i) => {
+      const cls = i === leagueIdx ? 'cur' : (i < leagueIdx ? 'past' : 'next');
+      return `<div class="lg-step ${cls}" style="--c:${lg.color}">
+        <div class="lg-ico">${lg.icon}</div>
+        <div class="lg-nm">${escapeHtml(lg.short || lg.name)}</div>
+      </div>`;
+    }).join('');
 
     screen.innerHTML = `
-      <div class="league-card wr-card" style="--lg-tint:${league.tint || league.color};background:${league.grad};border-color:${league.tint || league.color}">
-        <div class="wr-top">
-          <div class="wr-emblem">${league.icon}</div>
-          <div class="wr-head" style="flex:1">
-            <div>
-              <div class="wr-liga" style="color:${league.color}">${escapeHtml(league.name)}</div>
-              <div class="wr-place">Место <b style="color:#fff">#${me.pos}</b> • ${me.xp} XP</div>
-            </div>
-            <div class="wr-side">
-              <button class="wr-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
-              <div class="wr-timer" id="wr-timer">${fmtWeekLeft(left)}</div>
-            </div>
-          </div>
+      <div class="lg-strip">${strip}</div>
+      <div class="lg-now">
+        <div class="lg-now-name" style="color:${league.color}">${league.icon} ${escapeHtml(league.name)}</div>
+        <div class="lg-now-side">
+          <div class="lg-timer" id="wr-timer">⏱️ ${fmtWeekLeft(left)}</div>
+          <button class="lg-prizes" onclick="openLeaguePrizes()">Награды</button>
         </div>
-        ${hint}
       </div>
 
       <div id="rank-list">${renderRankRows(rows)}</div>`;
@@ -1551,7 +1584,7 @@
         weeklyTickTimer = null;
         return;
       }
-      t.textContent = fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
+      t.textContent = '⏱️ ' + fmtWeekLeft(weekStartTs() + 7 * 86400000 - Date.now());
     }, 30000);
   };
 
@@ -1603,7 +1636,7 @@
     const passed = !(curL.isExam && mistakes > 4);
     const wasDone = st.done.includes(curL.id);
 
-    // Награды (XP, микрофоны, хайп, комбо) считает единая функция в index.html.
+    // Награды (XP, Ноты 🎵, бустер ×2 и комбо) считает единая функция в index.html.
     origFinishLesson();
     if (!passed) return;
 
@@ -1628,12 +1661,19 @@
 
   function bootStudio() {
     initStudioState();
-    syncResources();   // обновляем шапку (стрик 🔥, микрофоны, лайтстики)
+    syncResources();   // обновляем шапку (стрик 🔥, ноты 🎵, лайтстики ⚡)
     renderLessons();
     // Сработала заморозка ❄️ — короткое уведомление.
+    const hadFreeze = pendingFreezeToast;
     if (pendingFreezeToast) {
       pendingFreezeToast = false;
       showToast(`❄️ Заморозка спасла серию 🔥 ${st.streak.count} дн.! Осталось: ${st.streakFreeze}/${STREAK_FREEZE_MAX}`, 3200);
+    }
+    // Веха серии: 5, 10, 15… дней подряд — +30 🎵.
+    const streakReward = pendingStreakReward;
+    pendingStreakReward = 0;
+    if (streakReward) {
+      setTimeout(() => showToast(`🔥 Серия ${streakReward} дней! Награда: +30 🎵`, 3200), hadFreeze ? 3600 : 0);
     }
     // Первый вход после понедельника — показываем итоги недели.
     if (pendingWeeklyResult || window.__weeklyLastResult) {

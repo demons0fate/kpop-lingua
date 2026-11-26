@@ -9,10 +9,11 @@
 <script src="js/telegram.js?v=1"></script>
 <style>
 :root {
-  --bg: #0b0814; --surface: #161124; --surface-2: #221b36;
-  --accent: #ff2e93; --purple: #8a2be2; --cyan: #00e5ff;
-  --gold: #ffd700; --success: #00e676; --danger: #ff4757;
-  --text: #ffffff; --muted: #988fb3;
+  /* Спокойная глубокая 2D-палитра: без кислотных рамок и неона */
+  --bg: #131f24; --surface: #1d2d35; --surface-2: #273b45;
+  --accent: #ff4b8b; --purple: #a855f7; --cyan: #38bdf8;
+  --gold: #fbbf24; --success: #22c55e; --danger: #ef4444;
+  --text: #f1f5f9; --muted: #94a3b8;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -21,67 +22,81 @@ svg { display: block; flex-shrink: 0; }
 
 #confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
 
-.header { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; background: rgba(18,13,30,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07); position: sticky; top: 0; z-index: 20; gap: 8px; }
-.brand { font-weight: 900; font-size: 15px; letter-spacing: 0.3px; background: linear-gradient(90deg, #ff7ac6, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; background: rgba(19,31,36,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 20; gap: 8px; }
+.brand { font-weight: 900; font-size: 15px; letter-spacing: 0.3px; background: linear-gradient(90deg, #ff8fbd, #7dd3fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
 .stats { display: flex; gap: 6px; align-items: center; }
-.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); padding: 5px 9px; border-radius: 16px; font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: transform 0.2s var(--spring); }
-.pill:active { transform: scale(0.92); }
-.pill.energy { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.1); color: #bdf7ff; }
-.pill.streak { border-color: rgba(255,184,0,0.45); background: linear-gradient(135deg, rgba(255,120,0,0.2), rgba(255,215,0,0.12)); color: #ffd48a; }
-.pill.coins { border-color: rgba(255,46,147,0.45); background: rgba(255,46,147,0.12); color: #ffb3dc; }
-.pill.xp { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.1); color: #ffe98a; }
+.pill { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); padding: 5px 9px; border-radius: 14px; font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; transition: transform 0.2s var(--spring); }
+.pill:active { transform: scale(0.94); }
+.pill.energy { border-color: rgba(56,189,248,0.28); background: rgba(56,189,248,0.1); color: #bae6fd; }
+.pill.streak { border-color: rgba(251,191,36,0.28); background: rgba(251,191,36,0.1); color: #fde3a7; }
+.pill.coins { border-color: rgba(255,75,139,0.3); background: rgba(255,75,139,0.12); color: #ffb3cc; }
+.pill.xp { border-color: rgba(251,191,36,0.24); background: rgba(251,191,36,0.08); color: #fde68a; }
+.pill.boost { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.14); color: #e9d5ff; }
 
 .screen { display: none; padding: 16px; animation: screenIn 0.28s var(--spring); }
 .screen.active { display: block; }
 @keyframes screenIn { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-.module-banner { background: linear-gradient(135deg, #2a124a, #4d1143); border: 1px solid rgba(255,46,147,0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; box-shadow: 0 10px 28px rgba(77,17,67,0.28); }
+.module-banner { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 16px; margin-bottom: 16px; cursor: pointer; transition: background 0.18s ease, transform 0.18s var(--spring); }
+.module-banner:active { transform: scale(0.99); background: var(--surface-2); }
 .module-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
-.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 10px; color: #ff99d6; }
+.module-top-right { display: flex; align-items: center; gap: 8px; }
+.module-arrow { color: var(--muted); font-size: 14px; line-height: 1; }
+.module-tag { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 9px; color: #ffa9c9; }
 .module-banner h2 { margin: 0 0 6px; font-size: 20px; }
-.module-banner p { margin: 0 0 12px; font-size: 13px; color: #d8cce8; line-height: 1.4; }
-.bar-bg { background: rgba(0,0,0,0.4); height: 8px; border-radius: 8px; overflow: hidden; }
+.module-banner p { margin: 0 0 12px; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.bar-bg { background: rgba(0,0,0,0.28); height: 8px; border-radius: 8px; overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 8px; transition: width 0.45s var(--spring); }
 
-/* Вертикальная тропа уроков (Duolingo-style) */
+/* Вертикальная 2D-тропа уроков (плоский стиль) */
 .lesson-path { position: relative; padding: 4px 0 10px; }
-.lesson-path::before { content: ''; position: absolute; top: 12px; bottom: 12px; left: 50%; width: 3px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, rgba(255,255,255,0.12) 0 9px, transparent 9px 19px); border-radius: 3px; z-index: 0; }
-.path-row { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding-top: 28px; margin-bottom: 8px; transform: translateX(var(--ox, 0px)); }
-.path-node { width: 74px; height: 74px; border: none; border-radius: 50%; font-size: 26px; font-weight: 900; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: transform 0.16s var(--spring), box-shadow 0.2s, filter 0.2s; }
-.path-node:active { transform: translateY(4px) scale(0.97); }
-.path-node.exam { width: 86px; height: 86px; font-size: 30px; }
-.path-node.done { background: linear-gradient(160deg, #35d98a, #0e9f5b); box-shadow: 0 6px 0 #076b3c, 0 10px 20px rgba(0,230,118,0.22); }
-.path-node.done.exam { background: linear-gradient(160deg, #ffe27a, #ffb300); color: #3a2200; box-shadow: 0 6px 0 #8a5a00, 0 10px 22px rgba(255,215,0,0.25); }
-.path-node.open { background: linear-gradient(160deg, #3a2a63, #241a3f); color: #c9bff0; box-shadow: 0 6px 0 #120d1e; }
-.path-node.active { background: linear-gradient(160deg, var(--accent), #7a2cff); box-shadow: 0 6px 0 #6a0b46, 0 0 0 4px rgba(255,46,147,0.16), 0 0 24px rgba(255,46,147,0.5); animation: nodePulse 2.2s ease-in-out infinite; }
-.path-node.active.exam { background: linear-gradient(160deg, #ffd54a, #ff8a00); color: #2a1500; box-shadow: 0 6px 0 #8a4a00, 0 0 0 4px rgba(255,215,0,0.18), 0 0 26px rgba(255,184,0,0.55); animation: nodePulseGold 2.2s ease-in-out infinite; }
-@keyframes nodePulse { 0%,100% { box-shadow: 0 6px 0 #6a0b46, 0 0 0 4px rgba(255,46,147,0.16), 0 0 20px rgba(255,46,147,0.42); } 50% { box-shadow: 0 6px 0 #6a0b46, 0 0 0 8px rgba(255,46,147,0.07), 0 0 34px rgba(255,46,147,0.68); } }
-@keyframes nodePulseGold { 0%,100% { box-shadow: 0 6px 0 #8a4a00, 0 0 0 4px rgba(255,215,0,0.16), 0 0 20px rgba(255,184,0,0.45); } 50% { box-shadow: 0 6px 0 #8a4a00, 0 0 0 8px rgba(255,215,0,0.07), 0 0 34px rgba(255,184,0,0.7); } }
-.path-node.locked { background: linear-gradient(160deg, #241d34, #171122); color: #6f6688; font-size: 24px; box-shadow: 0 6px 0 #0d0a16; }
-.path-start-badge { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ff2e93, #8a2be2); color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 1.2px; padding: 5px 12px; border-radius: 10px; box-shadow: 0 4px 0 rgba(106,11,70,0.65), 0 0 18px rgba(255,46,147,0.5); white-space: nowrap; animation: badgeFloat 1.8s ease-in-out infinite; pointer-events: none; }
-@keyframes badgeFloat { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -4px); } }
-.path-label { margin-top: 9px; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 0.4px; white-space: nowrap; }
+.lesson-path::before { content: ''; position: absolute; top: 12px; bottom: 12px; left: 50%; width: 2px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, rgba(255,255,255,0.1) 0 8px, transparent 8px 18px); border-radius: 2px; z-index: 0; }
+.path-row { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding-top: 26px; margin-bottom: 6px; transform: translateX(var(--ox, 0px)); }
+.path-node { width: 72px; height: 72px; border: 3px solid transparent; border-radius: 50%; background: var(--surface-2); font-size: 24px; font-weight: 900; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: transform 0.16s var(--spring), background 0.2s, border-color 0.2s; }
+.path-node:active { transform: scale(0.95); }
+.path-node.exam { width: 84px; height: 84px; font-size: 28px; }
+.path-node.done { background: rgba(34,197,94,0.16); border-color: var(--success); color: #86efac; }
+.path-node.done.exam { background: rgba(251,191,36,0.16); border-color: var(--gold); color: #fde68a; }
+.path-node.open { background: var(--surface-2); border-color: rgba(255,255,255,0.14); color: #cbd5e1; }
+.path-node.active { background: rgba(255,75,139,0.16); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 5px rgba(255,75,139,0.12); animation: nodePulse 2.6s ease-in-out infinite; }
+.path-node.active.exam { background: rgba(251,191,36,0.16); border-color: var(--gold); color: #fde68a; box-shadow: 0 0 0 5px rgba(251,191,36,0.12); animation: nodePulseGold 2.6s ease-in-out infinite; }
+@keyframes nodePulse { 0%,100% { box-shadow: 0 0 0 5px rgba(255,75,139,0.12); } 50% { box-shadow: 0 0 0 9px rgba(255,75,139,0.05); } }
+@keyframes nodePulseGold { 0%,100% { box-shadow: 0 0 0 5px rgba(251,191,36,0.12); } 50% { box-shadow: 0 0 0 9px rgba(251,191,36,0.05); } }
+.path-node.locked { background: var(--surface); border-color: rgba(255,255,255,0.06); color: var(--muted); font-size: 22px; }
+.path-start-badge { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 10px; font-weight: 900; letter-spacing: 1.2px; padding: 4px 11px; border-radius: 9px; white-space: nowrap; animation: badgeFloat 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes badgeFloat { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -3px); } }
+.path-label { margin-top: 8px; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 0.4px; white-space: nowrap; }
 .path-row.is-active .path-label { color: #fff; }
-.path-popover { position: relative; z-index: 2; background: linear-gradient(160deg, #271c42, #150f24); border: 1px solid rgba(255,46,147,0.45); border-radius: 20px; padding: 14px 15px; margin: 4px 0 18px; box-shadow: 0 14px 30px rgba(0,0,0,0.5); animation: popIn 0.24s var(--spring); }
-.path-popover.exam { border-color: rgba(255,215,0,0.5); }
+/* Кейс на тропе (после 4 и 8 урока) */
+.path-chest { width: 56px; height: 46px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.14); background: var(--surface-2); color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.16s var(--spring); }
+.path-chest:active { transform: scale(0.94); }
+.path-chest.locked { opacity: 0.5; }
+.path-chest.ready { border-color: var(--gold); background: rgba(251,191,36,0.14); color: #fde68a; }
+.path-chest.claimed { border-color: rgba(34,197,94,0.45); background: rgba(34,197,94,0.12); color: #86efac; }
+/* 2D-заглушки персонажей вдоль тропы */
+.path-char { display: flex; align-items: center; gap: 10px; width: max-content; max-width: 250px; margin: 0 auto 14px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 8px 12px 8px 8px; position: relative; z-index: 1; }
+.path-char-ava { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: #0f172a; overflow: hidden; }
+.path-char-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.path-char-stub { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.path-char-name { font-size: 12px; font-weight: 900; }
+.path-char-line { font-size: 10px; color: var(--muted); line-height: 1.35; margin-top: 1px; }
+.path-popover { position: relative; z-index: 2; background: var(--surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px 15px; margin: 4px 0 16px; animation: popIn 0.24s var(--spring); }
+.path-popover.exam { border-color: rgba(251,191,36,0.4); }
 @keyframes popIn { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
 .pop-title { font-size: 15px; font-weight: 800; line-height: 1.3; }
 .pop-desc { font-size: 12px; color: var(--muted); margin: 5px 0 10px; line-height: 1.45; }
-.pop-reward { display: inline-block; font-size: 11px; font-weight: 800; color: #ffd48a; background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.25); padding: 5px 10px; border-radius: 10px; margin-bottom: 12px; }
+.pop-reward { display: inline-block; font-size: 11px; font-weight: 800; color: #fde68a; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.22); padding: 5px 10px; border-radius: 9px; margin-bottom: 12px; }
 .path-popover .btn { width: 100%; padding: 13px 12px; font-size: 12.5px; }
 
-.btn { background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff; border: none; padding: 12px 18px; border-radius: 16px; font-weight: 900; font-size: 14px; cursor: pointer; flex-shrink: 0; letter-spacing: 0.3px; transition: transform 0.12s var(--spring), box-shadow 0.12s, filter 0.18s; box-shadow: 0 4px 0 rgba(120,10,70,0.6), 0 8px 18px rgba(255,46,147,0.18); }
-.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(120,10,70,0.6); }
-.btn:disabled { opacity: 0.55; cursor: default; }
-.btn:disabled:active { transform: none; }
+.btn { background: var(--accent); color: #fff; border: none; padding: 12px 18px; border-radius: 14px; font-weight: 900; font-size: 14px; cursor: pointer; flex-shrink: 0; letter-spacing: 0.3px; transition: transform 0.12s var(--spring), filter 0.18s; }
+.btn:active { transform: scale(0.97); filter: brightness(0.94); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn:disabled:active { transform: none; filter: none; }
 .btn.full { width: 100%; padding: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.6px; }
-.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 0 rgba(0,0,0,0.35); }
-.btn.ghost:active { box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
-.btn.cyan { background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 0 #004e8f, 0 8px 18px rgba(0,198,255,0.2); }
-.btn.cyan:active { box-shadow: 0 1px 0 #004e8f; }
-.btn.gold { background: linear-gradient(135deg, #ffb800, #ff6b00); color: #160c00; box-shadow: 0 4px 0 #8a4a00, 0 8px 18px rgba(255,184,0,0.22); }
-.btn.gold:active { box-shadow: 0 1px 0 #8a4a00; }
-.btn.locked-cta { background: var(--surface-2); color: var(--muted); box-shadow: 0 4px 0 rgba(0,0,0,0.35); text-transform: none; letter-spacing: 0.2px; }
+.btn.ghost { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); }
+.btn.cyan { background: #0e7490; }
+.btn.gold { background: var(--gold); color: #201400; }
+.btn.locked-cta { background: var(--surface-2); color: var(--muted); text-transform: none; letter-spacing: 0.2px; }
 .btn.locked-cta:disabled { opacity: 1; }
 
 .study-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -94,10 +109,10 @@ svg { display: block; flex-shrink: 0; }
 .jump-btn { min-width: 34px; height: 32px; padding: 0 8px; border-radius: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.12); color: var(--muted); font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; }
 .jump-btn.active { background: rgba(0,229,255,0.18); border-color: var(--cyan); color: #fff; }
 
-.card-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; margin-bottom: 16px; line-height: 1.55; }
-.card-box h3 { margin: 0 0 10px; color: #ff85cb; font-size: 18px; }
-.card-box p { margin: 0 0 10px; font-size: 14px; color: #e6e1f2; }
-.tip-box { background: rgba(0,229,255,0.08); border-left: 3px solid var(--cyan); padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #ccf7ff; margin: 12px 0; }
+.card-box { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 18px; padding: 18px; margin-bottom: 16px; line-height: 1.55; }
+.card-box h3 { margin: 0 0 10px; color: #ffa9c9; font-size: 18px; }
+.card-box p { margin: 0 0 10px; font-size: 14px; color: #e2e8f0; }
+.tip-box { background: rgba(56,189,248,0.08); border-left: 3px solid var(--cyan); padding: 10px 12px; border-radius: 8px; font-size: 13px; color: #d7f0ff; margin: 12px 0; }
 
 .example-list { display: grid; gap: 9px; margin-top: 12px; }
 .example-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 11px 13px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: transform 0.15s; }
@@ -160,9 +175,9 @@ svg { display: block; flex-shrink: 0; }
 .fc-scene { perspective: 1100px; margin: 14px 0 18px; height: 290px; }
 .fc-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s var(--spring); cursor: pointer; }
 .fc-inner.flipped { transform: rotateY(180deg); }
-.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 24px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 14px 34px rgba(0,0,0,0.45); overflow: hidden; }
-.fc-front { background: radial-gradient(circle at 20% 20%, rgba(0,229,255,0.18), transparent 55%), linear-gradient(155deg, #21183b, #120d21); border: 1.5px solid rgba(0,229,255,0.38); }
-.fc-back { background: radial-gradient(circle at 80% 20%, rgba(255,46,147,0.22), transparent 55%), linear-gradient(155deg, #301438, #140e24); border: 1.5px solid rgba(255,46,147,0.5); transform: rotateY(180deg); }
+.fc-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+.fc-front { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); }
+.fc-back { background: var(--surface-2); border: 1px solid rgba(255,75,139,0.28); transform: rotateY(180deg); }
 .fc-badge { position: absolute; top: 14px; left: 16px; font-size: 11px; font-weight: 800; color: var(--cyan); background: rgba(0,229,255,0.12); padding: 4px 10px; border-radius: 10px; }
 .fc-kr { font-size: 48px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 24px rgba(0,229,255,0.3); }
 .fc-tr { font-size: 18px; color: var(--cyan); font-weight: 700; margin-top: 8px; }
@@ -175,14 +190,14 @@ svg { display: block; flex-shrink: 0; }
 .tabs-row { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; }
 .subtab { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .subtab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.bias-banner { background: linear-gradient(135deg, rgba(255,46,147,0.16), rgba(0,229,255,0.12)); border: 1px solid rgba(255,46,147,0.4); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bias-banner { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 
 .binder-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.photocard { background: linear-gradient(160deg, #251e3d, #140f24); border-radius: 18px; padding: 10px; text-align: center; border: 1.5px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s var(--spring); }
+.photocard { background: var(--surface); border-radius: 16px; padding: 10px; text-align: center; border: 1.5px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s var(--spring); }
 .photocard:active { transform: scale(0.95); }
 .photocard.locked { filter: grayscale(1) opacity(0.42); cursor: default; }
-.photocard.sr { border-color: #c278ff; box-shadow: 0 0 14px rgba(194,120,255,0.22); }
-.photocard.ssr { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+.photocard.sr { border-color: #c278ff; }
+.photocard.ssr { border: 2px solid var(--gold); }
 .photocard.bias-active { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .photocard.sr::after, .photocard.ssr::after { content: ''; position: absolute; inset: -60%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.22) 50%, transparent 65%); transform: rotate(18deg); animation: holo 3.8s infinite linear; pointer-events: none; }
 @keyframes holo { 0% { transform: translateX(-110%) rotate(18deg); } 100% { transform: translateX(110%) rotate(18deg); } }
@@ -217,17 +232,16 @@ svg { display: block; flex-shrink: 0; }
 .res-val { font-size: 19px; font-weight: 800; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .res-sub { font-size: 11px; color: var(--muted); }
 .shop-sec { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin: 16px 0 8px; }
-.shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.shop-item.vip { background: linear-gradient(135deg, #2f1d4a, #42183f); border-color: var(--gold); }
-.league-card { background: linear-gradient(135deg, #1b2142, #2e1842); border: 1px solid rgba(0,229,255,0.3); border-radius: 18px; padding: 16px; margin-bottom: 16px; text-align: center; }
-.rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 14px; margin-bottom: 8px; }
-.rank-row.me { border: 1px solid var(--accent); background: rgba(255,46,147,0.12); }
+.shop-item { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.shop-item.vip { background: var(--surface-2); border-color: rgba(251,191,36,0.45); }
+.league-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; margin-bottom: 16px; text-align: center; }
+.rank-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 13px 15px; border-radius: 12px; margin-bottom: 8px; }
+.rank-row.me { border: 1px solid var(--accent); background: rgba(255,75,139,0.1); }
 
-.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,11,26,0.96); backdrop-filter: blur(14px); display: flex; justify-content: space-around; padding: 8px 4px 13px; border-top: 1px solid rgba(255,255,255,0.08); z-index: 25; }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19,31,36,0.97); backdrop-filter: blur(14px); display: flex; justify-content: space-around; padding: 8px 4px 13px; border-top: 1px solid rgba(255,255,255,0.06); z-index: 25; }
 .nav-item { color: var(--muted); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; transition: color 0.2s, transform 0.2s var(--spring); position: relative; }
 .nav-item:active { transform: scale(0.9); }
 .nav-item.active { color: var(--accent); }
-.nav-item.active svg { filter: drop-shadow(0 0 8px rgba(255,46,147,0.65)); }
 </style>
 </head>
 <body>
@@ -237,13 +251,11 @@ svg { display: block; flex-shrink: 0; }
 <div class="header">
   <div class="brand">K-POP LINGUA</div>
   <div class="stats">
+    <div class="pill boost" id="boost-pill" onclick="switchTab('shop')" style="display:none">⚡ ×2 XP</div>
     <div class="pill streak" onclick="showStreakInfo()">🔥 <span id="streak-val">1</span></div>
-    <div class="pill coins" onclick="openQuickShop()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff2e93" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
-      <span id="coins-val">50</span>
-    </div>
-    <div class="pill energy" onclick="openQuickShop()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <div class="pill coins" onclick="switchTab('shop')">🎵 <span id="coins-val">50</span></div>
+    <div class="pill energy" onclick="switchTab('shop')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       <span id="energy-val">5/5</span>
     </div>
   </div>
@@ -251,10 +263,13 @@ svg { display: block; flex-shrink: 0; }
 
 <!-- LESSONS -->
 <div id="screen-lessons" class="screen active">
-  <div class="module-banner">
+  <div class="module-banner" id="module-banner" onclick="openModulePicker()" role="button" tabindex="0">
     <div class="module-top">
       <div class="module-tag">Блок 1 • Хангыль</div>
-      <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
+      <div class="module-top-right">
+        <div class="pill xp">★ <span id="xp-val">0</span> XP</div>
+        <div class="module-arrow">▾</div>
+      </div>
     </div>
     <h2>Стажировка: Код Хангыля</h2>
     <p>Новый урок или экзамен тратит 1 лайтстик ⚡. Повтор и Словарь — бесплатно.</p>
@@ -304,6 +319,9 @@ svg { display: block; flex-shrink: 0; }
 <!-- RANK -->
 <div id="screen-rank" class="screen"></div>
 
+<!-- SHOP -->
+<div id="screen-shop" class="screen"></div>
+
 <!-- PACK MODAL -->
 <div class="modal-bg" id="pack-modal"></div>
 
@@ -323,6 +341,10 @@ svg { display: block; flex-shrink: 0; }
   <div class="nav-item" id="nav-binder" onclick="switchTab('binder')">
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="12" height="17" rx="2"/><path d="M16 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1"/></svg>
     Студия
+  </div>
+  <div class="nav-item" id="nav-shop" onclick="switchTab('shop')">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    Магазин
   </div>
 </div>
 
@@ -457,6 +479,8 @@ function syncResources() {
   document.getElementById('streak-val').innerText = (st.streak && st.streak.count) || 1;
   document.getElementById('coins-val').innerText = st.coins;
   document.getElementById('xp-val').innerText = st.xp;
+  const boostPill = document.getElementById('boost-pill');
+  if (boostPill) boostPill.style.display = (st.xpBoostUntil && Date.now() < st.xpBoostUntil) ? 'flex' : 'none';
 }
 
 function fmtWait(ms) {
@@ -474,12 +498,12 @@ function save(doSync = true) {
    чтобы inline-скрипт не зависел от порядка загрузки. */
 function buyEnergy(amount, price) {
   syncResources();
-  if (st.energy >= MAX_ENERGY) return alert('Энергия уже полная!');
-  if (st.coins < price) return alert(`Нужно ${price} микрофонов.`);
+  if (st.energy >= MAX_ENERGY) return alert('Лайтстики уже полные!');
+  if (st.coins < price) return alert(`Нужно ${price} 🎵.`);
   st.coins -= price; st.energy = Math.min(MAX_ENERGY, st.energy + amount);
   if (st.energy >= MAX_ENERGY) st.lastEnergyTs = Date.now();
   haptic('ok'); sfx('ok'); save();
-  if (typeof window.openQuickShop === 'function') window.openQuickShop();
+  if (typeof window.renderShop === 'function') window.renderShop();
 }
 
 let curAudio = null;
@@ -500,10 +524,6 @@ function playAudio(file, text, rate = 1.0) {
 
 function switchTab(t) {
   haptic('light'); syncResources();
-  if (t === 'shop') {
-    if (typeof window.openQuickShop === 'function') window.openQuickShop();
-    return;
-  }
   const target = document.getElementById('screen-' + t);
   if (!target) return;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -515,6 +535,7 @@ function switchTab(t) {
   if (t === 'vocab') renderVocab();
   if (t === 'binder') renderBinder();
   if (t === 'rank') renderRank();
+  if (t === 'shop' && typeof window.renderShop === 'function') window.renderShop();
 }
 
 /* ====== СЛОВАРЬ, 3D-КАРТОЧКИ И ДИКТАНТ ====== */
@@ -605,7 +626,7 @@ function renderVocab() {
 
     const topInfo = document.createElement('div');
     topInfo.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--muted);font-weight:700';
-    topInfo.innerHTML = `<span>Слово ${dictIdx + 1} из ${dictDeck.length}</span><span style="color:${isNew ? 'var(--cyan)' : 'var(--success)'}">${isNew ? '+5 микрофонов за 1-й раз' : '✓ Уже записано'}</span>`;
+    topInfo.innerHTML = `<span>Слово ${dictIdx + 1} из ${dictDeck.length}</span><span style="color:${isNew ? 'var(--cyan)' : 'var(--success)'}">${isNew ? '+5 🎵 за 1-й раз' : '✓ Уже записано'}</span>`;
 
     const widgetWrap = document.createElement('div');
     const navRow = document.createElement('div');
@@ -661,7 +682,7 @@ function rollCard() {
 
 function openPackModal(price) {
   if (!Array.isArray(CARDS) || !CARDS.length) return alert('Данные ещё загружаются. Подожди секунду.');
-  if (st.coins < price) return alert(`Нужно ${price} микрофонов!`);
+  if (st.coins < price) return alert(`Нужно ${price} 🎵!`);
   haptic('medium');
   st.coins -= price; save();
 
@@ -695,7 +716,7 @@ function openPackModal(price) {
       const rc = c.r === 'SSR' ? 'ssr' : (c.r === 'SR' ? 'sr' : '');
       modal.innerHTML = `
         <div style="font-size:14px;font-weight:900;color:${c.r === 'SSR' ? 'var(--gold)' : 'var(--cyan)'};margin-bottom:14px">
-          ${isDup ? 'ПОВТОРКА • ВОЗВРАТ +20 МИКРОФОНОВ' : 'НОВАЯ КАРТА В АЛЬБОМ!'}
+          ${isDup ? 'ПОВТОРКА • ВОЗВРАТ +20 🎵' : 'НОВАЯ КАРТА В АЛЬБОМ!'}
         </div>
         <div class="photocard ${rc} reveal-card">
           <div class="pc-rarity">${c.r}</div>
@@ -869,9 +890,30 @@ function isModuleExamPassed(moduleId) {
   return (Array.isArray(LESSONS) ? LESSONS : []).some(l => l.moduleId === moduleId && l.isExam && st.done.includes(l.id));
 }
 
+const selectedModuleId = { value: null };
 function getCurrentModule() {
   if (!Array.isArray(MODULES) || !MODULES.length) return null;
+  if (selectedModuleId.value) {
+    const picked = MODULES.find(m => m.id === selectedModuleId.value);
+    if (picked) return picked;
+  }
   return MODULES.find(m => (m.lessonIds || []).some(id => !st.done.includes(id))) || MODULES[MODULES.length - 1];
+}
+
+/* Уроки выбранного курса (модуля). Если данных нет — показываем все. */
+function getModulePathLessons(module) {
+  const all = Array.isArray(LESSONS) ? LESSONS : [];
+  if (!module) return all;
+  const ids = Array.isArray(module.lessonIds) ? module.lessonIds : [];
+  let list = all.filter(l => ids.length ? ids.includes(l.id) : l.moduleId === module.id);
+  if (!list.length) list = all.filter(l => l.moduleId === module.id);
+  return list.length ? list : all;
+}
+
+/* Награда за новый урок в Нотах 🎵 (та же формула, что в calcLessonRewards). */
+function lessonNoteReward(l) {
+  const base = Math.max(10, Math.round((Number(l && l.coins) || 80) * 0.15));
+  return (l && l.isExam) ? Math.max(40, base) : base;
 }
 
 function isLessonUnlocked(l, idx) {
@@ -883,6 +925,114 @@ function isLessonUnlocked(l, idx) {
 /* Вертикальная тропа: смещение узлов «змейкой» и открытый поповер. */
 const PATH_OFFSETS = [0, -42, -64, -42, 0, 42, 64, 42, 0];
 let pathOpenId = null, pathInitDone = false;
+
+/* Кейсы на тропе: открываются после указанного урока и дают +25 🎵. */
+const PATH_CHESTS = [
+  { id: 'chest-4', after: 4, icon: '🎁', ox: 42 },
+  { id: 'chest-8', after: 8, icon: '💿', ox: -42 }
+];
+
+/* 2D-заглушки персонажей вдоль тропы (после 2-го и 6-го узла). */
+const PATH_CHARS = {
+  2: { name: 'Юна', img: 'img/chars/yuna.webp', color: '#ff4b8b', line: 'Хванён! Ты справишься 💪' },
+  6: { name: 'Мина', img: 'img/chars/mina.webp', color: '#38bdf8', line: 'Слышишь ритм? Держи темп!' }
+};
+
+function renderPathChar(lessonId) {
+  const c = PATH_CHARS[lessonId];
+  if (!c) return '';
+  const initial = escapeHtml(c.name.slice(0, 1));
+  return `<div class="path-char">
+    <div class="path-char-ava" style="background:${c.color}">
+      <img src="${escapeHtml(c.img)}" alt="${escapeHtml(c.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="path-char-stub" style="display:none;background:${c.color}">${initial}</div>
+    </div>
+    <div style="min-width:0">
+      <div class="path-char-name">${escapeHtml(c.name)}</div>
+      <div class="path-char-line">${escapeHtml(c.line)}</div>
+    </div>
+  </div>`;
+}
+
+function renderPathChest(chest) {
+  const claimed = Array.isArray(st.claimedChests) && st.claimedChests.includes(chest.id);
+  const ready = Array.isArray(st.done) && st.done.includes(chest.after);
+  const state = claimed ? 'claimed' : (ready ? 'ready' : 'locked');
+  const icon = claimed ? '✓' : (ready ? chest.icon : '🔒');
+  const label = claimed ? 'Открыто' : `Кейс • Урок ${chest.after}`;
+  return `<div class="path-row" style="--ox:${chest.ox}px;padding-top:14px">
+    <button class="path-chest ${state}" data-chest-id="${chest.id}" aria-label="${escapeHtml(label)}">${icon}</button>
+    <div class="path-label">${escapeHtml(label)}</div>
+  </div>`;
+}
+
+/* Открытие кейса: +25 Нот, один раз на аккаунт. */
+function claimPathChest(id) {
+  const chest = PATH_CHESTS.find(c => c.id === id);
+  if (!chest) return false;
+  if (!Array.isArray(st.claimedChests)) st.claimedChests = [];
+  if (st.claimedChests.includes(id)) { alert('Этот кейс уже открыт.'); return false; }
+  if (!Array.isArray(st.done) || !st.done.includes(chest.after)) {
+    alert(`Кейс откроется после Урока ${chest.after}.`);
+    return false;
+  }
+  st.claimedChests.push(id);
+  st.coins = (Number(st.coins) || 0) + 25;
+  save(); haptic('ok'); sfx('win'); fireConfetti();
+  alert('🎁 Кейс открыт! +25 🎵');
+  renderLessons();
+  return true;
+}
+window.claimPathChest = claimPathChest;
+
+/* Выбор курса в 2D-модалке (клик по .module-banner). */
+function openModulePicker() {
+  haptic('light');
+  const modal = document.getElementById('pack-modal');
+  if (!modal) return;
+  const modules = Array.isArray(MODULES) ? MODULES : [];
+  const current = getCurrentModule();
+  modal.classList.add('open');
+  modal.innerHTML = `
+    <div class="card-box" style="width:100%;max-width:340px;margin:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:900">Выбор курса</div>
+        <button class="close-btn" onclick="document.getElementById('pack-modal').classList.remove('open')" style="width:30px;height:30px;font-size:14px">✕</button>
+      </div>
+      ${modules.map(m => {
+        const list = getModulePathLessons(m);
+        const doneCount = list.filter(l => st.done.includes(l.id)).length;
+        const active = current && current.id === m.id;
+        return `<div class="shop-item" style="cursor:pointer;${active ? 'border-color:var(--accent)' : ''}" onclick="selectModule('${escapeHtml(m.id)}')">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:800">${escapeHtml(m.tag || m.title || m.id)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${escapeHtml(m.title || '')}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px">Пройдено: ${doneCount}/${list.length}</div>
+          </div>
+          <div class="pill" style="${active ? 'color:var(--accent);border-color:var(--accent)' : ''}">${active ? '✓ сейчас' : 'Открыть'}</div>
+        </div>`;
+      }).join('')}
+      <div class="shop-item" style="opacity:0.55">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800">Блок 2 • База TOPIK I</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Новые уроки уже готовятся</div>
+        </div>
+        <div class="pill">Скоро</div>
+      </div>
+    </div>`;
+}
+window.openModulePicker = openModulePicker;
+
+function selectModule(id) {
+  selectedModuleId.value = id;
+  pathOpenId = null;
+  pathInitDone = false;
+  const modal = document.getElementById('pack-modal');
+  if (modal) modal.classList.remove('open');
+  haptic('light'); sfx('tap');
+  renderLessons();
+}
+window.selectModule = selectModule;
 
 /* Первый незавершённый урок, который уже открыт (обычно он один). */
 function getActiveLessonId(lessons) {
@@ -905,7 +1055,7 @@ function renderPathPopover(l, done, unlocked) {
   return `<div class="path-popover${l.isExam ? ' exam' : ''}">
     <div class="pop-title">${escapeHtml(l.title)}</div>
     <div class="pop-desc">${escapeHtml(l.desc || '')}</div>
-    <div class="pop-reward">+${Number(l.coins) || 0} 🎤 • +${Number(l.xp) || 0} XP</div>
+    <div class="pop-reward">+${lessonNoteReward(l)} 🎵 • +${Number(l.xp) || 0} XP</div>
     ${action}
   </div>`;
 }
@@ -922,13 +1072,16 @@ function wirePathEvents(root) {
   root.querySelectorAll('[data-start-id]').forEach(btn => {
     btn.addEventListener('click', () => startLesson(Number(btn.dataset.startId)));
   });
+  root.querySelectorAll('.path-chest').forEach(chest => {
+    chest.addEventListener('click', () => { haptic('light'); claimPathChest(chest.dataset.chestId); });
+  });
 }
 
 function renderLessons() {
   const list = document.getElementById('lessons-list');
   if (!list) return;
-  const lessons = Array.isArray(LESSONS) ? LESSONS : [];
-  if (!lessons.length) {
+  const allLessons = Array.isArray(LESSONS) ? LESSONS : [];
+  if (!allLessons.length) {
     list.innerHTML = window.APP_DATA_ERROR
       ? ''
       : '<div class="card-box" style="text-align:center">Загружаю уроки…</div>';
@@ -936,16 +1089,17 @@ function renderLessons() {
   }
 
   const activeModule = getCurrentModule();
+  const lessons = getModulePathLessons(activeModule);
+
   if (activeModule) {
-    const moduleLessons = getModuleLessons(activeModule.id);
-    const moduleDone = moduleLessons.filter(l => st.done.includes(l.id)).length;
+    const moduleDone = lessons.filter(l => st.done.includes(l.id)).length;
     const tag = document.querySelector('#screen-lessons .module-tag');
     const title = document.querySelector('#screen-lessons .module-banner h2');
     const desc = document.querySelector('#screen-lessons .module-banner p');
     if (tag) tag.textContent = activeModule.tag || activeModule.title || '';
     if (title) title.textContent = activeModule.title || '';
     if (desc) desc.textContent = activeModule.desc || '';
-    document.getElementById('module-progress').style.width = Math.round((moduleDone / Math.max(1, moduleLessons.length)) * 100) + '%';
+    document.getElementById('module-progress').style.width = Math.round((moduleDone / Math.max(1, lessons.length)) * 100) + '%';
   } else {
     document.getElementById('module-progress').style.width = Math.round((st.done.length / Math.max(1, lessons.length)) * 100) + '%';
   }
@@ -959,20 +1113,10 @@ function renderLessons() {
   }
 
   const parts = [];
-  let lastModuleId = null, nodeIdx = 0;
-  lessons.forEach((l, idx) => {
-    if (l.moduleId && l.moduleId !== lastModuleId) {
-      lastModuleId = l.moduleId;
-      const module = getModuleById(l.moduleId);
-      if (module) {
-        const moduleLessons = getModuleLessons(l.moduleId);
-        const moduleDone = moduleLessons.filter(x => st.done.includes(x.id)).length;
-        parts.push(`<div class="era-head"><span>${escapeHtml(module.tag || module.title || l.moduleId)}</span><span>${moduleDone}/${moduleLessons.length}</span></div>`);
-      }
-    }
-
+  let nodeIdx = 0;
+  lessons.forEach((l) => {
     const done = st.done.includes(l.id);
-    const unlocked = isLessonUnlocked(l, idx);
+    const unlocked = isLessonUnlocked(l, allLessons.indexOf(l));
     const active = l.id === activeId;
     const state = done ? 'done' : (active ? 'active' : (unlocked ? 'open' : 'locked'));
     const ox = PATH_OFFSETS[nodeIdx % PATH_OFFSETS.length];
@@ -991,6 +1135,12 @@ function renderLessons() {
       </div>`);
 
     if (pathOpenId === l.id) parts.push(renderPathPopover(l, done, unlocked));
+
+    const chest = PATH_CHESTS.find(c => c.after === l.id);
+    if (chest) parts.push(renderPathChest(chest));
+
+    const charHtml = renderPathChar(l.id);
+    if (charHtml) parts.push(charHtml);
   });
 
   list.innerHTML = `<div class="lesson-path">${parts.join('')}</div>`;
@@ -1277,26 +1427,31 @@ function awardDictationStep() {
 }
 window.awardDictationStep = awardDictationStep;
 
-/* Единый расчёт наград за урок: база + таланты группы (studio.js) + комбо. */
+/* Единый расчёт наград за урок: строгая экономика Нот 🎵 + бустер XP. */
 function calcLessonRewards(lesson, replay) {
   const baseCoins = Number(lesson.coins) || 0;
   const baseXp = Number(lesson.xp) || 0;
+  const boostOn = !!(st.xpBoostUntil && Date.now() < st.xpBoostUntil);
+
   if (replay) {
-    return {
-      coins: Math.max(5, Math.round(baseCoins * 0.1)), xp: 5, hype: false, comboPct: 0
-    };
+    return { coins: 2, xp: 5, hype: false, comboPct: 0, xpBoost: false };
   }
+
   const team = typeof window.getTeamBonuses === 'function'
     ? window.getTeamBonuses()
-    : { coinsPct: 0, hypePct: 0 };
+    : { coinsPct: 0 };
   const comboPct = typeof window.getLessonComboPct === 'function'
     ? window.getLessonComboPct()
     : 0;
-  const xp = Math.round(baseXp * (1 + Math.max(0, comboPct) / 100));
-  let coins = Math.round(baseCoins * (1 + Math.max(0, team.coinsPct || 0) / 100));
-  const hype = (team.hypePct || 0) > 0 && Math.random() * 100 < team.hypePct;
-  if (hype) coins += baseCoins;
-  return { coins, xp, hype, comboPct };
+
+  const baseNotes = Math.max(10, Math.round((baseCoins || 80) * 0.15));
+  const notes = lesson.isExam ? Math.max(40, baseNotes) : baseNotes;
+  const coins = Math.round(notes * (1 + Math.max(0, team.coinsPct || 0) / 100));
+
+  let xp = Math.round(baseXp * (1 + Math.max(0, comboPct) / 100));
+  if (boostOn) xp *= 2;   // бустер ×2 XP за 120 🎵
+
+  return { coins, xp, hype: false, comboPct, xpBoost: boostOn };
 }
 
 function finishLesson() {
@@ -1335,9 +1490,10 @@ function finishLesson() {
   save();
 
   const stars = mistakes === 0 ? 'Идеально (0 ошибок)!' : (mistakes <= 2 ? 'Отлично!' : 'Засчитано (ошибок: ' + mistakes + ')');
+  const boostMark = rewards.xpBoost ? ' <span style="color:#c4b5fd;font-weight:800">⚡ ×2 XP</span>' : '';
   const rewardLine = wasFirst
-    ? `Награда: <b>+${rewards.coins} микрофонов</b> и <b>+${rewards.xp} XP</b>`
-    : `Повтор: <b>+${rewards.coins} микрофонов</b> и <b>+${rewards.xp} XP</b>`;
+    ? `Награда: <b>+${rewards.coins} 🎵</b> и <b>+${rewards.xp} XP</b>${boostMark}`
+    : `Повтор: <b>+${rewards.coins} 🎵</b> и <b>+${rewards.xp} XP</b>`;
   document.getElementById('study-body').innerHTML = `
     <div class="card-box" style="text-align:center;padding:26px 18px">
       <h2 style="margin:0 0 6px">${curL.isExam ? 'Экзамен сдан!' : 'Урок пройден!'}</h2>
@@ -1367,11 +1523,12 @@ document.addEventListener('app:data-ready', function () {
   if (active.id === 'screen-vocab') renderVocab();
   if (active.id === 'screen-binder') renderBinder();
   if (active.id === 'screen-rank') renderRank();
+  if (active.id === 'screen-shop' && typeof window.renderShop === 'function') window.renderShop();
 });
 
 setInterval(syncResources, 30000);
 </script>
-  <script src="studio.js?v=31"></script>
+  <script src="studio.js?v=32"></script>
   <script src="rules.js?v=2"></script>
 </body>
 </html>
