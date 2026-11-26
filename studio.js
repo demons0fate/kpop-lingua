@@ -1,37 +1,55 @@
-/* ====== СТУДИЯ 2.1: ПРОФИЛЬ, БИАС +15% 🎵, АЛЬБОМ КАРТ И КВЕСТЫ ====== */
+/* ====== ЖИВАЯ СТУДИЯ: 50 УРОВНЕЙ, 4 ГЕРОЯ, ЭПИЗОДЫ ====== */
 (function () {
-  /* Редкости карт: R / SR / SSR. Каждой соответствует своя рамка из Figma. */
-  const RARITY = {
-    R:   { name: "R",   cls: "tier-silver",   color: "#cfd8dc", dupeCoins: 30 },
-    SR:  { name: "SR",  cls: "tier-gold",     color: "#ffd700", dupeCoins: 60 },
-    SSR: { name: "SSR", cls: "tier-platinum", color: "#6ed9b2", dupeCoins: 120 }
-  };
-  /* Шансы выпадения редкости из Винилового бокса (в процентах). */
-  const RARITY_WEIGHTS = {
-    silver:   { R: 70, SR: 25, SSR: 5 },
-    gold:     { R: 35, SR: 45, SSR: 20 },
-    platinum: { R: 10, SR: 40, SSR: 50 }
-  };
-
-  /* 12 постоянных Рангов агентства (по XP): задают рамку и значок профиля.
-     Названия не пересекаются с недельными лигами турнира (WEEKLY_LEAGUES) — это разные системы. */
-  const XP_RANKS = [
-    { id: "bronze1", name: "Стажёр I",      minXp: 0,    icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 2 },
-    { id: "bronze2", name: "Стажёр II",     minXp: 100,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 3 },
-    { id: "bronze3", name: "Стажёр III",    minXp: 220,  icon: "◆", cls: "lg-bronze", color: "#cd9b6a", maxUpg: 4 },
-    { id: "silver1", name: "Продюсер I",    minXp: 360,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
-    { id: "silver2", name: "Продюсер II",   minXp: 520,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 5 },
-    { id: "silver3", name: "Продюсер III",  minXp: 700,  icon: "◈", cls: "lg-silver", color: "#cfd8dc", maxUpg: 6 },
-    { id: "gold1",   name: "Хитмейкер I",   minXp: 900,  icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 7 },
-    { id: "gold2",   name: "Хитмейкер II",  minXp: 1150, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
-    { id: "gold3",   name: "Хитмейкер III", minXp: 1450, icon: "★", cls: "lg-gold",   color: "#ffd700", maxUpg: 8 },
-    { id: "neon1",   name: "Магнат I",      minXp: 1800, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 9 },
-    { id: "neon2",   name: "Магнат II",     minXp: 2200, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 },
-    { id: "neon3",   name: "Магнат III",    minXp: 2700, icon: "✦", cls: "lg-neon",   color: "#ff2e93", maxUpg: 10 }
+  /* 4 героя студии: картинки из img/chars с мягкой 2D-заглушкой. */
+  const HEROES = [
+    { id: "mina", name: "Мина", role: "Лидер",   img: "img/chars/mina.webp", grad: "linear-gradient(135deg,#ff8fbd,#a855f7)", color: "#ff8fbd" },
+    { id: "kai",  name: "Кай",  role: "Продюсер", img: "img/chars/kai.webp",  grad: "linear-gradient(135deg,#7dd3fc,#2563eb)", color: "#7dd3fc" },
+    { id: "sora", name: "Сора", role: "Вокал",    img: "img/chars/sora.webp", grad: "linear-gradient(135deg,#fcd34d,#f97316)", color: "#fcd34d" },
+    { id: "yuna", name: "Юна",  role: "Макнэ",    img: "img/chars/yuna.webp", grad: "linear-gradient(135deg,#86efac,#16a34a)", color: "#86efac" }
   ];
 
-  /* Эры открываются по количеству пройденных уроков. */
-  const ERA_UNLOCK_LESSONS = { trainee: 0, debut: 3, neon: 6, tour: 8 };
+  /* Эпохи студии: каждые 10 уровней. */
+  const STUDIO_ERAS = [
+    { from: 1,  to: 10, name: "Репетиционный зал",  icon: "🎧", color: "#7dd3fc" },
+    { from: 11, to: 20, name: "Инди-лейбл",         icon: "🎸", color: "#c4b5fd" },
+    { from: 21, to: 30, name: "Продюсерский центр", icon: "🎛️", color: "#fcd34d" },
+    { from: 31, to: 40, name: "Топ-агентство Сеула", icon: "👑", color: "#fda4af" },
+    { from: 41, to: 50, name: "Мировой стадион",    icon: "🌍", color: "#86efac" }
+  ];
+  const STUDIO_MAX_LEVEL = 50;
+
+  /* Порог уровня L: 120*(L-1) + 25*(L-1)^2. */
+  function studioLevelXp(level) {
+    const n = Math.max(0, level - 1);
+    return Math.round(120 * n + 25 * n * n);
+  }
+
+  function eraForLevel(level) {
+    return STUDIO_ERAS.find(e => level >= e.from && level <= e.to) || STUDIO_ERAS[STUDIO_ERAS.length - 1];
+  }
+
+  /* Уровень студии (1–50) по накопленному XP + прогресс до следующего. */
+  function getStudioLevel(xp) {
+    const total = Math.max(0, Math.round(Number(xp) || 0));
+    let level = 1;
+    for (let L = 2; L <= STUDIO_MAX_LEVEL; L++) {
+      if (total >= studioLevelXp(L)) level = L;
+    }
+    const base = studioLevelXp(level);
+    const next = level < STUDIO_MAX_LEVEL ? studioLevelXp(level + 1) : null;
+    const pct = next ? Math.min(100, Math.round(((total - base) / Math.max(1, next - base)) * 100)) : 100;
+    return {
+      level,
+      era: eraForLevel(level),
+      xp: total,
+      baseXp: base,
+      nextXp: next,
+      toNext: next ? Math.max(0, next - total) : 0,
+      pct
+    };
+  }
+  window.getStudioLevel = getStudioLevel;
+
 
   const MONTHS = [
     { m: 0, name: "Янв", icon: "❄️", col: "#00e5ff" }, { m: 1, name: "Фев", icon: "💜", col: "#b46eff" },
@@ -62,8 +80,7 @@
   const STREAK_FREEZE_MAX = 2;
   const STREAK_FREEZE_PRICE = 250;
 
-  const BOX_IMAGES = { silver: '', gold: '', platinum: '', vinyl: '' };
-  let studioSubTab = 'group'; // 'group' (Альбом) | 'quests' (Квесты)
+  let studioSubTab = 'group'; // 'group' (Группа) | 'quests' (Квесты)
   /* Комбо верных ответов в текущем уроке — только для дейлика «Чистый бит». */
   let lessonComboRun = 0, lessonMaxCombo = 0, comboTrackedLessonId = null;
 
@@ -414,12 +431,15 @@
     .zone-head.zone-hold { color: var(--muted); }
     .zone-head.zone-drop { color: #ff8a94; }
 
-    /* Топ: строка участника в одну линию */
-    .wr-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 7px 11px; margin-bottom: 5px; }
-    .wr-row.me { border: 1.5px solid var(--accent); background: rgba(255,75,139,0.12); }
-    .wr-pos { width: 24px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
-    .wr-row.top .wr-pos { color: var(--gold); }
-    .wr-ava { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    /* Топ: чистый список участников, без коробок у обычных строк */
+    .wr-row { display: flex; align-items: center; gap: 12px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 0; padding: 11px 6px; margin-bottom: 0; }
+    .wr-row.me { background: rgba(255,75,139,0.12); border: 1px solid rgba(255,75,139,0.4); border-radius: 14px; padding: 10px; margin: 4px 0; }
+    .wr-pos { width: 26px; font-weight: 900; font-size: 12px; color: var(--muted); text-align: center; flex-shrink: 0; }
+    .wr-pos.medal { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1a1320; font-size: 12px; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.18); }
+    .wr-row.top1 .wr-pos { background: linear-gradient(135deg, #fde68a, #f59e0b); }
+    .wr-row.top2 .wr-pos { background: linear-gradient(135deg, #e5e7eb, #94a3b8); }
+    .wr-row.top3 .wr-pos { background: linear-gradient(135deg, #fcd0a1, #c2410c); color: #fff; }
+    .wr-ava { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #fff; flex-shrink: 0; }
     .wr-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .wr-score { font-size: 12px; font-weight: 900; color: #ff85cb; white-space: nowrap; }
 
@@ -481,21 +501,52 @@
     .shop-actions { display: flex; flex-direction: column; gap: 6px; width: 100%; }
     .shop-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; line-height: 1.4; }
 
-    /* === ЛИГА: РЯД ИЗ 5 ЗНАЧКОВ + КОМПАКТНАЯ ШАПКА === */
-    .lg-strip { display: flex; gap: 4px; justify-content: space-between; margin-bottom: 14px; }
-    .lg-step { flex: 1; min-width: 0; text-align: center; opacity: 0.42; filter: grayscale(1); }
+    /* === ЛИГА: КРУПНАЯ КАРУСЕЛЬ ТРОФЕЕВ + ЧИСТЫЙ ЗАГОЛОВОК === */
+    .lg-strip { display: flex; gap: 16px; overflow-x: auto; padding: 8px 16px; margin: 0 -16px 14px; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .lg-strip::-webkit-scrollbar { display: none; }
+    .lg-step { flex: 0 0 auto; width: 68px; text-align: center; opacity: 0.42; filter: grayscale(1); scroll-snap-align: center; }
     .lg-step.past, .lg-step.cur { opacity: 1; filter: none; }
-    .lg-ico { width: 38px; height: 38px; margin: 0 auto 5px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; background: var(--surface-2); border: 2px solid transparent; }
+    .lg-ico { width: 68px; height: 68px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; background: var(--surface-2); border: 2px solid transparent; transition: width 0.2s ease, height 0.2s ease; }
     .lg-step.past .lg-ico { border-color: rgba(255,255,255,0.16); }
-    .lg-step.cur .lg-ico { width: 48px; height: 48px; font-size: 22px; border-color: var(--c); box-shadow: 0 0 0 4px rgba(255,255,255,0.04); }
+    .lg-step.cur .lg-ico { width: 82px; height: 82px; font-size: 36px; border-color: var(--c); box-shadow: 0 0 0 5px rgba(255,255,255,0.06), 0 0 18px -2px var(--c); }
     .lg-nm { font-size: 9px; font-weight: 800; color: var(--muted); line-height: 1.15; }
     .lg-step.cur .lg-nm { color: #fff; font-size: 10px; }
-    .lg-now { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 10px 12px; margin-bottom: 14px; }
-    .lg-now-name { font-size: 15px; font-weight: 900; min-width: 0; }
-    .lg-now-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .lg-timer { font-size: 11px; font-weight: 900; color: #fff; background: var(--surface-2); padding: 5px 8px; border-radius: 10px; white-space: nowrap; }
-    .lg-prizes { font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 10px; border: 1px solid rgba(251,191,36,0.4); background: rgba(251,191,36,0.1); color: #fde68a; cursor: pointer; white-space: nowrap; }
+    .lg-now { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; padding: 0 4px; }
+    .lg-now-name { font-size: 22px; font-weight: 900; line-height: 1.15; }
+    .lg-now-side { display: flex; align-items: center; gap: 12px; }
+    .lg-timer { font-size: 13px; font-weight: 800; color: #e2e8f0; background: none; padding: 0; white-space: nowrap; }
+    .lg-prizes { font-size: 11px; font-weight: 800; padding: 6px 11px; border-radius: 10px; border: 1px solid rgba(251,191,36,0.35); background: rgba(251,191,36,0.1); color: #fde68a; cursor: pointer; white-space: nowrap; }
     .lg-prizes:active { transform: scale(0.95); }
+
+    /* === ЖИВАЯ СТУДИЯ: ПРОФИЛЬ, ГЕРОИ, ЭПИЗОДЫ === */
+    .studio-head { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 15px 16px; margin-bottom: 14px; }
+    .studio-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 19px; font-weight: 900; cursor: pointer; line-height: 1.2; }
+    .studio-name .sn-arrow { font-size: 18px; color: var(--muted); font-weight: 900; }
+    .studio-lvl { display: inline-flex; align-items: center; gap: 6px; margin: 9px 0 8px; padding: 7px 13px; border-radius: 12px; font-size: 16px; font-weight: 900; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); }
+    .studio-xp-note { font-size: 10px; color: var(--muted); margin-top: 5px; }
+    .studio-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .hero-card { position: relative; background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 14px 10px 11px; text-align: center; cursor: pointer; transition: transform 0.18s var(--spring), background 0.18s; }
+    .hero-card:active { transform: scale(0.97); background: var(--surface-2); }
+    .hero-ava-frame { width: 84px; height: 84px; margin: 0 auto 8px; padding: 3px; border-radius: 26px; display: flex; }
+    .hero-ava { width: 100%; height: 100%; border-radius: 22px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.32); }
+    .hero-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-name { font-size: 14px; font-weight: 900; }
+    .hero-role { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .hero-count { font-size: 10px; font-weight: 800; color: var(--cyan); margin-top: 5px; }
+    .hero-cloud { position: absolute; top: 7px; right: 9px; font-size: 19px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(255,255,255,0.35)); animation: cloudPulse 1.6s ease-in-out infinite; }
+    @keyframes cloudPulse { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.14); } }
+    .ep-item { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 13px; margin-bottom: 10px; }
+    .ep-item.read { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.07); }
+    .ep-tag { display: inline-block; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 8px; background: rgba(255,255,255,0.07); color: #ffa9c9; }
+    .ep-title { font-size: 14px; font-weight: 900; margin: 6px 0 4px; }
+    .ep-text { font-size: 12px; line-height: 1.5; color: #cbd5e1; }
+    .ep-phrase { display: flex; align-items: center; gap: 8px; margin-top: 9px; font-size: 12px; color: #ff99d6; font-weight: 700; }
+    .ep-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .ep-actions .btn { padding: 8px 12px; font-size: 12px; }
+    .ep-done { font-size: 11px; font-weight: 800; color: var(--success); }
+    .ep-locked { font-size: 11px; color: var(--muted); }
+    .studio-empty { font-size: 12px; line-height: 1.5; color: var(--muted); background: var(--surface); border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; padding: 14px; text-align: center; }
 
     /* === КОНЕЦ БЛОКА РАМОК === */
   `;
@@ -539,45 +590,115 @@
   function weekKey() { const d = new Date(), s = new Date(d.getFullYear(), 0, 1); return `${d.getFullYear()}-W${Math.ceil((((d - s) / 86400000) + s.getDay() + 1) / 7)}`; }
   function monthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()}`; }
 
-  /* Постоянный ранг агентства по накопленному XP (не связан с недельным турниром). */
-  function getRank(xp) {
-    let cur = XP_RANKS[0];
-    XP_RANKS.forEach(l => { if (xp >= l.minXp) cur = l; });
-    return cur;
+  /* ====== ЖИВАЯ СТУДИЯ: ГЕРОИ И ЭПИЗОДЫ ====== */
+  function getEpisodes() {
+    return Array.isArray(window.EPISODES) ? window.EPISODES : [];
   }
 
-  /* Активный Биас: выбранная карта, которая есть в коллекции.
-     Проверяем st.biasCardId, затем старое поле st.avatarCardId. */
-  function currentBiasCardId() {
-    const raw = [st.biasCardId, st.avatarCardId];
-    for (let i = 0; i < raw.length; i++) {
-      if (raw[i] == null) continue;
-      const id = Number(raw[i]);
-      if (isFinite(id) && Array.isArray(st.cards) && st.cards.includes(id)) return id;
-    }
-    return null;
+  function heroById(id) {
+    return HEROES.find(h => h.id === id) || HEROES[0];
   }
 
-  /* Эры, открытые по количеству пройденных уроков. */
-  function getUnlockedEras() {
-    const doneCount = Array.isArray(st.done) ? st.done.length : 0;
-    return (Array.isArray(ERAS) ? ERAS : [])
-      .filter(e => doneCount >= (ERA_UNLOCK_LESSONS[e.id] || 0))
-      .map(e => e.id);
+  function episodesForHero(charId) {
+    return getEpisodes().filter(e => e.charId === charId);
   }
 
-  function renderProfileAvatarHtml(size = 56) {
-    const lg = getRank(st.xp);
-    const cards = Array.isArray(window.CARDS) ? window.CARDS : [];
-    const biasId = currentBiasCardId();
-    const c = biasId != null ? cards.find(x => x.id === biasId) : null;
-    const inner = c
-      ? `<div class="av-frame-in" style="background:${c.grad}">${c.img
-        ? `<img src="${escapeHtml(c.img)}" alt="${escapeHtml(c.tag)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${escapeHtml(c.tag)}</span>`
-        : `<span>${escapeHtml(c.tag)}</span>`}</div>`
-      : `<div class="av-frame-in" style="background:linear-gradient(135deg,#ff2e93,#7b2cbf)">🎧</div>`;
-    return `<div class="av-frame ${lg.cls}" style="width:${size}px;height:${size}px">${inner}<div class="av-league-badge" style="color:${lg.color}">${lg.icon}</div></div>`;
+  function isEpisodeOpen(ep, level) {
+    return !!ep && Number(ep.unlockLevel || 1) <= level;
   }
+
+  function unreadEpisodesForHero(charId, level) {
+    const read = Array.isArray(st.readEpisodes) ? st.readEpisodes : [];
+    return episodesForHero(charId).filter(ep => isEpisodeOpen(ep, level) && !read.includes(ep.id));
+  }
+
+  function heroAvatarHtml(hero, size = 84) {
+    return `<div class="hero-ava-frame" style="width:${size}px;height:${size}px;background:${hero.grad}">
+      <div class="hero-ava">
+        <img src="${escapeHtml(hero.img)}" alt="${escapeHtml(hero.name)}"
+          onerror="this.style.display='none';this.parentNode.textContent='${escapeHtml(hero.name.slice(0, 1))}'">
+      </div>
+    </div>`;
+  }
+
+  /* Модалка героя: открытые эпизоды + условие открытия следующего. */
+  function openHeroModal(charId) {
+    haptic('light');
+    initStudioState();
+    const hero = heroById(charId);
+    const lvl = getStudioLevel(st.xp);
+    const eps = episodesForHero(charId);
+    const read = Array.isArray(st.readEpisodes) ? st.readEpisodes : [];
+    const modal = document.getElementById('pack-modal');
+    if (!modal) return;
+
+    const items = eps.map(ep => {
+      const open = isEpisodeOpen(ep, lvl.level);
+      const done = read.includes(ep.id);
+      if (!open) {
+        return `<div class="ep-item">
+          <span class="ep-tag">${escapeHtml(ep.tag)}</span>
+          <div class="ep-title">${escapeHtml(ep.title)}</div>
+          <div class="ep-locked">🔒 Откроется на уровне ${Number(ep.unlockLevel) || 1}</div>
+        </div>`;
+      }
+      return `<div class="ep-item ${done ? 'read' : ''}" data-ep="${escapeHtml(ep.id)}">
+        <span class="ep-tag">${escapeHtml(ep.tag)}</span>
+        <div class="ep-title">${escapeHtml(ep.title)}</div>
+        <div class="ep-text">${escapeHtml(ep.text)}</div>
+        <div class="ep-phrase">«${escapeHtml(ep.phraseKr)}» ${escapeHtml(ep.phraseTr)} — ${escapeHtml(ep.phraseRu)}
+          <button class="btn ghost ep-audio" data-file="${escapeHtml(ep.file)}" data-kr="${escapeHtml(ep.phraseKr)}" style="padding:5px 9px;font-size:12px">🔊</button>
+        </div>
+        <div class="ep-actions">
+          ${done
+            ? '<span class="ep-done">✓ Прочитано</span>'
+            : `<button class="btn cyan ep-read" data-ep="${escapeHtml(ep.id)}">Прочитано (+10 🎵)</button>`}
+        </div>
+      </div>`;
+    }).join('');
+
+    const nextLocked = eps.find(ep => Number(ep.unlockLevel || 1) > lvl.level);
+    const nextNote = nextLocked
+      ? `<div class="studio-empty" style="margin-top:4px">Следующий эпизод откроется на уровне <b style="color:#fff">${Number(nextLocked.unlockLevel)}</b> (сейчас ${lvl.level}).</div>`
+      : '';
+
+    modal.classList.add('open');
+    modal.innerHTML = `
+      <div class="card-box" style="width:100%;max-width:360px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            ${heroAvatarHtml(hero, 52)}
+            <div>
+              <div style="font-size:16px;font-weight:900">${escapeHtml(hero.name)}</div>
+              <div style="font-size:11px;color:var(--muted)">${escapeHtml(hero.role)} • ${lvl.level} ур.</div>
+            </div>
+          </div>
+          <button class="close-btn" style="width:30px;height:30px;font-size:14px" onclick="document.getElementById('pack-modal').classList.remove('open')">✕</button>
+        </div>
+        <div style="max-height:60vh;overflow-y:auto;margin-top:10px">
+          ${items || '<div class="studio-empty">У этого героя пока нет эпизодов.</div>'}
+          ${nextNote}
+        </div>
+      </div>`;
+
+    modal.querySelectorAll('.ep-audio').forEach(btn => {
+      btn.onclick = () => playAudio(btn.dataset.file, btn.dataset.kr);
+    });
+    modal.querySelectorAll('.ep-read').forEach(btn => {
+      btn.onclick = () => {
+        const epId = btn.dataset.ep;
+        if (!Array.isArray(st.readEpisodes)) st.readEpisodes = [];
+        if (st.readEpisodes.includes(epId)) return;
+        st.readEpisodes.push(epId);
+        st.coins = (Number(st.coins) || 0) + 10;
+        save(); haptic('ok'); sfx('ok');
+        alert('Эпизод прочитан: +10 🎵');
+        openHeroModal(charId);
+        renderBinder();
+      };
+    });
+  }
+  window.openHeroModal = openHeroModal;
 
   function initStudioState() {
     if (!st.agencyName) st.agencyName = "Neon Wave Ent.";
@@ -586,6 +707,8 @@
     if (!Array.isArray(st.monthlyBadges)) st.monthlyBadges = [];
     if (!Array.isArray(st.cards)) st.cards = [];
     if (!Array.isArray(st.done)) st.done = [];
+    if (!Array.isArray(st.readEpisodes)) st.readEpisodes = [];
+    st.readEpisodes = st.readEpisodes.map(String).filter((id, i, arr) => id && arr.indexOf(id) === i);
 
     /* Старые сохранения хранили коллекцию в st.inv ({id: {silver: 1}}).
        Переносим ключи в простой массив st.cards без дублей. */
@@ -978,59 +1101,41 @@
 
   window.getLastWeeklyResult = function () { return window.__weeklyLastResult || null; };
 
-  /* Бонус Биаса: если выбрана карта из коллекции — +15% 🎵 за уроки. */
+  /* Старой гачи и бонуса Биаса больше нет: команда не даёт пассивных процентов. */
   window.getTeamBonuses = function () {
-    const activeBias = currentBiasCardId();
-    return activeBias != null
-      ? { coinsPct: 15, hypePct: 0 }
-      : { coinsPct: 0, hypePct: 0 };
+    return { coinsPct: 0, hypePct: 0 };
   };
 
   window.getEnergyRegenMs = function () {
     return BASE_ENERGY_MS;
   };
 
-  /* ====== ПРОФИЛЬ СТУДИИ И 12 РАНГОВ АГЕНТСТВА ====== */
+  /* ====== ПРОФИЛЬ СТУДИИ: СМЕНА НАЗВАНИЯ И УРОВЕНЬ ====== */
   window.openProfileModal = function () {
     haptic('light');
     initStudioState();
-    const lg = getRank(st.xp);
-    const biasId = currentBiasCardId();
-    const bias = biasId != null
-      ? (Array.isArray(window.CARDS) ? window.CARDS : []).find(c => c.id === biasId)
-      : null;
+    const lvl = getStudioLevel(st.xp);
 
     profileOverlay.innerHTML = `
       <div class="ov-header">
         <div>
-          <div style="font-size:16px;font-weight:900">Профиль агентства</div>
-          <div style="font-size:11px;color:var(--muted)">ID: ${escapeHtml(st.producerId)} • ${st.xp} XP</div>
+          <div style="font-size:16px;font-weight:900">Студия</div>
+          <div style="font-size:11px;color:var(--muted)">ID: ${escapeHtml(st.producerId)} • ${lvl.xp} XP</div>
         </div>
         <button class="close-btn" style="width:32px;height:32px;font-size:15px" onclick="document.getElementById('profile-overlay').classList.remove('open')">✕</button>
       </div>
       <div class="ov-scroll">
         <div class="card-box" style="margin-bottom:14px;text-align:center">
-          <div style="display:flex;justify-content:center;margin-bottom:10px">${renderProfileAvatarHtml(76)}</div>
+          <div style="font-size:34px;margin-bottom:8px">${lvl.era.icon}</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Название твоей студии</div>
           <div style="display:flex;gap:8px;margin-bottom:10px">
             <input id="prof-name-in" class="onb-input" style="margin:0;padding:9px 12px;font-size:14px;text-align:left" maxlength="22" value="${escapeHtml(st.agencyName)}">
             <button class="btn cyan" id="prof-name-save" style="padding:0 14px">Ок</button>
           </div>
-          <div style="font-size:11px;color:var(--muted)">${bias ? `Биас: ${escapeHtml(bias.name)} ★ • +15% 🎵` : 'Биас не выбран — открой Альбом и нажми на карту'}</div>
+          <div class="studio-lvl" style="color:${lvl.era.color}">Уровень ${lvl.level} • ${escapeHtml(lvl.era.name)}</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${lvl.pct}%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">${lvl.nextXp ? `До следующего уровня: ${lvl.toNext} XP` : 'Максимальный уровень студии'}</div>
         </div>
-
-        <div class="quest-sec"><span>Ранги агентства (открывают рамки профиля)</span><span style="color:${lg.color}">${lg.name}</span></div>
-        ${XP_RANKS.map(l => {
-          const isCur = l.id === lg.id, reached = st.xp >= l.minXp;
-          return `<div class="rank-step ${isCur ? 'current' : (reached ? 'reached' : '')}" style="${isCur ? `border-color:${l.color}` : ''}">
-            <div class="rs-ico" style="color:${l.color}">${l.icon}</div>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:800;color:${reached ? '#fff' : 'var(--muted)'}">${l.name} ${isCur ? '<span style="font-size:10px;color:var(--cyan)">• Сейчас</span>' : ''}</div>
-              <div style="font-size:11px;color:var(--muted)">От ${l.minXp} XP</div>
-            </div>
-            <div style="font-size:12px;font-weight:800;color:${reached ? 'var(--success)' : 'var(--muted)'}">${reached ? '✓' : '🔒'}</div>
-          </div>`;
-        }).join('')}
       </div>`;
 
     document.getElementById('prof-name-save').onclick = () => {
@@ -1042,42 +1147,35 @@
 
   window.setStudioSubTab = function (t) { haptic('light'); studioSubTab = t; renderBinder(); };
 
-  /* ====== ЭКРАН СТУДИИ (2 ВКЛАДКИ: АЛЬБОМ | КВЕСТЫ) ====== */
+  /* ====== ЭКРАН СТУДИИ (2 ВКЛАДКИ: ГРУППА | КВЕСТЫ) ====== */
   window.renderBinder = function () {
-    if (!Array.isArray(window.CARDS)) return;
     initStudioState();
     const screen = document.getElementById('screen-binder');
-    const lg = getRank(st.xp);
-    const nextLg = XP_RANKS.find(x => x.minXp > st.xp);
-    const pctNext = nextLg ? Math.min(100, Math.round(((st.xp - lg.minXp) / Math.max(1, nextLg.minXp - lg.minXp)) * 100)) : 100;
-    const biasId = currentBiasCardId();
+    if (!screen) return;
+    const lvl = getStudioLevel(st.xp);
     const vocab = Array.isArray(window.VOCAB) ? window.VOCAB : [];
     const rules = Array.isArray(window.RULES) ? window.RULES : [];
     const learnedWords = vocab.filter(w => st.done.includes(w.l)).length;
     const learnedRules = rules.filter(r => st.done.includes(r.l)).length;
-    const cs = st.cases || { silver: 0, gold: 0, platinum: 0 };
-    const boxStock = (cs.silver || 0) + (cs.gold || 0) + (cs.platinum || 0);
 
     screen.innerHTML = `
-      <div class="agency-card ${lg.cls}" onclick="openProfileModal()">
-        <div class="agency-head">
-          ${renderProfileAvatarHtml(56)}
-          <div style="flex:1;min-width:0">
-            <div class="agency-name">${escapeHtml(st.agencyName)}</div>
-            <div class="league-pill" style="color:${lg.color}" onclick="event.stopPropagation()">${lg.icon} ${lg.name} • ${st.xp} XP</div>
-            <div class="agency-id" style="margin-top:5px">🔥 Серия ${st.streak.count} дн.<span class="freeze-pill ${st.streakFreeze > 0 ? '' : 'empty'}" onclick="event.stopPropagation();showStreakInfo()">❄️ ${st.streakFreeze}/${STREAK_FREEZE_MAX}</span></div>
-          </div>
-          <div style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:900">›</div>
+      <div class="studio-head">
+        <div class="studio-name" onclick="openProfileModal()">
+          <span>${escapeHtml(st.agencyName)}</span>
+          <span class="sn-arrow">›</span>
         </div>
-        ${nextLg ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px">До «${nextLg.name}»: ${nextLg.minXp - st.xp} XP</div><div class="bar-bg"><div class="bar-fill" style="width:${pctNext}%"></div></div>` : ''}
-        <div class="agency-buffs" style="flex-direction:column;gap:5px;align-items:flex-start">
-          <span>Слов выучено: <b style="color:#fff">${learnedWords}/${vocab.length}</b> • Правил: <b style="color:#fff">${learnedRules}/${rules.length}</b></span>
-          <span style="color:${biasId != null ? 'var(--success)' : 'var(--gold)'};font-weight:800">${biasId != null ? 'Биас: +15% 🎵' : 'Выбери Биаса ниже'}</span>
+        <div class="studio-lvl" style="color:${lvl.era.color};border-color:${lvl.era.color}66">${lvl.era.icon} Уровень ${lvl.level} • ${escapeHtml(lvl.era.name)}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${lvl.pct}%"></div></div>
+        <div class="studio-xp-note">${lvl.nextXp ? `До уровня ${lvl.level + 1}: ${lvl.toNext} XP` : 'Максимальный уровень студии'}</div>
+        <div class="studio-meta">
+          <span>🔥 Серия ${st.streak.count} дн.</span>
+          <span class="freeze-pill ${st.streakFreeze > 0 ? '' : 'empty'}" onclick="showStreakInfo()">❄️ ${st.streakFreeze}/${STREAK_FREEZE_MAX}</span>
+          <span>Слов: <b style="color:#fff">${learnedWords}/${vocab.length}</b> • Правил: <b style="color:#fff">${learnedRules}/${rules.length}</b></span>
         </div>
       </div>
 
       <div class="mode-switch">
-        <button class="mode-btn ${studioSubTab === 'group' ? 'active' : ''}" onclick="setStudioSubTab('group')">Альбом</button>
+        <button class="mode-btn ${studioSubTab === 'group' ? 'active' : ''}" onclick="setStudioSubTab('group')">Группа</button>
         <button class="mode-btn ${studioSubTab === 'quests' ? 'active' : ''}" onclick="setStudioSubTab('quests')">Квесты</button>
       </div>
       <div id="studio-sub-body"></div>
@@ -1086,62 +1184,27 @@
     const sub = document.getElementById('studio-sub-body');
 
     if (studioSubTab === 'group') {
-      const unlockedEras = getUnlockedEras();
       sub.innerHTML = `
-        <button class="btn gold full" id="album-open-box" style="margin-bottom:12px">${boxStock > 0 ? `Открыть Виниловый бокс • в запасе: ${boxStock}` : 'Открыть Виниловый бокс (50 🎵)'}</button>
-        <div id="eras-cards-wrap"></div>
+        <div class="hero-grid">
+          ${HEROES.map(h => {
+            const eps = episodesForHero(h.id);
+            const openEps = eps.filter(ep => isEpisodeOpen(ep, lvl.level));
+            const unread = unreadEpisodesForHero(h.id, lvl.level);
+            const firstLevel = eps.length ? Math.min(...eps.map(ep => Number(ep.unlockLevel) || 1)) : 1;
+            const caption = !eps.length ? 'Скоро новые заметки'
+              : (openEps.length === 0 ? `Эпизоды с уровня ${firstLevel}`
+                : (unread.length ? `${unread.length} новых 💬` : `${openEps.length} из ${eps.length} прочитано`));
+            return `<div class="hero-card" onclick="openHeroModal('${h.id}')" style="border-color:${unread.length ? h.color + '66' : 'rgba(255,255,255,0.07)'}">
+              ${unread.length ? '<div class="hero-cloud">💬</div>' : ''}
+              ${heroAvatarHtml(h, 84)}
+              <div class="hero-name">${escapeHtml(h.name)}</div>
+              <div class="hero-role">${escapeHtml(h.role)}</div>
+              <div class="hero-count">${caption}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="studio-empty">Тапни по герою, чтобы прочитать живые заметки о Корее и K-pop. За каждый эпизод — <b style="color:#fde68a">+10 🎵</b>.</div>
       `;
-
-      const openBtn = document.getElementById('album-open-box');
-      if (openBtn) openBtn.onclick = () => {
-        haptic('light');
-        const nextType = (cs.platinum || 0) > 0 ? 'platinum' : ((cs.gold || 0) > 0 ? 'gold' : 'silver');
-        window.openCaseModal(nextType);
-      };
-
-      const erasWrap = document.getElementById('eras-cards-wrap');
-      (Array.isArray(ERAS) ? ERAS : []).forEach(era => {
-        const isUnlocked = unlockedEras.includes(era.id);
-        const eraCards = CARDS.filter(c => c.album === era.id);
-        const ownedInEra = eraCards.filter(c => st.cards.includes(c.id));
-
-        const head = document.createElement('div');
-        head.className = 'era-head';
-        head.innerHTML = `<span style="color:${isUnlocked ? era.color : 'var(--muted)'}">${isUnlocked ? '' : '🔒 '}${era.name}</span><span style="color:var(--muted)">${ownedInEra.length}/${eraCards.length}</span>`;
-        erasWrap.appendChild(head);
-
-        if (!isUnlocked) {
-          const need = ERA_UNLOCK_LESSONS[era.id] || 0;
-          const lockBox = document.createElement('div');
-          lockBox.className = 'card-box';
-          lockBox.style.cssText = 'padding:12px;font-size:12px;color:var(--muted);margin-bottom:8px';
-          lockBox.innerHTML = `Откроется после <b style="color:#fff">${need}</b> пройденных уроков (сейчас: ${st.done.length})`;
-          erasWrap.appendChild(lockBox);
-          return;
-        }
-
-        const grid = document.createElement('div');
-        grid.className = 'cards-mini-grid';
-        eraCards.forEach(c => {
-          const el = document.createElement('div');
-          if (!st.cards.includes(c.id)) {
-            el.className = 'mini-card locked-card';
-            el.innerHTML = `<div class="pc-art" style="background:#181326"><div class="pc-monogram" style="opacity:0.25">?</div></div><div class="mc-name">???</div><div class="mc-sub">${c.r}</div>`;
-          } else {
-            const rarity = RARITY[c.r] || RARITY.R;
-            const isBias = biasId === c.id;
-            el.className = `mini-card ${rarity.cls}`;
-            el.innerHTML = `
-              ${isBias ? '<div class="mc-dot"></div>' : ''}
-              ${cardArtHtml(c)}
-              <div class="mc-name">${escapeHtml(c.name.split('•')[0].trim())}${isBias ? ' ★' : ''}</div>
-              <div class="mc-sub" style="color:${rarity.color}">${rarity.name}${isBias ? ' • Биас' : ''}</div>`;
-            el.onclick = () => openArtistModal(c.id);
-          }
-          grid.appendChild(el);
-        });
-        erasWrap.appendChild(grid);
-      });
     }
 
     if (studioSubTab === 'quests') {
@@ -1234,40 +1297,6 @@
       };
     }
   };
-
-  /* ====== МОДАЛКА КАРТЫ И ВЫБОР БИАСА ====== */
-  function openArtistModal(cardId) {
-    const c = CARDS.find(x => x.id === cardId);
-    if (!c) return;
-    const rarity = RARITY[c.r] || RARITY.R;
-    const isBias = currentBiasCardId() === c.id;
-    const modal = document.getElementById('pack-modal');
-    modal.classList.add('open');
-    modal.innerHTML = `
-      <div class="card-box zoom-modal">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span style="font-size:12px;font-weight:900;color:${rarity.color}">${rarity.name} • ${escapeHtml(c.role || '')}</span>
-          <button class="close-btn" style="width:30px;height:30px;font-size:14px" onclick="document.getElementById('pack-modal').classList.remove('open')">✕</button>
-        </div>
-        <div class="photocard ${rarity.cls}" style="margin-bottom:10px;cursor:default">
-          <div class="pc-rarity" style="color:${rarity.color}">${rarity.name}</div>
-          ${cardArtHtml(c)}
-          <div class="pc-name" style="font-size:16px">${escapeHtml(c.name)}</div>
-          <div class="pc-role">${escapeHtml(c.role || '')}</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px;font-size:13px;color:#ff99d6">«${escapeHtml(c.quoteKr || '')}»<button class="btn ghost" id="card-audio" style="padding:6px 10px;font-size:13px">🔊</button></div>
-        <button class="btn ${isBias ? 'ghost' : 'cyan'} full" id="do-bias">${isBias ? 'Мой Биас ★' : 'Сделать Биасом'}</button>
-      </div>`;
-
-    document.getElementById('card-audio').onclick = () => playAudio(c.quoteFile, c.quoteKr);
-    document.getElementById('do-bias').onclick = () => {
-      st.biasCardId = c.id;
-      st.avatarCardId = c.id;   // рамка профиля показывает того же артиста
-      save(); haptic('ok'); sfx('ok');
-      renderBinder();
-      openArtistModal(c.id);
-    };
-  }
 
   /* ====== МАГАЗИН (ЭКРАН) + АНИМАЦИЯ ВИНИЛОВОГО БОКСА ====== */
   const XP_BOOST_PRICE = 120;
@@ -1378,100 +1407,6 @@
     if (ef) ef.onclick = () => buyEnergy(5, 100);
   };
 
-  /* Рандом редкости по типу бокса: gold/platinum чаще дают SR и SSR. */
-  function rollRarity(type) {
-    const w = RARITY_WEIGHTS[type] || RARITY_WEIGHTS.silver;
-    const r = Math.random() * 100;
-    if (r < w.R) return 'R';
-    if (r < w.R + w.SR) return 'SR';
-    return 'SSR';
-  }
-
-  window.openCaseModal = function (type) {
-    initStudioState();
-    const prices = { silver: 50, gold: 120, platinum: 0 };
-    if (st.cases[type] > 0) st.cases[type]--;
-    else {
-      if (type === 'platinum') return alert('Платиновый бокс выдаётся за Экзамен!');
-      if (st.coins < prices[type]) return alert(`Нужно ${prices[type]} 🎵!`);
-      st.coins -= prices[type];
-    }
-    save(); haptic('medium');
-
-    const titleMap = { silver: "SILVER EDITION", gold: "GOLD EDITION", platinum: "PLATINUM EDITION" };
-    const boxUrl = BOX_IMAGES[type];
-    const vinylUrl = BOX_IMAGES.vinyl;
-    const modal = document.getElementById('pack-modal');
-    modal.classList.add('open');
-
-    modal.innerHTML = `
-      <div style="font-size:12px;color:var(--cyan);font-weight:800;letter-spacing:1.5px;margin-bottom:10px">НАЖМИ НА АЛЬБОМ, ЧТОБЫ ДОСТАТЬ ПЛАСТИНКУ</div>
-      <div class="album-stage" id="album-stage">
-        <div class="album-vinyl" style="${vinylUrl ? `background:url('${vinylUrl}') no-repeat center;background-size:contain;border:none;box-shadow:none;` : ''}">
-          ${vinylUrl ? '' : '<div class="vinyl-label"><div class="vinyl-hole"></div></div>'}
-        </div>
-        <div class="album-sleeve ${type} ${boxUrl ? '' : 'no-img'}" style="${boxUrl ? `background-image:url('${boxUrl}');box-shadow:none;` : ''}">
-          ${boxUrl ? '' : `
-            <div style="font-size:10px;font-weight:900;letter-spacing:1.5px;opacity:0.8">K-POP LINGUA</div>
-            <div style="font-size:18px;font-weight:900;line-height:1.1">${titleMap[type]}</div>
-            <div style="font-size:10px;opacity:0.65">LIMITED VINYL BOX</div>
-          `}
-        </div>
-      </div>`;
-
-    document.getElementById('album-stage').onclick = () => {
-      const stg = document.getElementById('album-stage');
-      if (stg.classList.contains('opening')) return;
-      stg.classList.add('opening');
-      haptic('heavy'); sfx('tap');
-
-      /* Ждём пока винил полностью выедет и раскрутится (650мс) + короткая пауза -> БУМ! */
-      setTimeout(() => {
-        triggerFlash(() => {
-          const unlockedEras = getUnlockedEras();
-          const pool = CARDS.filter(c => unlockedEras.includes(c.album));
-          if (!pool.length) return alert('Для этой Эры пока нет карт. Пройди первые уроки, чтобы открыть Эры.');
-
-          /* Сначала выбираем редкость по шансам бокса, потом карту этой редкости. */
-          const rarityKey = rollRarity(type);
-          let candidates = pool.filter(c => c.r === rarityKey);
-          if (!candidates.length) candidates = pool;
-          const c = candidates[Math.floor(Math.random() * candidates.length)];
-          const rarity = RARITY[c.r] || RARITY.R;
-
-          let message;
-          if (st.cards.includes(c.id)) {
-            st.coins += rarity.dupeCoins;
-            message = `Повторка • +${rarity.dupeCoins} 🎵`;
-          } else {
-            st.cards.push(c.id);
-            if (currentBiasCardId() == null) {
-              st.biasCardId = c.id;
-              st.avatarCardId = c.id;
-            }
-            message = 'Новая карта в Альбоме!';
-          }
-
-          save(); renderBinder();
-          haptic('ok'); sfx('win');
-          if (c.r !== 'R') fireConfetti();
-          if (c.quoteFile) setTimeout(() => playAudio(c.quoteFile, c.quoteKr), 120);
-
-          modal.innerHTML = `
-            <div style="font-size:14px;font-weight:900;color:${rarity.color};margin-bottom:14px">${escapeHtml(message)}</div>
-            <div class="photocard ${rarity.cls} reveal-card">
-              <div class="pc-rarity" style="color:${rarity.color}">${rarity.name}</div>
-              ${cardArtHtml(c)}
-              <div class="pc-name" style="font-size:16px">${escapeHtml(c.name)}</div>
-              <div class="pc-role">${escapeHtml(c.role || '')}</div>
-              <div style="margin-top:8px;font-size:12px;color:#ff99d6">«${escapeHtml(c.quoteKr || '')}»</div>
-            </div>
-            <button class="btn full" style="max-width:240px;margin-top:18px" onclick="document.getElementById('pack-modal').classList.remove('open')">Забрать</button>`;
-        });
-      }, 880);
-    };
-  };
-
   /* ====== ТОП: НЕДЕЛЬНЫЙ ТУРНИР ИЗ 30 СТУДИЙ (3 ЗОНЫ) ====== */
   /* Разделители зон: только короткая плашка, без номеров мест. */
   function zoneHeadHtml(cls) {
@@ -1488,8 +1423,12 @@
         lastZone = z.cls;
         html += zoneHeadHtml(z.cls);
       }
-      html += `<div class="wr-row ${r.me ? 'me' : ''} ${r.pos <= 3 ? 'top' : ''}">
-        <div class="wr-pos">#${r.pos}</div>
+      const medalCls = r.pos <= 3 ? `top top${r.pos}` : '';
+      const posHtml = r.pos <= 3
+        ? `<div class="wr-pos medal">${r.pos}</div>`
+        : `<div class="wr-pos">#${r.pos}</div>`;
+      html += `<div class="wr-row ${r.me ? 'me' : ''} ${medalCls}">
+        ${posHtml}
         <div class="wr-ava" style="background:${r.grad}">${escapeHtml(r.initials)}</div>
         <div class="wr-name">${escapeHtml(r.name)}${r.me ? ' • ты' : ''}</div>
         <div class="wr-score">${r.xp} XP</div>
@@ -1554,7 +1493,7 @@
     const rows = weeklyBoard();
     const left = weekStartTs() + 7 * 86400000 - Date.now();
 
-    /* Ряд из 5 значков: пройденные и текущая — цветные, будущие — серые. */
+    /* Ряд из 5 крупных значков: пройденные и текущая — цветные, будущие — серые. */
     const strip = WEEKLY_LEAGUES.map((lg, i) => {
       const cls = i === leagueIdx ? 'cur' : (i < leagueIdx ? 'past' : 'next');
       return `<div class="lg-step ${cls}" style="--c:${lg.color}">
@@ -1569,7 +1508,7 @@
         <div class="lg-now-name" style="color:${league.color}">${league.icon} ${escapeHtml(league.name)}</div>
         <div class="lg-now-side">
           <div class="lg-timer" id="wr-timer">⏱️ ${fmtWeekLeft(left)}</div>
-          <button class="lg-prizes" onclick="openLeaguePrizes()">Награды</button>
+          <button class="lg-prizes" onclick="openLeaguePrizes()">🏆 Награды</button>
         </div>
       </div>
 
@@ -1634,7 +1573,6 @@
   window.finishLesson = function () {
     if (!curL) return origFinishLesson();
     const passed = !(curL.isExam && mistakes > 4);
-    const wasDone = st.done.includes(curL.id);
 
     // Награды (XP, Ноты 🎵, бустер ×2 и комбо) считает единая функция в index.html.
     origFinishLesson();
@@ -1648,10 +1586,6 @@
     lessonMaxCombo = 0;
     comboTrackedLessonId = null;
 
-    if (!wasDone) {
-      if (curL.isExam) st.cases.platinum++;
-      else if (curL.id % 4 === 0) st.cases.gold++;
-    }
     syncResources();
     save();
   };

@@ -3,12 +3,12 @@
    Индекс уроков и справочники грузим на старте (это мало),
    а шаги конкретного урока — только когда игрок нажал «Учить». */
 (function () {
-  const VERSION = '2';
+  const VERSION = '3';
   const cache = new Map();
 
   function getJSON(path) {
     if (!cache.has(path)) {
-      const p = fetch(`${path}?v=${VERSION}`, { cache: 'force-cache' }).then((r) => {
+      const p = fetch(`${path}?v=${VERSION}`, { cache: 'no-cache' }).then((r) => {
         if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
         return r.json();
       });
@@ -42,12 +42,13 @@
     },
 
     async init() {
-      const [modules, index, cards, vocab, rules] = await Promise.all([
+      const [modules, index, cards, vocab, rules, episodes] = await Promise.all([
         getJSON('data/modules.json'),
         getJSON('data/lessons-index.json'),
         getJSON('data/cards.json'),
         getJSON('data/vocab.json'),
-        getJSON('data/rules.json')
+        getJSON('data/rules.json'),
+        getJSON('data/episodes.json')
       ]);
       window.MODULES = modules.modules || [];
       window.LESSONS = index.lessons || [];
@@ -55,6 +56,7 @@
       window.ERAS = cards.eras || [];
       window.VOCAB = vocab.items || [];
       window.RULES = rules.items || [];
+      window.EPISODES = episodes.episodes || [];
 
       this.ready = true;
       this._waiters.splice(0).forEach((cb) => {
