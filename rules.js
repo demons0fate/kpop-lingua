@@ -6,21 +6,20 @@
   const css = document.createElement('style');
   css.textContent = `
     #screen-vocab .mode-btn { font-size: 11px; padding: 9px 4px; }
-    .rule-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s; }
-    .rule-card.open { border-color: rgba(0,229,255,0.45); }
-    .rule-card.locked { opacity: 0.45; }
+    .rule-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+    .rule-card.open { border-color: var(--accent); box-shadow: 0 4px 14px rgba(217,119,66,0.1); }
+    .rule-card.locked { opacity: 0.5; }
     .rule-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 14px; cursor: pointer; }
-    .rule-badge { display: inline-block; font-size: 10px; font-weight: 800; color: var(--cyan); background: rgba(0,229,255,0.12); padding: 2px 8px; border-radius: 7px; margin-bottom: 4px; }
-    .rule-title { font-size: 14px; font-weight: 800; color: #fff; }
+    .rule-badge { display: inline-block; font-size: 10px; font-weight: 800; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 7px; margin-bottom: 4px; }
+    .rule-title { font-size: 14px; font-weight: 800; color: var(--text); }
     .rule-sum { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .rule-arrow { font-size: 16px; color: var(--muted); font-weight: 900; transition: transform 0.2s; }
-    .rule-card.open .rule-arrow { transform: rotate(90deg); color: var(--cyan); }
-    .rule-body { padding: 0 14px 14px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 13px; line-height: 1.5; color: #e6e1f2; }
-    .rule-formula { background: rgba(138,43,226,0.18); border: 1px solid rgba(138,43,226,0.45); border-radius: 10px; padding: 9px 11px; font-size: 12px; font-weight: 800; color: #fff; text-align: center; margin: 10px 0; }
+    .rule-arrow { font-size: 18px; color: var(--muted); font-weight: 900; transition: transform 0.2s; }
+    .rule-card.open .rule-arrow { transform: rotate(90deg); color: var(--accent); }
+    .rule-body { padding: 0 14px 14px; border-top: 1px solid var(--border); font-size: 13px; line-height: 1.55; color: var(--text); }
+    .rule-formula { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 12px; font-weight: 800; color: var(--text); text-align: center; margin: 10px 0; }
   `;
   document.head.appendChild(css);
 
-  /* Добавляем 4-ю кнопку «Правила» в переключатель Словаря */
   const sw = document.querySelector('#screen-vocab .mode-switch');
   if (sw && !document.getElementById('vmode-rules')) {
     const cardsBtn = document.getElementById('vmode-cards');
